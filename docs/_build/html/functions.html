@@ -1,0 +1,338 @@
+
+
+<!doctype html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>EngCoolProp Functions &#8212; EngCoolProp 0.1.0 documentation</title>
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="copyright" title="Copyright" href="copyright.html" />
+    <link rel="next" title="Copyright" href="copyright.html" />
+    <link rel="prev" title="QuickStart" href="quickstart.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="copyright.html" title="Copyright"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="QuickStart"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/generic_logo.svg" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="quickstart.html">QuickStart</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">EngCoolProp Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.html"
+                        title="previous chapter">QuickStart</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="copyright.html"
+                        title="next chapter">Copyright</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/functions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-engcoolprop.ec_fluid">
+<span id="engcoolprop-functions"></span><h1>EngCoolProp Functions<a class="headerlink" href="#module-engcoolprop.ec_fluid" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="engcoolprop.ec_fluid.EC_Fluid">
+<em class="property">class </em><code class="descclassname">engcoolprop.ec_fluid.</code><code class="descname">EC_Fluid</code><span class="sig-paren">(</span><em>symbol='N2'</em>, <em>T=530.0</em>, <em>P=1000.0</em>, <em>child=1</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.Qdescription">
+<code class="descname">Qdescription</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.Qdescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>CoolProp Q values areDifferent from RefProp:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#:c == RefProp ==</span>
+<span class="c1">#:c        q--vapor quality on a MOLAR basis [moles vapor/total moles]</span>
+<span class="c1">#:c           q &lt; 0 indicates subcooled (compressed) liquid</span>
+<span class="c1">#:c           q = 0 indicates saturated liquid</span>
+<span class="c1">#:c           q = 1 indicates saturated vapor</span>
+<span class="c1">#:c           q &gt; 1 indicates superheated vapor</span>
+<span class="c1">#:c           q = -998 subcooled liquid, but quality not defined (p &gt; Pc)</span>
+<span class="c1">#:c           q = 999 indicates supercritical state (t &gt; Tc) and (p &gt; Pc)</span>
+<span class="c1">#:</span>
+<span class="c1">#:c == CoolProp ==</span>
+<span class="c1">#:c        q--vapor quality on a MASS basis [mass vapor/total mass]</span>
+<span class="c1">#:c           q  indicates subcooled (compressed) liquid</span>
+<span class="c1">#:c           q  indicates saturated liquid</span>
+<span class="c1">#:c           q  indicates saturated vapor</span>
+<span class="c1">#:c           q &lt; 0 indicates superheated vapor OR (p &gt; Pc)</span>
+<span class="c1">#:c           q  subcooled liquid, but quality not defined (p &gt; Pc)</span>
+<span class="c1">#:c           q  indicates supercritical state (t &gt; Tc) and (p &gt; Pc)</span>
+<span class="c1">#:</span>
+<span class="c1">#:Phase String            Phase Region</span>
+<span class="c1">#:liquid                  p &lt; pcrit &amp; T &lt; Tcrit ; above saturation</span>
+<span class="c1">#:gas                     p &lt; pcrit &amp; T &lt; Tcrit ; below saturation</span>
+<span class="c1">#:twophase                p &lt; pcrit &amp; T &lt; Tcrit ; mixed liquid/gas</span>
+<span class="c1">#:</span>
+<span class="c1">#:supercritical_liquid    p &gt; pcrit &amp; T &lt; Tcrit</span>
+<span class="c1">#:supercritical_gas       p &lt; pcrit &amp; T &gt; Tcrit</span>
+<span class="c1">#:supercritical           p &gt; pcrit &amp; T &gt; Tcrit        </span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.constH_newP">
+<code class="descname">constH_newP</code><span class="sig-paren">(</span><em>P=1000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.constH_newP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at new P with same H</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.constP_newH">
+<code class="descname">constP_newH</code><span class="sig-paren">(</span><em>H</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.constP_newH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at new H with same P</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.constS_newP">
+<code class="descname">constS_newP</code><span class="sig-paren">(</span><em>P=1000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.constS_newP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at new P with same S</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.dH_FromHref">
+<code class="descname">dH_FromHref</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.dH_FromHref" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate Enthalpy difference from self.Href</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.dHvap">
+<code class="descname">dHvap</code><span class="sig-paren">(</span><em>P=None</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.dHvap" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate heat of vaporization at input P or self.P (BTU/lbm)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.gamma">
+<code class="descname">gamma</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.gamma" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate ratio of specific heats from Cp and Cv</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.getSatP">
+<code class="descname">getSatP</code><span class="sig-paren">(</span><em>T=None</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.getSatP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Psat for Liquid at input T or self.T</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.getSatPandDens">
+<code class="descname">getSatPandDens</code><span class="sig-paren">(</span><em>T=None</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.getSatPandDens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Psat and rho for both Liquid &amp; Gas at input T or self.T</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.getSatT">
+<code class="descname">getSatT</code><span class="sig-paren">(</span><em>P=None</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.getSatT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Tsat for Liquid at input P or self.P</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.getSatTandDens">
+<code class="descname">getSatTandDens</code><span class="sig-paren">(</span><em>P=None</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.getSatTandDens" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get Tsat and Density for both Liquid &amp; Gas at input P or self.P</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.getStrTPD">
+<code class="descname">getStrTPD</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTPD" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a string from the TPDEHS properties</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.getStrTPDphase">
+<code class="descname">getStrTPDphase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTPDphase" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a string from the TPDEHS properties</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.getStrTransport">
+<code class="descname">getStrTransport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a string from the Transport properties</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.html_desc">
+<code class="descname">html_desc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.html_desc" title="Permalink to this definition">¶</a></dt>
+<dd><p>html output a multiline property summary with units</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.initFromObj">
+<code class="descname">initFromObj</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.initFromObj" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize properties from another n_fluid object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.newDE">
+<code class="descname">newDE</code><span class="sig-paren">(</span><em>D=0.1</em>, <em>E=50.0</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.newDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at new D and E</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.printCriticalProps">
+<code class="descname">printCriticalProps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.printCriticalProps" title="Permalink to this definition">¶</a></dt>
+<dd><p>print a multiline property summary with units</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.printProps">
+<code class="descname">printProps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.printProps" title="Permalink to this definition">¶</a></dt>
+<dd><p>print a multiline property summary with units</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.printTPD">
+<code class="descname">printTPD</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.printTPD" title="Permalink to this definition">¶</a></dt>
+<dd><p>print a string from the TPDEHS properties</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.restoreFromDup">
+<code class="descname">restoreFromDup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.restoreFromDup" title="Permalink to this definition">¶</a></dt>
+<dd><p>restore properties from duplicate n_fluid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.saveToDup">
+<code class="descname">saveToDup</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.saveToDup" title="Permalink to this definition">¶</a></dt>
+<dd><p>save properties to duplicate n_fluid</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.setPD">
+<code class="descname">setPD</code><span class="sig-paren">(</span><em>P=1000.0</em>, <em>D=0.01</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.setPD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc props from P and D</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.setPH">
+<code class="descname">setPH</code><span class="sig-paren">(</span><em>P</em>, <em>H</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.setPH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at P and H</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.setProps">
+<code class="descname">setProps</code><span class="sig-paren">(</span><em>**inpD</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.setProps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic call using any two of supported inputs T,P,D,Q,S,H,E:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#: for example</span>
+<span class="c1">#: ec.setProps(T=100, D=0.1)</span>
+<span class="c1">#: ec.setProps(D=0.1, T=100)</span>
+<span class="c1">#: ec.setProps(P=100, H=20)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.setPropsFromAS">
+<code class="descname">setPropsFromAS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.setPropsFromAS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Assume that self.AS (AbstractState) has been set elsewhere.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.setTD">
+<code class="descname">setTD</code><span class="sig-paren">(</span><em>T=530.0</em>, <em>D=0.01</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.setTD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc P from T and D</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.setTP">
+<code class="descname">setTP</code><span class="sig-paren">(</span><em>T=530.0</em>, <em>P=1000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.setTP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc props from T and P</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="engcoolprop.ec_fluid.EC_Fluid.surfTen">
+<code class="descname">surfTen</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid.surfTen" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate surface tension, lbf / inch</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="copyright.html" title="Copyright"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.html" title="QuickStart"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; <a href="copyright.html">Copyright</a> 2015, Charlie Taylor.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.4.
+    </div>
+  </body>
+</html>
