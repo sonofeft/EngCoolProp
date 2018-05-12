@@ -15,6 +15,7 @@ Contents:
    :maxdepth: 2
 
    quickstart
+   examples
    functions
    copyright
    authors

@@ -1,0 +1,9 @@
+future
+numpy
+coolprop
+
+[dev]
+check-manifest
+
+[test]
+coverage
