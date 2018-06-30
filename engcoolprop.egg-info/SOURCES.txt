@@ -19,6 +19,9 @@ engcoolprop.egg-info/dependency_links.txt
 engcoolprop.egg-info/not-zip-safe
 engcoolprop.egg-info/requires.txt
 engcoolprop.egg-info/top_level.txt
+engcoolprop/examples/crit_props.py
 engcoolprop/examples/example_1.py
+engcoolprop/examples/example_2.py
+engcoolprop/examples/sample_plot.py
 engcoolprop/tests/__init__.py
 engcoolprop/tests/test_ec_fluid.py

@@ -1,0 +1,105 @@
+________tk_nosy UNITTEST RUN# 4_________
+
+{Item #1} test_dHvap_N2, 
+ERROR in dHvap P=1000, Pc=492.519
+
+{Item #2} test_dHvap_O2, 
+ERROR in dHvap P=1000, Pc=731.425
+
+{Item #3} test_getSatP_N2, 
+ERROR... getSatP called with T>Tc.   T=None,   Tc=227.146
+
+{Item #4} test_getSatP_O2, 
+ERROR... getSatP called with T>Tc.   T=None,   Tc=278.246
+
+{Item #5} test_getSatPandDens_N2, 
+ERROR... getSatP called with T>Tc.   T=None,   Tc=227.146
+
+{Item #6} test_getSatPandDens_O2, 
+ERROR... getSatP called with T>Tc.   T=None,   Tc=278.246
+
+{Item #7} test_getSatT_N2, 
+ERROR... getSatT called with P>Pc.   P=None,   Pc=492.519
+
+{Item #8} test_getSatT_O2, 
+ERROR... getSatT called with P>Pc.   P=None,   Pc=731.425
+ERROR... getSatT called with P>Pc.   P=None,   Pc=731.425
+
+{Item #9} test_getSatTandDens_N2, 
+ERROR... getSatT called with P>Pc.   P=None,   Pc=492.519
+
+{Item #10} test_getSatTandDens_O2, 
+ERROR... getSatT called with P>Pc.   P=None,   Pc=731.425
+
+{Item #11} test_printCriticalProps_N2, 
+Critical Properties for fluid Nitrogen (N2)
+Tc= 227.146 degR
+Tnbp= 139.239 degR
+Pc = 492.519 psia
+Dc = 19.5587 lbm/cu ft
+MW= 28.0135  lbm/lbmmole
+Zc =0.289458  (-)
+Hc = 12.5678  BTU/lbm
+Ec = 7.90791  BTU/lbm
+Sc = 1.00671  BTU/lbm degR
+Ac = 444.365  ft/sec
+Vc = 1.22997  viscosity [1.0E5 * lb/ft-sec]
+Cc = 886.461  thermal conductivity [BTU/ft-hr-R]
+
+{Item #12} test_printCriticalProps_O2, 
+Critical Properties for fluid Oxygen (O2)
+Tc= 278.246 degR
+Tnbp= 162.338 degR
+Pc = 731.425 psia
+Dc = 27.2276 lbm/cu ft
+MW= 31.9988  lbm/lbmmole
+Zc =0.287943  (-)
+Hc = 13.9393  BTU/lbm
+Ec = 8.96846  BTU/lbm
+Sc = 1.00335  BTU/lbm degR
+Ac = 502.502  ft/sec
+Vc =     nan  viscosity [1.0E5 * lb/ft-sec]
+Cc =0.0221309  thermal conductivity [BTU/ft-hr-R]
+
+{Item #13} test_printProps_N2, 
+State Point for fluid Nitrogen (N2)
+T =     530  degR (Tc= 227.146 , Tnbp= 139.239 Ttriple= 113.672 )
+P =    1000  psia (Pc= 492.519 )
+D = 4.94659  lbm/cu ft (Dc= 19.5587 )
+E = 87.6732  BTU/lbm
+H = 125.083  BTU/lbm
+S = 1.31927  BTU/lbm degR
+Cv=0.181367  BTU/lbm degR
+Cp=0.275948  BTU/lbm degR
+g = 1.52149  Cp/Cv (-)
+A = 1198.41  ft/sec
+V = 1.27232  viscosity [1.0E5 * lb/ft-sec]
+C =0.0167546  thermal conductivity [BTU/ft-hr-R]
+MW= 28.0135  lbm/lbmmole
+Q =      -1  Vapor Quality (mass fraction gas)
+Z =0.995923  (-)
+
+{Item #14} test_printProps_O2, 
+State Point for fluid Oxygen (O2)
+T =     530  degR (Tc= 278.246 , Tnbp= 162.338 Ttriple= 97.8498 )
+P =    1000  psia (Pc= 731.425 )
+D = 5.86053  lbm/cu ft (Dc= 27.2276 )
+E = 76.1981  BTU/lbm
+H = 107.774  BTU/lbm
+S = 1.25462  BTU/lbm degR
+Cv=0.161096  BTU/lbm degR
+Cp=0.247971  BTU/lbm degR
+g = 1.53928  Cp/Cv (-)
+A = 1085.38  ft/sec
+V = 1.47634  viscosity [1.0E5 * lb/ft-sec]
+C =0.0170064  thermal conductivity [BTU/ft-hr-R]
+MW= 31.9988  lbm/lbmmole
+Q =      -1  Vapor Quality (mass fraction gas)
+Z =  0.9602  (-)
+
+{Item #15} test_printTPD_N2, 
+N2 T= 530.0 P=1000.0 D=4.9466 E= 87.67 H=125.08 S=1.319 Q=-1.00
+
+{Item #16} test_printTPD_O2, 
+O2 T= 530.0 P=1000.0 D=5.8605 E= 76.20 H=107.77 S=1.255 Q=-1.00
+

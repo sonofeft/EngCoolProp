@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: engcoolprop
-Version: 0.1.0
+Version: 0.1.1
 Summary: EngCoolProp is a python Engineering Units wrapper around the CoolProp project.
 Home-page: http://engcoolprop.readthedocs.org/en/latest/
 Author: Charlie Taylor

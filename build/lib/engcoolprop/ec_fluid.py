@@ -254,7 +254,7 @@ class EC_Fluid(object):
         INPUTS, ec1, ec2 = call_tuplesD[key]
         P1si = toSI_callD[ec1]( inpD[ec1] )
         P2si = toSI_callD[ec2]( inpD[ec2] )
-        print('Calling',key,'with',call_tuplesD[key],'P1si=%g,  P2si=%g'%(P1si, P2si))
+        #print('Calling',key,'with',call_tuplesD[key],'P1si=%g,  P2si=%g'%(P1si, P2si))
         
         self.AS.update(INPUTS, P1si, P2si)
         
@@ -609,7 +609,7 @@ class EC_Fluid(object):
 
     def printCriticalProps(self):
         '''print a multiline property summary with units'''
-        print("for fluid",self.name,"("+self.symbol+")")
+        print("Critical Properties for fluid",self.name,"("+self.symbol+")")
         print("Tc=%8g"%self.Tc,"degR")
         print("Tnbp=%8g"%self.Tnbp,"degR")
         print("Pc =%8g"%self.Pc,"psia")
@@ -644,7 +644,7 @@ class EC_Fluid(object):
 
     def printProps(self):
         '''print a multiline property summary with units'''
-        print("for fluid",self.name,"("+self.symbol+")", sep=' ')
+        print("State Point for fluid",self.name,"("+self.symbol+")", sep=' ')
         print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=%8g"%self.Tnbp, "Ttriple=%8g"%self.Ttriple,")", sep=' ')
         print("P =%8g"%self.P," psia (Pc=%8g"%self.Pc,")", sep=' ')
         print("D =%8g"%self.D," lbm/cu ft (Dc=%8g"%self.Dc,")", sep=' ')

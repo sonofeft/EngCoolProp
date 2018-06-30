@@ -206,18 +206,30 @@ class EC_Fluid(object):
 
         self.Tmin =  Teng_fromSI( AS.Tmin() )
         self.Tmax =  Teng_fromSI( AS.Tmax() )
+        #self.Pmin = Peng_fromSI( AS.pmin() ) # missing from AbstractState
         self.Pmax = Peng_fromSI( AS.pmax() )
         
         dcIdeal = self.Pc*self.WtMol/self.Tc/10.729
         self.Zc = dcIdeal / self.Dc
         
-        TnbpSI = PropsSI("T", "P", 101325, "Q", Q_GAS, self.symbol)
-        self.Tnbp = Teng_fromSI( TnbpSI )
-        
-        if self.Tnbp < 536.67:
-            self.Tref = self.Tnbp
+        try:
+            TnbpSI = PropsSI("T", "P", 101325, "Q", Q_LIQUID, self.symbol)
+            self.good_nbp = True
+            self.Tnbp = Teng_fromSI( TnbpSI )
+        except:
+            #print('WARNING... "%s" failed Normal Boiling Point Calculation.'%self.symbol)
+            Ttriple = PropsSI(self.symbol,'Ttriple')
+            #print('    Using Triple Point = %g degK as Tref'%Ttriple)
+            self.good_nbp = False
+            self.Tnbp = 'N/A'
+            
+        if self.good_nbp:
+            if self.Tnbp < 536.67:
+                self.Tref = self.Tnbp # if NBP is low, use NBP as ref
+            else:
+                self.Tref = 536.67 # 536.67R = (SATP, Standard Ambient T P) = 77F, 25C 
         else:
-            self.Tref = 536.67
+            self.Tref = Teng_fromSI( Ttriple ) + 0.1
         self.Pref = 14.7
         
         #print( 'About to call setTP #1 with Tref, Pref=',self.Tref,self.Pref )
@@ -281,8 +293,15 @@ class EC_Fluid(object):
         self.Cv = CPeng_fromSI( AS.cvmass() )
         self.Cp = CPeng_fromSI( AS.cpmass() )
         self.sonicV = Aeng_fromSI( AS.speed_sound() )
-        self.Visc = Veng_fromSI( AS.viscosity() ) * 1.0E5
-        self.Cond = CondEng_fromSI( AS.conductivity() )
+        
+        try:
+            self.Visc = Veng_fromSI( AS.viscosity() ) * 1.0E5
+        except:
+            self.Visc = 0.0
+        try:
+            self.Cond = CondEng_fromSI( AS.conductivity() )
+        except:
+            self.Cond = 0.0
         self.Q = AS.Q()  # maybe use AS.PIP() ???
         
         dIdeal = self.P*self.WtMol/self.T/10.729
@@ -611,7 +630,11 @@ class EC_Fluid(object):
         '''print a multiline property summary with units'''
         print("Critical Properties for fluid",self.name,"("+self.symbol+")")
         print("Tc=%8g"%self.Tc,"degR")
-        print("Tnbp=%8g"%self.Tnbp,"degR")
+        if self.good_nbp:
+            print("Tnbp=%8g"%self.Tnbp,"degR")
+        else:
+            print("Tnbp=N/A")
+            
         print("Pc =%8g"%self.Pc,"psia")
         print("Dc =%8g"%self.Dc,"lbm/cu ft")
         print("MW=%8g"%self.WtMol," lbm/lbmmole")
@@ -645,7 +668,11 @@ class EC_Fluid(object):
     def printProps(self):
         '''print a multiline property summary with units'''
         print("State Point for fluid",self.name,"("+self.symbol+")", sep=' ')
-        print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=%8g"%self.Tnbp, "Ttriple=%8g"%self.Ttriple,")", sep=' ')
+        if self.good_nbp:
+            print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=%8g"%self.Tnbp, "Ttriple=%8g"%self.Ttriple,")", sep=' ')
+        else:
+            print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=N/A", "Ttriple=%8g"%self.Ttriple,")", sep=' ')
+            
         print("P =%8g"%self.P," psia (Pc=%8g"%self.Pc,")", sep=' ')
         print("D =%8g"%self.D," lbm/cu ft (Dc=%8g"%self.Dc,")", sep=' ')
         print("E =%8g"%self.E," BTU/lbm", sep=' ')
@@ -664,15 +691,16 @@ class EC_Fluid(object):
 
 if __name__ == '__main__':
     
-    C = EC_Fluid()
+    C = EC_Fluid( symbol='CO2' )
     
-    C.setProps(T=120., Q=0.5)
+    C.setProps(T=C.Tref, Q=0.5)
     #C.setProps(P=5., Q=0.5)
     #C.setProps(H=120., E=0.5) # illegal inputs
     
     C.printProps()
-    print('-'*55)
+    print('='*55)
     
+    C = EC_Fluid( symbol='N2' )
     
     
     print(C.getStrTransport())
@@ -737,10 +765,10 @@ if __name__ == '__main__':
     print('_'*55)
     Tsat = C.getSatT( P=14.7 )
     print('Tnpb =',C.Tnbp,'   Tsat @1atm =',Tsat)
-    #C.setTP(C.Tnbp, 14.7)
+    C.setTP(C.Tnbp, 14.7)
     for P in [5.0, 14.7, 50.0]:
         dH = C.dHvap( P=P )
-        print('dH=%g at P=%g'%(dH,P) )
+        print('dHvap=%g at P=%g'%(dH,P) )
     
     
     
