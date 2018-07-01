@@ -77,7 +77,7 @@ import CoolProp.CoolProp as CP
 Q_LIQUID = 0  # all liquid
 Q_GAS = 1     # all gas
 
-def Deng_fromSI( D ):
+def Deng_fromSI( D ): # 1 lbm/ft^3 = 16.01843417 kg/m^3
     return D  / 16.01843417
 
 def DSI_fromEng( D ):
@@ -95,11 +95,11 @@ def Peng_fromSI( P ):
 def PSI_fromEng( P ):
     return P * 6894.76
 
-def UHeng_fromSI( UH ):
-    return UH * 0.000429923
+def UHeng_fromSI( UH ): # 1 BTU/lbm = 2326 J/kg
+    return UH / 2326.0
 
 def UHSI_fromEng( UH ):
-    return UH / 0.000429923
+    return UH * 2326.0
     
 def Seng_fromSI( S ):
     return S * 0.0002388461111111111
@@ -176,8 +176,115 @@ for s in dir(CP):
                             call_tuplesD[(ec1, ec2)] = (getattr(CP, s), ec1, ec2)
                             call_tuplesD[(ec2, ec1)] = (getattr(CP, s), ec1, ec2)
             
+# key = common names, value= CoolProp name
+fluidNames = {"Acetone":"Acetone", 
+              "Ammonia":"NH3", 
+              "AR":"AR", 
+              "Argon":"AR", 
+              "Benzene":"Benzene", 
+              "Butane":"Butane", 
+              "Butene":"Butene", 
+              "C(CH3)4":"Neopentane", 
+              "C2H6O":"C2H6O", 
+              "C3H6O":"Acetone", 
+              "C6H6":"Benzene", 
+              "Carbon Dioxide":"CO2", 
+              "Carbon Monoxide":"CO", 
+              "Carbonyl Sulfide":"COS",
+              "CH(CH3)3":"Isobutane", 
+              "CH2=C(CH3)2":"Isobutene", 
+              "CH2=CH-CH3":"Propylene", 
+              "CH2=CH2":"Ethylene", 
+              "CH2CCH2":"Propyne", 
+              "CH3-10(CH2)-CH3":"Dodecane", 
+              "CH3-2(CH2)-CH3":"Butane", 
+              "CH3-3(CH2)-CH3":"Pentane", 
+              "CH3-4(CH2)-CH3":"Hexane", 
+              "CH3-5(CH2)-CH3":"Heptane", 
+              "CH3-6(CH2)-CH3":"Octane", 
+              "CH3-7(CH2)-CH3":"Nonane", 
+              "CH3-8(CH2)-CH3":"Decane", 
+              "CH3-C6H5":"Toluene", 
+              "CH3-CH2-CH=CH2":"Butene", 
+              "CH3-CH=CH-CH3":"T2BUTENE", 
+              "CH3CH2CH3":"Propane", 
+              "CH3CH3":"Ethane", 
+              "CH3OH":"Methanol", 
+              "CH4":"CH4", 
+              "CO":"CO", 
+              "CO2":"CO2", 
+              "COS":"COS", 
+              "CYCLO-C3H6":"Cyclopropane", 
+              "CYCLO-C6H12":"Cyclohexane", 
+              "Cyclohexane":"Cyclohexane", 
+              "Cyclopropane":"Cyclopropane", 
+              "D2":"D2", 
+              "D2O":"D2O", 
+              "Decane":"Decane", 
+              "Deuterium":"D2", 
+              "Dodecane":"Dodecane", 
+              "Ethane":"Ethane", 
+              "ETHANOL":"ETHANOL", 
+              "Ethanol":"ETHANOL", 
+              "Ethylene":"Ethylene", 
+              "F2":"Fluorine", 
+              "Fluorine":"Fluorine", 
+              "H2":"H2", 
+              "H2O":"H2O", 
+              "H2S":"H2S", 
+              "HE":"HE", 
+              "Heavy Water":"D2O", 
+              "Helium":"HE", 
+              "Heptane":"Heptane", 
+              "Hexane":"Hexane", 
+              "Hydrogen Sulfide":"H2S", 
+              "Isobutane":"Isobutane", 
+              "Isobutene":"Isobutene", 
+              "Isohexane":"Isohexane", 
+              "Isopentane":"Isopentane", 
+              "KR":"Krypton", 
+              "Krypton":"Krypton", 
+              "Methane":"CH4", 
+              "Methanol":"Methanol", 
+              "N2":"N2", 
+              "N2O":"N2O", 
+              "NE":"Neon", 
+              "Neon":"Neon", 
+              "Neopentane":"Neopentane", 
+              "NH3":"NH3", 
+              "Nitrogen":"N2", 
+              "Nitrous Oxide":"N2O", 
+              "Nonane":"Nonane", 
+              "O2":"O2", 
+              "Octane":"Octane", 
+              "Oxygen":"O2", 
+              "ParaHydrogen":"ParaHydrogen", 
+              "Pentane":"Pentane", 
+              "PH2":"ParaHydrogen", 
+              "Propane":"Propane", 
+              "Propylene":"Propylene", 
+              "Propyne":"Propyne", 
+              "SF6":"SF6", 
+              "SO2":"SO2", 
+              "Sulfur Dioxide":"SO2", 
+              "Sulfur Hexafluoride":"SF6", 
+              "Toluene":"Toluene", 
+              "Trans-Butene":"T2BUTENE", 
+              "Water":"H2O", 
+              "XE":"XE", 
+              "Xenon":"XE", }
+
+# make upper case key values for all entries
+keyL = fluidNames.keys()     # can be legal or illegal name
+valueL = fluidNames.values() # all legal names
+for v in valueL:
+    fluidNames[v.upper()] = v # legal to legal lookup
+for k in keyL:
+    fluidNames[k.upper()] = fluidNames[k] # any key to legal lookup
 
 class EC_Fluid(object):
+    
+    fluidNames = fluidNames
 
     def __init__(self,symbol="N2",T=530.0,P=1000.0, child=1):
         '''Init generic Fluid'''
@@ -321,9 +428,39 @@ class EC_Fluid(object):
         Dsi = DSI_fromEng( D )
         Esi = UHSI_fromEng( E )
 
-        self.AS.update(CP.DmassUmass_INPUTS, Dsi, Esi)
+        try:
+            self.AS.update(CP.DmassUmass_INPUTS, Dsi, Esi)
+            self.setPropsFromAS()
+        except:
+            #print('Failed in newDE for D=%g, E=%g'%(D, E))
+            '''iterate on temperature until internal energy is correct
+            tRbegin--begining search temperature [R]'''
+            
+            if self.Ttriple > self.T:
+                Tbegin = self.Ttriple
+            else:
+                Tbegin = self.T
+            
+            tolr = 1.0E-8
+            tR = Tbegin
+            #print '---'
+            for i in range(48): # limit number of interations
+                self.setTD(T=tR, D=D)
+                dedt = self.Cv
+                eError = E-self.E
+                
+                #print 'dedt=',dedt,'  eError=',eError,'  tR=',tR
+                
+                if self.Cv==0.0:
+                    print( '==> ERROR in wrap_dll.  CV=0 for tR=',tR,'  Dpcf=',Dpcf)
+                
+                tR = tR + eError / dedt
+                
+                if abs(eError) <= tolr:
+                    break
+            
         
-        self.setPropsFromAS()
+        
         
     def constP_newH(self,H):
         '''Calc properties at new H with same P'''
@@ -688,6 +825,12 @@ class EC_Fluid(object):
         print("Q =%8g"%self.Q," Vapor Quality (mass fraction gas)", sep=' ')
         print("Z =%8g"%self.Z," (-)", sep=' ')
 
+    def compressibility(self):
+        '''returns Z'''
+        return self.Z
+
+    def dH_FromHZero(self):
+        return self.H - self.Href
 
 if __name__ == '__main__':
     

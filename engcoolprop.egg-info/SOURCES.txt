@@ -13,6 +13,7 @@ engcoolprop/__init__.py
 engcoolprop/_version.py
 engcoolprop/ec_fluid.py
 engcoolprop/ec_fluid.py.bak
+engcoolprop/nosetests_details.txt
 engcoolprop.egg-info/PKG-INFO
 engcoolprop.egg-info/SOURCES.txt
 engcoolprop.egg-info/dependency_links.txt
