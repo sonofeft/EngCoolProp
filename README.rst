@@ -8,8 +8,7 @@
 .. |Image2Link| image:: https://img.shields.io/pypi/v/EngCoolProp.svg
 .. _Image2Link: https://pypi.python.org/pypi/engcoolprop
 
-.. |Image3Link| image:: https://img.shields.io/pypi/pyversions/EngCoolProp.svg
-.. _Image3Link: https://wiki.python.org/moin/Python2orPython3
+.. image:: https://img.shields.io/badge/python-2.7|3.6|3.7-blue
 
 .. |Image4Link| image:: https://img.shields.io/pypi/l/EngCoolProp.svg
 .. _Image4Link: https://pypi.python.org/pypi/engcoolprop
