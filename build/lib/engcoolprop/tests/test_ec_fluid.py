@@ -458,6 +458,7 @@ class MyTest(unittest.TestCase):
     def test_surfTen_N2(self):
         '''Check call to surfTen with fluid N2'''
         ec = EC_Fluid( symbol="N2", P=80, T=200 )
+        ec.setProps(T=200, Q=0)
         st = ec.surfTen()        
         self.assertAlmostEqual(st, 1.1726812809126956e-05, places=5)
 
@@ -467,6 +468,7 @@ class MyTest(unittest.TestCase):
     def test_surfTen_O2(self):
         '''Check call to surfTen with fluid O2'''
         ec = EC_Fluid( symbol="O2", P=80, T=200 )
+        ec.setProps(T=200, Q=0)
         st = ec.surfTen()
         self.assertAlmostEqual(st, 4.638551601014212e-05, places=5)
 

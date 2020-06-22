@@ -26,7 +26,7 @@ EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and
     Cp = Heat Capacity (const. P) = BTU/lbm degR
     g = Ratio of Specific Heats (Cp/Cv) = (-)
     A = Sonic Velocity = ft/sec
-    V = Viscosity = 1.0E5 * lb/ft-sec
+    V = Viscosity = 1.0E5 * lbm/ft-sec
     C = Thermal Conductivity = BTU/ft-hr-R
     MW = Molecular Weight = lbm/lbmmole
     Q = Quality (mass fraction gas) = (-)
@@ -120,10 +120,11 @@ def ASI_fromEng( A ):
     return A / 3.28084
 
 def Veng_fromSI( V ):
-    return V * 0.6719689751
+    # AS.viscosity() returns Pa*s
+    return V * 0.6719689751 / 32.174 # convert from Pa*s to lbm/ft/sec
     
 def VSI_fromEng( V ):
-    return V / 0.6719689751
+    return V * 32.174 / 0.6719689751
 
 def CondEng_fromSI( Cond ):
     return Cond * 0.578176
@@ -309,6 +310,10 @@ class EC_Fluid(object):
         self.Pc = Peng_fromSI( AS.p_critical() )
         self.Dc = Deng_fromSI( AS.rhomass_critical() )
         self.Ttriple = Teng_fromSI( AS.Ttriple() )
+        try:
+            self.Tfreeze = Teng_fromSI( AS.T_freeze() )
+        except:
+            self.Tfreeze = self.Ttriple
 
 
         self.Tmin =  Teng_fromSI( AS.Tmin() )
@@ -796,7 +801,7 @@ class EC_Fluid(object):
             sonicV = Aeng_fromSI( self.dup.AS.speed_sound() )
             print("Ac =%8g"%sonicV," ft/sec", sep=' ')
             Visc = Veng_fromSI( self.dup.AS.viscosity() ) * 1.0E5
-            print("Vc =%8g"%Visc," viscosity [1.0E5 * lb/ft-sec]", sep=' ')
+            print("Vc =%8g"%Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
             Cond = CondEng_fromSI( self.dup.AS.conductivity() )
             print("Cc =%8g"%Cond," thermal conductivity [BTU/ft-hr-R]", sep=' ')
         except:
@@ -819,7 +824,7 @@ class EC_Fluid(object):
         print("Cp=%8g"%self.Cp," BTU/lbm degR", sep=' ')
         print("g =%8g"%self.gamma()," Cp/Cv (-)", sep=' ')
         print("A =%8g"%self.sonicV," ft/sec", sep=' ')
-        print("V =%8g"%self.Visc," viscosity [1.0E5 * lb/ft-sec]", sep=' ')
+        print("V =%8g"%self.Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
         print("C =%8g"%self.Cond," thermal conductivity [BTU/ft-hr-R]", sep=' ')
         print("MW=%8g"%self.WtMol," lbm/lbmmole", sep=' ')
         print("Q =%8g"%self.Q," Vapor Quality (mass fraction gas)", sep=' ')

@@ -1,20 +1,25 @@
 
 
-.. image:: https://travis-ci.org/sonofeft/EngCoolProp.svg?branch=master
-    :target: https://travis-ci.org/sonofeft/EngCoolProp
+|Image1Link|_ |Image2Link|_ |Image3Link|_ |Image4Link|_
 
-.. image:: https://img.shields.io/pypi/v/EngCoolProp.svg
-    :target: https://pypi.python.org/pypi/engcoolprop
-        
-.. image:: https://img.shields.io/pypi/pyversions/EngCoolProp.svg
-    :target: https://wiki.python.org/moin/Python2orPython3
+.. |Image1Link| image:: https://img.shields.io/travis/sonofeft/EngCoolProp.svg
+.. _Image1Link: https://travis-ci.org/sonofeft/EngCoolProp
 
-.. image:: https://img.shields.io/pypi/l/EngCoolProp.svg
-    :target: https://pypi.python.org/pypi/engcoolprop
+.. |Image2Link| image:: https://img.shields.io/pypi/v/EngCoolProp.svg
+.. _Image2Link: https://pypi.python.org/pypi/engcoolprop
+
+.. |Image3Link| image:: https://img.shields.io/pypi/pyversions/EngCoolProp.svg
+.. _Image3Link: https://wiki.python.org/moin/Python2orPython3
+
+.. |Image4Link| image:: https://img.shields.io/pypi/l/EngCoolProp.svg
+.. _Image4Link: https://pypi.python.org/pypi/engcoolprop
 
 
-EngCoolProp Interfaces The Coolprop Project with English Units
-==============================================================
+.. _internal_index:
+
+EngCoolProp 
+===========
+Interfaces The Coolprop Project with English Units
 
 `CoolProp <http://www.coolprop.org/dev/index.html>`_ uses SI units for calculating
 fluid properties. For those of us in industries that rely on English/Engineering

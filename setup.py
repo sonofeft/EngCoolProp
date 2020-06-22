@@ -42,6 +42,8 @@ exec( open( target_file ).read() )  # creates local __version__ variable
 setup(
     name='engcoolprop',
     version = __version__,  # METADATA_RESET:    version = '<<version>>',
+    
+    long_description_content_type='text/x-rst'
 
     description = 'EngCoolProp is a python Engineering Units wrapper around the CoolProp project.',
     long_description = long_description,
