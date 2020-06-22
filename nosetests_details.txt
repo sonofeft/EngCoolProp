@@ -1,4 +1,4 @@
-________tk_nosy UNITTEST RUN# 2_________
+________tk_nosy UNITTEST RUN# 8_________
 
 {Item #1} test_dHvap_N2, 
 ERROR in dHvap P=1000, Pc=492.519
@@ -43,7 +43,7 @@ Hc = 12.5678  BTU/lbm
 Ec =  7.9079  BTU/lbm
 Sc = 1.00671  BTU/lbm degR
 Ac = 444.365  ft/sec
-Vc = 1.22997  viscosity [1.0E5 * lb/ft-sec]
+Vc =0.0382286  viscosity [1.0E5 * lbm/ft-sec]
 Cc = 886.461  thermal conductivity [BTU/ft-hr-R]
 
 {Item #12} test_printCriticalProps_O2, 
@@ -58,7 +58,7 @@ Hc = 13.9393  BTU/lbm
 Ec = 8.96846  BTU/lbm
 Sc = 1.00335  BTU/lbm degR
 Ac = 502.502  ft/sec
-Vc =     nan  viscosity [1.0E5 * lb/ft-sec]
+Vc =     nan  viscosity [1.0E5 * lbm/ft-sec]
 Cc =0.0221309  thermal conductivity [BTU/ft-hr-R]
 
 {Item #13} test_printProps_N2, 
@@ -73,7 +73,7 @@ Cv=0.181367  BTU/lbm degR
 Cp=0.275948  BTU/lbm degR
 g = 1.52149  Cp/Cv (-)
 A = 1198.41  ft/sec
-V = 1.27232  viscosity [1.0E5 * lb/ft-sec]
+V =0.039545  viscosity [1.0E5 * lbm/ft-sec]
 C =0.0167546  thermal conductivity [BTU/ft-hr-R]
 MW= 28.0135  lbm/lbmmole
 Q =      -1  Vapor Quality (mass fraction gas)
@@ -91,7 +91,7 @@ Cv=0.161096  BTU/lbm degR
 Cp=0.247971  BTU/lbm degR
 g = 1.53928  Cp/Cv (-)
 A = 1085.38  ft/sec
-V = 1.47634  viscosity [1.0E5 * lb/ft-sec]
+V =0.0458861  viscosity [1.0E5 * lbm/ft-sec]
 C =0.0170064  thermal conductivity [BTU/ft-hr-R]
 MW= 31.9988  lbm/lbmmole
 Q =      -1  Vapor Quality (mass fraction gas)

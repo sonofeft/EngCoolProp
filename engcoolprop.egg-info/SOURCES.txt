@@ -23,6 +23,7 @@ engcoolprop.egg-info/top_level.txt
 engcoolprop/examples/crit_props.py
 engcoolprop/examples/example_1.py
 engcoolprop/examples/example_2.py
+engcoolprop/examples/example_h2.py
 engcoolprop/examples/sample_plot.py
 engcoolprop/tests/__init__.py
 engcoolprop/tests/test_ec_fluid.py

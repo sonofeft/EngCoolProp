@@ -275,8 +275,8 @@ fluidNames = {"Acetone":"Acetone",
               "Xenon":"XE", }
 
 # make upper case key values for all entries
-keyL = fluidNames.keys()     # can be legal or illegal name
-valueL = fluidNames.values() # all legal names
+keyL = list(fluidNames.keys())     # can be legal or illegal name
+valueL = list(fluidNames.values()) # all legal names
 for v in valueL:
     fluidNames[v.upper()] = v # legal to legal lookup
 for k in keyL:

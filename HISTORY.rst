@@ -7,6 +7,20 @@ History
 GitHub Log
 ----------
 
+* June 19, 2020
+    - (by: sonofeft) 
+        - Fixed some units issues and some unit test issues
+
+* Jul 1, 2018
+    - (by: sonofeft) 
+        - Fixed python 3.x error
+
+ 
+* Jun 30, 2018
+    - (by: sonofeft) 
+        - handle missing Visc, Cond and NBP
+        - detect missing visc, cond and NBP
+
 * May 12, 2018
     - (by: sonofeft) 
         - added python 3.5 to travis.yml
@@ -16,7 +30,6 @@ GitHub Log
         - First Commit of Project
     - (by: Charlie Taylor) 
         - Initial commit
-
 
 * May 10, 2018
     - (by: sonofeft)
