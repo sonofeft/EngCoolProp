@@ -43,10 +43,10 @@ setup(
     name='engcoolprop',
     version = __version__,  # METADATA_RESET:    version = '<<version>>',
     
-    long_description_content_type='text/x-rst'
 
     description = 'EngCoolProp is a python Engineering Units wrapper around the CoolProp project.',
     long_description = long_description,
+    long_description_content_type='text/x-rst',
 
     # The project's main homepage.
     url='http://engcoolprop.readthedocs.org/en/latest/',

@@ -101,3 +101,9 @@ ENV/
 # mypy
 .mypy_cache/
 .coverage
+*.whl
+*.gz
+*.whl
+*.exe
+dist/engcoolprop-0.1.0-py2.py3-none-any.whl
+dist/engcoolprop-0.1.0.tar.gz
