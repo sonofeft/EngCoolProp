@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: engcoolprop
-Version: 0.1.6
+Version: 0.1.7
 Summary: EngCoolProp is a python Engineering Units wrapper around the CoolProp project.
 Home-page: http://engcoolprop.readthedocs.org/en/latest/
 Download-URL: https://github.com/sonofeft/EngCoolProp
@@ -21,10 +21,15 @@ Classifier: Programming Language :: Python :: 3
 Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7
 Description-Content-Type: text/x-rst
-Provides-Extra: dev
-Provides-Extra: test
 License-File: LICENSE.txt
 License-File: AUTHORS.rst
+Requires-Dist: future
+Requires-Dist: numpy
+Requires-Dist: coolprop
+Provides-Extra: dev
+Requires-Dist: check-manifest; extra == "dev"
+Provides-Extra: test
+Requires-Dist: coverage; extra == "test"
 
 
 
