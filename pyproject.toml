@@ -18,6 +18,9 @@ readme = "README.rst"
 [tool.poetry.dependencies]
 python = "*"
 coverage = {optional = true, version = "*"}
+numpy
+coolprop
+
 
 [tool.poetry.dev-dependencies]
 check-manifest = "*"
