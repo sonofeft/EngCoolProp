@@ -7,6 +7,10 @@ History
 GitHub Log
 ----------
 
+* Jan 21, 2025
+    - (by: sonofeft) 
+        - Fixed Viscosity conversion factor from Pa-s to lbm/ft-sec
+
 * June 19, 2020
     - (by: sonofeft) 
         - Fixed some units issues and some unit test issues

@@ -121,7 +121,7 @@ def ASI_fromEng( A ):
 
 def Veng_fromSI( V ):
     # AS.viscosity() returns Pa*s
-    return V * 0.6719689751 / 32.174 # convert from Pa*s to lbm/ft/sec
+    return V * 0.6719689751 # convert from Pa*s to lbm/ft/sec
     
 def VSI_fromEng( V ):
     return V * 32.174 / 0.6719689751
