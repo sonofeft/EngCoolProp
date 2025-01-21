@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "engcoolprop"
+version = "0.1.7"
+description = "EngCoolProp is a python Engineering Units wrapper around the CoolProp project."
+license = "GPL-3"
+keywords = ["engcoolprop", "setuptools", "development"]
+classifiers = ["Development Status :: 4 - Beta", "Operating System :: OS Independent", 
+    "Intended Audience :: Developers", "Intended Audience :: End Users/Desktop", 
+    "Topic :: Software Development :: Build Tools", 
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)", 
+    "Programming Language :: Python :: 3", "Programming Language :: Python :: 3.7", 
+    "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", 
+    "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11"]
+homepage = "http://engcoolprop.readthedocs.org/en/latest/"
+authors = ["Charlie Taylor <cet@appliedpython.com>"]
+readme = "README.rst"
+
+[tool.poetry.dependencies]
+python = "*"
+coverage = {optional = true, version = "*"}
+
+[tool.poetry.dev-dependencies]
+check-manifest = "*"
+
+[tool.poetry.extras]
+test = ["coverage"]
