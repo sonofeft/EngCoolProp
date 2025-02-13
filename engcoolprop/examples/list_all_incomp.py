@@ -1,4 +1,5 @@
 import CoolProp.CoolProp as CP
+from CoolProp import __incompressibles_pure__, __incompressibles_solution__
 
 def list_incompressible_fluids():
     # Retrieve the list of all available fluids
@@ -16,3 +17,9 @@ if __name__ == "__main__":
 
     solutions = list_incompressible_solutions()
     print( solutions )
+
+    print( '.'*66 )
+    print( '__incompressibles_pure__ =', __incompressibles_pure__)
+
+    print( '.'*66 )
+    print( '__incompressibles_solution__ =', __incompressibles_solution__)

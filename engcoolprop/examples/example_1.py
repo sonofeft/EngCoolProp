@@ -6,3 +6,5 @@ ec.setProps(T=500., D=0.1)
 
 ec.printProps() # Print state point at given T,P
 
+import engcoolprop.ec_fluid
+print( dir( engcoolprop.ec_fluid ) )

@@ -67,13 +67,12 @@ __email__ = "cet@appliedpython.com"
 __status__ = "4 - Beta" # "3 - Alpha", "4 - Beta", "5 - Production/Stable"
 
 #
-import string, os, sys
-from math import exp
+import os
 from CoolProp.CoolProp import PropsSI
 from CoolProp import AbstractState
 import CoolProp.CoolProp as CP
 
-# Q values to indicat all liquid or gas
+# Q values to indicate all liquid or gas
 Q_LIQUID = 0  # all liquid
 Q_GAS = 1     # all gas
 
@@ -439,7 +438,7 @@ class EC_Fluid(object):
         except:
             #print('Failed in newDE for D=%g, E=%g'%(D, E))
             '''iterate on temperature until internal energy is correct
-            tRbegin--begining search temperature [R]'''
+            tRbegin--beginning search temperature [R]'''
             
             if self.Ttriple > self.T:
                 Tbegin = self.Ttriple
@@ -449,7 +448,7 @@ class EC_Fluid(object):
             tolr = 1.0E-8
             tR = Tbegin
             #print '---'
-            for i in range(48): # limit number of interations
+            for i in range(48): # limit number of iterations
                 self.setTD(T=tR, D=D)
                 dedt = self.Cv
                 eError = E-self.E
@@ -457,7 +456,7 @@ class EC_Fluid(object):
                 #print 'dedt=',dedt,'  eError=',eError,'  tR=',tR
                 
                 if self.Cv==0.0:
-                    print( '==> ERROR in wrap_dll.  CV=0 for tR=',tR,'  Dpcf=',Dpcf)
+                    print( '==> ERROR in wrap_dll.  CV=0 for tR=',tR )
                 
                 tR = tR + eError / dedt
                 
