@@ -20,82 +20,15 @@ EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and
     V = Viscosity = 1.0E5 * lbm/ft-sec
     C = Thermal Conductivity = BTU/ft-hr-R
 
-  Working methods of AbstractState
-Prandtl d() = 6.51198382628316
-...........................................
-Q d() = -inf
-...........................................
-T d() = 500.0
-...........................................
-Tmax d() = 633.15
-...........................................
-Tmin d() = 238.15
-...........................................
-backend_name d() = IncompressibleBackend
-...........................................
-conductivity d() = 0.09255528717032524
-...........................................
-cpmass d() = 2288.1643758645673
-...........................................
-cvmass d() = 2288.1643758645673
-...........................................
-has_melting_line d() = False
-...........................................
-hmass d() = 408385.32146991
-...........................................
-name d() = DowQ
-...........................................
-p d() = 101325.0
-...........................................
-rhomass d() = 809.0654931667821
-...........................................
-rhomolar d() = -inf
-...........................................
-smass d() = 1039.0927361604681
-...........................................
-umass d() = 408260.0843897777
-...........................................
-viscosity d() = 0.00026340700845078847
-...........................................    
 """
 import os
-from engcoolprop.ec_fluid import (  AbstractState ,  Aeng_fromSI ,  CP ,  CPSI_fromEng ,  
-                                  CPeng_fromSI ,  CondEng_fromSI ,  CondSI_fromEng ,  DSI_fromEng ,  
-                                  Deng_fromSI ,  EchoInput ,  PSI_fromEng ,  Peng_fromSI , 
+from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  
+                                  Deng_fromSI ,   PSI_fromEng,
                                   PropsSI ,   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
-                                  Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,  VSI_fromEng ,  Veng_fromSI ,  
-                                  here ,   toSI_callD  )
+                                  Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )
 from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP
 
-
-
-# ========== build up generic call logic for "setProps" =============
-# (i.e. discover which input pairs are supported in T,P,D,Q,S,H,E)
-
-# Make so both:
-# setProps(T=530, P=100)  AND  
-# setProps(P=100, T=530) will work
-
-# map property names between EngCoolProp and CoolProp
-cool_varD = {} # index=eng, value=coolprop  (e.g.  cool_varD['H'] = 'Hmass')
-cool_varD['H'] = 'Hmass'
-cool_varD['D'] = 'Dmass'
-cool_varD['S'] = 'Smass'
-cool_varD['E'] = 'Umass'
-cool_varD['T'] = 'T'
-cool_varD['P'] = 'P'
-cool_varD['Q'] = 'Q'
-
-# map Eng to SI conversion functions for each of the fluid properties
-toSI_callD = {} # index=eng, value=conversion func (e.g. SSI_fromEng)
-toSI_callD['H'] = UHSI_fromEng
-toSI_callD['D'] = DSI_fromEng
-toSI_callD['S'] = SSI_fromEng
-toSI_callD['E'] = UHSI_fromEng
-toSI_callD['T'] = TSI_fromEng
-toSI_callD['P'] = PSI_fromEng
-toSI_callD['Q'] = EchoInput
 
 # create simple look-up that is order-independent for input pairs
 
@@ -108,16 +41,6 @@ call_tuplesD[('P', 'S')] = {'L', 'T', 'U', 'H', 'V', 'C', 'D'}
 call_tuplesD[('P', 'T')] = {'L', 'S', 'U', 'H', 'V', 'C', 'D'}
 call_tuplesD[('S', 'P')] = {'L', 'T', 'U', 'H', 'V', 'C', 'D'}
 call_tuplesD[('T', 'P')] = {'L', 'S', 'U', 'H', 'V', 'C', 'D'}          
-
-call_InputD = {}  # key:tuple indep vars (e.g. ("T","P")), value: AbstractState input (PT_INPUTS, DmassP_INPUTS, etc.)
-call_InputD[('D', 'P')] = CP.DmassP_INPUTS
-call_InputD[('H', 'P')] = CP.HmassP_INPUTS
-call_InputD[('P', 'D')] = CP.DmassP_INPUTS
-call_InputD[('P', 'H')] = CP.HmassP_INPUTS
-call_InputD[('P', 'S')] = CP.PSmass_INPUTS
-call_InputD[('P', 'T')] = CP.PT_INPUTS
-call_InputD[('S', 'P')] = CP.PSmass_INPUTS
-call_InputD[('T', 'P')] = CP.PT_INPUTS
 
 
 # make a list of all incompressible fluids in coolprop
@@ -134,10 +57,7 @@ class EC_Incomp_Fluid(object):
         if symbol not in self.fluidNameL:
             raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(self.fluidNameL) ) )
         
-        self.symbol = symbol #.upper()
-        
-        # AS = CP.AbstractState("INCOMP", symbol)
-        # self.AS = AS
+        self.symbol = symbol
 
         self.fluid = 'INCOMP::%s'%symbol
         self.T = T
@@ -161,12 +81,17 @@ class EC_Incomp_Fluid(object):
             self.dup = EC_Incomp_Fluid(symbol=self.symbol, T=self.T, P=self.P, child=0)
 
     def setProps(self, **inpD):
-        '''Generic call using any two of supported inputs T,P,D,Q,S,H,E::
+        '''Generic call using any P with supported inputs T,D,S,H
         
         #: for example
-        #: ec.setProps(T=100, D=0.1)
-        #: ec.setProps(D=0.1, T=100)
+        #: ec.setProps(T=100, P=200)
+        #: ec.setProps(D=0.1, P=100)
         #: ec.setProps(P=100, H=20)
+
+        # Make so both:
+        # setProps(T=530, P=100)  AND  
+        # setProps(P=100, T=530) will work
+
         '''
         
         key = tuple( inpD.keys() )
@@ -220,7 +145,7 @@ class EC_Incomp_Fluid(object):
         self.S = Seng_fromSI( PropsSI('S','T',Tsi,'P',Psi, self.fluid ) )
         self.Cp = CPeng_fromSI( PropsSI('C','T',Tsi,'P',Psi, self.fluid ) )
         self.Visc = Veng_fromSI( PropsSI('V','T',Tsi,'P',Psi, self.fluid ) )
-        self.Cond = CondSI_fromEng( PropsSI('L','T',Tsi,'P',Psi, self.fluid ) )
+        self.Cond = CondEng_fromSI( PropsSI('L','T',Tsi,'P',Psi, self.fluid ) )
 
 
     def newDE(self,D=0.1,E=50.0):
@@ -283,7 +208,7 @@ class EC_Incomp_Fluid(object):
         self.S = Seng_fromSI( PropsSI('S','H',Hsi,'P',Psi, self.fluid ) )
         self.Cp = CPeng_fromSI( PropsSI('C','H',Hsi,'P',Psi, self.fluid ) )
         self.Visc = Veng_fromSI( PropsSI('V','H',Hsi,'P',Psi, self.fluid ) )
-        self.Cond = CondSI_fromEng( PropsSI('L','H',Hsi,'P',Psi, self.fluid ) )
+        self.Cond = CondEng_fromSI( PropsSI('L','H',Hsi,'P',Psi, self.fluid ) )
         
     def setPS(self,P,S):
         '''Calc properties at P and H'''
@@ -292,7 +217,7 @@ class EC_Incomp_Fluid(object):
         self.S = S
         
         Psi = PSI_fromEng( P )
-        Ssi = UHSI_fromEng( S )
+        Ssi = SSI_fromEng( S )
 
         self.T = Teng_fromSI( PropsSI('T','S',Ssi,'P',Psi, self.fluid ) )
 
@@ -303,7 +228,7 @@ class EC_Incomp_Fluid(object):
         self.E = UHeng_fromSI( PropsSI('U','S',Ssi,'P',Psi, self.fluid ) )
         self.Cp = CPeng_fromSI( PropsSI('C','S',Ssi,'P',Psi, self.fluid ) )
         self.Visc = Veng_fromSI( PropsSI('V','S',Ssi,'P',Psi, self.fluid ) )
-        self.Cond = CondSI_fromEng( PropsSI('L','S',Ssi,'P',Psi, self.fluid ) )
+        self.Cond = CondEng_fromSI( PropsSI('L','S',Ssi,'P',Psi, self.fluid ) )
 
     def constS_newP(self,P=1000.0):
         '''Calc properties at new P with same S'''
@@ -312,11 +237,11 @@ class EC_Incomp_Fluid(object):
 
     def setTD(self,T=530.0,D=0.01):
         '''Calc P from T and D'''
+
+        raise Exception( 'setTD not ready' )
         
         Tsi = TSI_fromEng( T )
         Dsi = DSI_fromEng( D )
-
-        raise Exception( 'setTD not ready' )
         
     def setPD(self,P=1000.0,D=0.01):
         '''Calc props from P and D'''
@@ -334,7 +259,7 @@ class EC_Incomp_Fluid(object):
         self.S = Seng_fromSI( PropsSI('S','D',Dsi,'P',Psi, self.fluid ) )
         self.Cp = CPeng_fromSI( PropsSI('C','D',Dsi,'P',Psi, self.fluid ) )
         self.Visc = Veng_fromSI( PropsSI('V','D',Dsi,'P',Psi, self.fluid ) )
-        self.Cond = CondSI_fromEng( PropsSI('L','D',Dsi,'P',Psi, self.fluid ) )
+        self.Cond = CondEng_fromSI( PropsSI('L','D',Dsi,'P',Psi, self.fluid ) )
 
         
 
@@ -365,8 +290,8 @@ class EC_Incomp_Fluid(object):
 
     def initFromObj(self, obj):
         '''initialize properties from another n_fluid object'''
-        if  self.symbol.upper() == obj.symbol.upper():
-            #self.setTD(T=obj.T,D=obj.D)
+        if  self.symbol == obj.symbol:
+            
             self.T = obj.T
             self.P = obj.P
             self.D = obj.D
@@ -430,8 +355,6 @@ if __name__ == '__main__':
     C = EC_Incomp_Fluid( symbol='DowQ' )
     
     C.setProps(T=C.Tref, P=C.Pref)
-    #C.setProps(P=5., Q=0.5)
-    #C.setProps(H=120., E=0.5) # illegal inputs
     
     C.printProps()
     print('='*55)
