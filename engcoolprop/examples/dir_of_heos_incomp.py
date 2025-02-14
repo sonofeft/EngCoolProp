@@ -20,14 +20,17 @@ for d_str in dowqL:
             print( d_str, 'd() =', d() )
             print( '...........................................')
         except:
-            tb_str = traceback.format_exc()
-            if tb_str.find('not implement') < 0 :
-                print( d_str, type(d))
-                print( 'FAILED', d_str)
-                print( tb_str )
-                print( '...........................................')
+            if 0:
+                tb_str = traceback.format_exc()
+                if tb_str.find('not implement') < 0 :
+                    print( d_str, type(d))
+                    print( 'FAILED', d_str)
+                    print( tb_str )
+                    print( '...........................................')
 
 # print( '... .molar_mass() ...')
 # print( N2.molar_mass() )
 # print( DowQ.molar_mass() )
+
+
 
