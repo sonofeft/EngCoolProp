@@ -161,6 +161,20 @@ toSI_callD['T'] = TSI_fromEng
 toSI_callD['P'] = PSI_fromEng
 toSI_callD['Q'] = EchoInput
 
+# map SI to Eng conversion functions for each of the fluid properties
+toEng_callD = {} # index=si char, value=conversion func (e.g. Seng_fromSI)
+toEng_callD['H'] = UHeng_fromSI
+toEng_callD['D'] = Deng_fromSI
+toEng_callD['S'] = Seng_fromSI
+toEng_callD['U'] = UHeng_fromSI
+toEng_callD['T'] = Teng_fromSI
+toEng_callD['P'] = Peng_fromSI
+toEng_callD['Q'] = EchoInput
+toEng_callD['C'] = CPeng_fromSI
+toEng_callD['V'] = Veng_fromSI
+toEng_callD['L'] = CondEng_fromSI
+
+
 # create simple look-up that is order-independent for input pairs
 call_tuplesD = {} # index=(ec1, ec2), value=(XX_INPUTS, c1, c2)
 
@@ -840,7 +854,7 @@ if __name__ == '__main__':
     
     C = EC_Fluid( symbol='CO2' )
     
-    C.setProps(T=C.Tref, Q=0.5)
+    # C.setProps(T=C.Tref, Q=0.5)
     #C.setProps(P=5., Q=0.5)
     #C.setProps(H=120., E=0.5) # illegal inputs
     

@@ -23,12 +23,13 @@ EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and
 """
 import os
 from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  
-                                  Deng_fromSI ,   PSI_fromEng,
+                                  Deng_fromSI ,   PSI_fromEng, Peng_fromSI,
                                   PropsSI ,   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )
 from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP
-
+from engcoolprop.iteration_utils import calc_Tnbp
+from engcoolprop.safe_get_property import safe_get_INCOMP_prop as SC
 
 # create simple look-up that is order-independent for input pairs
 
@@ -51,7 +52,7 @@ class EC_Incomp_Fluid(object):
     
     fluidNameL = incomp_pure_fluidL
 
-    def __init__(self,symbol="DowQ",T=530.0,P=1000.0, child=1):
+    def __init__(self,symbol="DowQ" ,P=1000.0, child=1):
         '''Init generic Fluid'''
 
         if symbol not in self.fluidNameL:
@@ -60,25 +61,69 @@ class EC_Incomp_Fluid(object):
         self.symbol = symbol
 
         self.fluid = 'INCOMP::%s'%symbol
-        self.T = T
         self.P = P
         self.child = child
 
         # get temperature limits
-        self.Tmin =  Teng_fromSI( PropsSI('Tmin','T',0,'P',0,'INCOMP::%s'%symbol)  )
-        self.Tmax =  Teng_fromSI( PropsSI('Tmax','T',0,'P',0,'INCOMP::%s'%symbol) )
-        
+        self.Tmin_si =   PropsSI('Tmin','T',0,'P',0,'INCOMP::%s'%symbol)  
+        self.Tmax_si =   PropsSI('Tmax','T',0,'P',0,'INCOMP::%s'%symbol) 
+
+        self.Tmin =  Teng_fromSI( self.Tmin_si  )
+        self.Tmax =  Teng_fromSI( self.Tmax_si )
+
+        # density is invariant with pressure for INCOMP
+        Psi = PSI_fromEng( 10000.0 )
+        self.Dmax_si =  PropsSI('D','T',self.Tmin_si,'P',Psi,'INCOMP::%s'%symbol) # Dmax at Tmin
+        self.Dmin_si =  PropsSI('D','T',self.Tmax_si,'P',Psi,'INCOMP::%s'%symbol) # Dmin at Tmax
+
+        self.Dmax = Deng_fromSI( self.Dmax_si )
+        self.Dmin = Deng_fromSI( self.Dmin_si )
+
+
+        self.T = self.Tmin 
+
         # set Href by using SATP
-        self.Tref = 536.67 # 536.67R = (SATP, Standard Ambient T P) = 77F, 25C 
-        self.Pref = 14.7
+        # self.Tref = 527.67 # 536.67R = (SATP, Standard Ambient T P) = 77F, 25C 
+
+        # H = 0.0 is the arbitrary ref for the fluid
+        self.Pref = 14.696
+        Psi = PSI_fromEng( self.Pref )
+        self.Tref = Teng_fromSI( PropsSI('T','H',0.0,'P',Psi, self.fluid ) )
+
+
+        # try to get Psat at Tref, Pref
+        if 1: #try:
+            self.Psat_ref = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.Tref ) ,'Q',0, self.fluid) )
+            if self.Pref < self.Psat_ref:
+                # can't use 1 atm as Pref
+                self.Pref = 0.999 * self.Psat_ref
+                print( 'Changed Pref from 1 atm to: %g psia'%self.Pref )
+        # except:
+        #     self.Psat_ref = None
+        print( 'self.Psat_ref =', self.Psat_ref)
+
+
         self.setTP(self.Tref,self.Pref)
-        self.Href = self.H
+        self.Href = self.H # CoolProp uses this Tref, Pref for setting Href and Sref to 0
+        self.Sref = self.S
+
+        if self.Psat_ref is not None:
+            try:
+                Tnbp, error_code = calc_Tnbp( self )
+                if not error_code:
+                    self.Tnbp = Tnbp 
+                else:
+                    self.Tnbp = None 
+            except:
+                self.Tnbp = None 
+        else:
+            self.Tnbp = None 
 
         # set properties to input T and P
-        self.setTP(T,P)
+        self.setTP(self.T, self.P)
             
         if child==1: 
-            self.dup = EC_Incomp_Fluid(symbol=self.symbol, T=self.T, P=self.P, child=0)
+            self.dup = EC_Incomp_Fluid(symbol=self.symbol, P=self.P, child=0)
 
     def setProps(self, **inpD):
         '''Generic call using any P with supported inputs T,D,S,H
@@ -127,58 +172,39 @@ class EC_Incomp_Fluid(object):
     def setTP(self,T=530.0,P=1000.0):
         '''Calc props from T and P'''
         
-        # CPeng_fromSI ,  CondEng_fromSI ,  CondSI_fromEng ,  DSI_fromEng ,  
-        # Deng_fromSI ,  Peng_fromSI ,  Seng_fromSI , 
-        # Teng_fromSI ,  UHeng_fromSI ,   Veng_fromSI
 
         Tsi = TSI_fromEng( T )
         Psi = PSI_fromEng( P )
+        changed_PsiL = [] # list of good_Psi that differs from input Psi
+        def get_prop( prop_desc='H' ):
+            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='T', ind_si_val=Tsi, symbol=self.symbol )
+            if good_Psi != Psi:
+                changed_PsiL.append( good_Psi )
+            return prop
 
         self.T = T
         self.P = P
+        self.Poverride = None
 
-        self.D = Deng_fromSI( PropsSI('D','T',Tsi,'P',Psi, self.fluid ) )
+        self.D = Deng_fromSI( get_prop('D') )
         self.rho = self.D / 1728.0
 
-        self.E = UHeng_fromSI( PropsSI('U','T',Tsi,'P',Psi, self.fluid ) )
-        self.H = UHeng_fromSI( PropsSI('H','T',Tsi,'P',Psi, self.fluid ) )
-        self.S = Seng_fromSI( PropsSI('S','T',Tsi,'P',Psi, self.fluid ) )
-        self.Cp = CPeng_fromSI( PropsSI('C','T',Tsi,'P',Psi, self.fluid ) )
-        self.Visc = Veng_fromSI( PropsSI('V','T',Tsi,'P',Psi, self.fluid ) )
-        self.Cond = CondEng_fromSI( PropsSI('L','T',Tsi,'P',Psi, self.fluid ) )
+        self.E = UHeng_fromSI( get_prop('U') )
+        self.H = UHeng_fromSI( get_prop('H') )
+        self.S = Seng_fromSI( get_prop('S') )
+        self.Cp = CPeng_fromSI( get_prop('C') )
+        self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
+        self.Cond = CondEng_fromSI( get_prop('L') )
+
+        # the Psi was overridden, set Poverride
+        if changed_PsiL:
+            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
 
 
-    def newDE(self,D=0.1,E=50.0):
-        '''Calc properties at new D and E'''
-        Dsi = DSI_fromEng( D )
-        Esi = UHSI_fromEng( E )
-
-        #print('Failed in newDE for D=%g, E=%g'%(D, E))
-        '''iterate on temperature until internal energy is correct
-        tRbegin--beginning search temperature [R]'''
-        
-        Tbegin = self.T
-        
-        tolr = 1.0E-8
-        tR = Tbegin
-        #print '---'
-        for i in range(48): # limit number of iterations
-            self.setTD(T=tR, D=D)
-            dedt = self.Cv
-            eError = E-self.E
-            
-            #print 'dedt=',dedt,'  eError=',eError,'  tR=',tR
-            
-            if self.Cv==0.0:
-                print( '==> ERROR in wrap_dll.  CV=0 for tR=',tR )
-            
-            tR = tR + eError / dedt
-            
-            if abs(eError) <= tolr:
-                break
-            
-        
-        
+        try:
+            self.Psat = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.T ) ,'Q',0, self.fluid) )
+        except:
+            self.Psat = None        
         
     def constP_newH(self,H):
         '''Calc properties at new H with same P'''
@@ -195,72 +221,124 @@ class EC_Incomp_Fluid(object):
 
         self.P = P 
         self.H = H
+        self.Poverride = None
         
         Psi = PSI_fromEng( P )
         Hsi = UHSI_fromEng( H )
 
-        self.T = Teng_fromSI( PropsSI('T','H',Hsi,'P',Psi, self.fluid ) )
+        changed_PsiL = [] # list of good_Psi that differs from input Psi
+        def get_prop( prop_desc='T' ):
+            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='H', ind_si_val=Hsi, symbol=self.symbol )
+            if good_Psi != Psi:
+                changed_PsiL.append( good_Psi )
+            return prop
 
-        self.D = Deng_fromSI( PropsSI('D','H',Hsi,'P',Psi, self.fluid ) )
+        self.T = Teng_fromSI( get_prop('T') )
+
+        self.D = Deng_fromSI( get_prop('D') )
         self.rho = self.D / 1728.0
 
-        self.E = UHeng_fromSI( PropsSI('U','H',Hsi,'P',Psi, self.fluid ) )
-        self.S = Seng_fromSI( PropsSI('S','H',Hsi,'P',Psi, self.fluid ) )
-        self.Cp = CPeng_fromSI( PropsSI('C','H',Hsi,'P',Psi, self.fluid ) )
-        self.Visc = Veng_fromSI( PropsSI('V','H',Hsi,'P',Psi, self.fluid ) )
-        self.Cond = CondEng_fromSI( PropsSI('L','H',Hsi,'P',Psi, self.fluid ) )
+        self.E = UHeng_fromSI( get_prop('U') )
+        self.S = Seng_fromSI( get_prop('S') )
+        self.Cp = CPeng_fromSI( get_prop('C') )
+        self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
+        self.Cond = CondEng_fromSI( get_prop('L') )
+
+        # the Psi was overridden, set Poverride
+        if changed_PsiL:
+            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
+
+
+        try:
+            self.Psat = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.T ) ,'Q',0, self.fluid) )
+        except:
+            self.Psat = None
         
     def setPS(self,P,S):
         '''Calc properties at P and H'''
 
         self.P = P 
         self.S = S
+        self.Poverride = None
         
         Psi = PSI_fromEng( P )
         Ssi = SSI_fromEng( S )
 
-        self.T = Teng_fromSI( PropsSI('T','S',Ssi,'P',Psi, self.fluid ) )
+        changed_PsiL = [] # list of good_Psi that differs from input Psi
+        def get_prop( prop_desc='H' ):
+            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='S', ind_si_val=Ssi, symbol=self.symbol )
+            if good_Psi != Psi:
+                changed_PsiL.append( good_Psi )
+            return prop
 
-        self.D = Deng_fromSI( PropsSI('D','S',Ssi,'P',Psi, self.fluid ) )
+
+        self.T = Teng_fromSI( get_prop('T') )
+
+        self.D = Deng_fromSI( get_prop('D') )
         self.rho = self.D / 1728.0
 
-        self.H = UHeng_fromSI( PropsSI('H','S',Ssi,'P',Psi, self.fluid ) )
-        self.E = UHeng_fromSI( PropsSI('U','S',Ssi,'P',Psi, self.fluid ) )
-        self.Cp = CPeng_fromSI( PropsSI('C','S',Ssi,'P',Psi, self.fluid ) )
-        self.Visc = Veng_fromSI( PropsSI('V','S',Ssi,'P',Psi, self.fluid ) )
-        self.Cond = CondEng_fromSI( PropsSI('L','S',Ssi,'P',Psi, self.fluid ) )
+        self.H = UHeng_fromSI( get_prop('H') )
+        self.E = UHeng_fromSI( get_prop('U') )
+        
+        self.Cp = CPeng_fromSI( get_prop('C') )
+        self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
+        self.Cond = CondEng_fromSI( get_prop('L') )
+
+        # the Psi was overridden, set Poverride
+        if changed_PsiL:
+            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
+
+
+        try:
+            self.Psat = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.T ) ,'Q',0, self.fluid) )
+        except:
+            self.Psat = None
 
     def constS_newP(self,P=1000.0):
         '''Calc properties at new P with same S'''
 
         self.setPS( P, self.S )
-
-    def setTD(self,T=530.0,D=0.01):
-        '''Calc P from T and D'''
-
-        raise Exception( 'setTD not ready' )
-        
-        Tsi = TSI_fromEng( T )
-        Dsi = DSI_fromEng( D )
         
     def setPD(self,P=1000.0,D=0.01):
-        '''Calc props from P and D'''
+        '''
+        Calc props from P and D
+        NOTE: The pressure has NO EFFECT on incompressible density calc.
+        '''
 
         self.P = P 
         self.D = D
+        self.Poverride = None
         
         Psi = PSI_fromEng( P )
         Dsi = DSI_fromEng( D )
         self.rho = self.D / 1728.0
 
-        self.T = Teng_fromSI( PropsSI('T','D',Dsi,'P',Psi, self.fluid ) )
-        self.H = UHeng_fromSI( PropsSI('H','D',Dsi,'P',Psi, self.fluid ) )
-        self.E = UHeng_fromSI( PropsSI('U','D',Dsi,'P',Psi, self.fluid ) )
-        self.S = Seng_fromSI( PropsSI('S','D',Dsi,'P',Psi, self.fluid ) )
-        self.Cp = CPeng_fromSI( PropsSI('C','D',Dsi,'P',Psi, self.fluid ) )
-        self.Visc = Veng_fromSI( PropsSI('V','D',Dsi,'P',Psi, self.fluid ) )
-        self.Cond = CondEng_fromSI( PropsSI('L','D',Dsi,'P',Psi, self.fluid ) )
+        changed_PsiL = [] # list of good_Psi that differs from input Psi
+        def get_prop( prop_desc='H' ):
+            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='D', ind_si_val=Dsi, symbol=self.symbol )
+            if good_Psi != Psi:
+                changed_PsiL.append( good_Psi )
+            return prop
 
+        self.T = Teng_fromSI( get_prop('T') )
+
+        self.H = UHeng_fromSI( get_prop('H') )
+        self.E = UHeng_fromSI( get_prop('U') )
+        self.S = Seng_fromSI( get_prop('S') )
+
+        self.Cp = CPeng_fromSI( get_prop('C') )
+        self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
+        self.Cond = CondEng_fromSI( get_prop('L') )
+
+        # the Psi was overridden, set Poverride
+        if changed_PsiL:
+            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
+
+
+        try:
+            self.Psat = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.T ) ,'Q',0, self.fluid) )
+        except:
+            self.Psat = None
         
 
     def restoreFromDup(self):
@@ -275,6 +353,7 @@ class EC_Incomp_Fluid(object):
         self.Cp = self.dup.Cp
         self.Visc = self.dup.Visc
         self.Cond = self.dup.Cond
+        self.Psat = self.dup.Psat
 
     def saveToDup(self):
         '''save properties to duplicate n_fluid'''
@@ -287,6 +366,7 @@ class EC_Incomp_Fluid(object):
         self.dup.Cp = self.Cp
         self.dup.Visc = self.Visc
         self.dup.Cond = self.Cond
+        self.dup.Psat = self.Psat
 
     def initFromObj(self, obj):
         '''initialize properties from another n_fluid object'''
@@ -302,6 +382,7 @@ class EC_Incomp_Fluid(object):
             self.Cp = obj.Cp
             self.Visc = obj.Visc
             self.Cond = obj.Cond
+            self.Psat = obj.Psat
         else:
             raise Exception('Wrong fluid for initializing')
 
@@ -324,21 +405,17 @@ class EC_Incomp_Fluid(object):
         '''print a string from the TPDEHS properties'''
         print(self.getStrTPD())
 
-    def html_desc(self):
-        '''html output a multiline property summary with units'''
-        return '<table><th colspan="3" align="left">&nbsp;&nbsp;&nbsp;for fluid "'+ str(self.fluid)+ " (" + str(self.symbol) + ')"</th>' \
-            + "<tr><td>E = </td><td>" + "%5g"%self.E + "</td><td> BTU/lbm"+ "</td></tr>" \
-            + "<tr><td>H = </td><td>" + "%5g"%self.H + "</td><td> BTU/lbm"+ "</td></tr>" \
-            + "<tr><td>S = </td><td>" + "%5g"%self.S + "</td><td> BTU/lbm degR"+ "</td></tr>" \
-            + "<tr><td>Cp= </td><td>" + "%5g"%self.Cp + "</td><td>BTU/lbm degR"+ "</td></tr></table>"
-
 
     def printProps(self):
         '''print a multiline property summary with units'''
         print("State Point for fluid",self.fluid,"("+self.symbol+")", sep=' ')
         print("T =%8g"%self.T," degR,", sep=' ')
-            
-        print("P =%8g"%self.P," psia", sep=' ')
+
+        if self.Poverride is None:
+            print("P =%8g"%self.P," psia", sep=' ')
+        else:
+            print("P =%8g OVERRIDE"%self.Poverride, '(Input P=%g psia)'%self.P, sep=' ')
+
         print("D =%8g"%self.D," lbm/cu ft", sep=' ')
         print("E =%8g"%self.E," BTU/lbm", sep=' ')
         print("H =%8g"%self.H," BTU/lbm", sep=' ')
@@ -347,14 +424,25 @@ class EC_Incomp_Fluid(object):
         print("V =%8g"%self.Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
         print("C =%8g"%self.Cond," thermal conductivity [BTU/ft-hr-R]", sep=' ')
 
+        print("    Tmin =%8g"%self.Tmin," degR,", sep=' ')
+        if self.Tnbp is not None:
+            print("    Tnbp =%8g"%self.Tnbp," degR,", sep=' ')
+        print("    Tmax =%8g"%self.Tmax," degR,", sep=' ')
+        
+        print("    Dmin =%8g"%self.Dmin," lbm/cu ft,", sep=' ')
+        print("    Dmax =%8g"%self.Dmax," lbm/cu ft,", sep=' ')
+        
+        if self.Psat is not None:
+            print("    Psat =%8g"%self.Psat," psia", sep=' ')
+
     def dH_FromHZero(self):
         return self.H - self.Href
 
 if __name__ == '__main__':
     
-    C = EC_Incomp_Fluid( symbol='DowQ' )
+    C = EC_Incomp_Fluid( symbol='Water' )
     
-    C.setProps(T=C.Tref, P=C.Pref)
+    C.setProps(T=800, P=1)
     
     C.printProps()
     print('='*55)
@@ -366,7 +454,6 @@ if __name__ == '__main__':
     print(C.getStrTPDphase())
     C.printTPD()
     print('.'*55)
-    print( C.html_desc() )
     
     if 1:
         print('='*55)
@@ -386,9 +473,7 @@ if __name__ == '__main__':
                 Dsi = PropsSI('D','T',Tsi,'P',Psi,'INCOMP::Water')
                 print( '           Dsi =', Dsi)
             
-    print('$'*55)
-    # C.newDE(D=1,E=50.0)
-    # C.printTPD()
+    print('/'*55)
 
     C.setTP(500.0, 500.0)
     
@@ -406,6 +491,4 @@ if __name__ == '__main__':
     C.setPD(P=800.0,D=C.D*0.9)
     C.printTPD()
     
-    C.setTD(T=500.0,D=5.0)
-    C.printTPD()
     
