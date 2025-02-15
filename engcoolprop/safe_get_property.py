@@ -81,7 +81,10 @@ def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=10
         f = lambda P: get_si_prop( P, targ_prop=prop_desc, ind_name=ind_name, ind_si_val=ind_si_val, symbol=symbol )
 
         good_Psi_val = find_exception_limit(f, tolerance=1e-4, lower_bound=1.0e-9, upper_bound=PSI_fromEng(5000) )
-        print( 'WARNING: P changed from %8g Pa to'%Psi_val, '%8g Pa'%good_Psi_val, '(%g psia)'%Peng_fromSI(good_Psi_val) )
+        psia_in = Peng_fromSI(Psi_val)
+        psia_2  = Peng_fromSI(good_Psi_val)
+        s = ind_name + 'P'
+        print( s,'WARNING: P OVERRIDE %i'%int(Psi_val) + '-->%i Pa'%int(good_Psi_val), '(%.1f-->%.1f psia)'%(psia_in, psia_2) )
 
         prop_val =  get_si_prop( good_Psi_val, targ_prop=prop_desc, ind_name=ind_name, ind_si_val=ind_si_val, symbol=symbol )
 
