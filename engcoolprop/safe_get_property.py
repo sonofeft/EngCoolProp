@@ -94,9 +94,13 @@ if __name__ == "__main__":
     from engcoolprop.ec_fluid import (toEng_callD,  DSI_fromEng ,  
                                       PropsSI ,   SSI_fromEng , TSI_fromEng ,  
                                       UHSI_fromEng )
+    from engcoolprop.parameter_units import si_unitsD
+
+    Psi_val = PSI_fromEng(14.696) # run through all possible calcs at 1 atm
+    # print( 'Psi_val =', Psi_val)
 
     ind_valD = {} # key:T, D, H or S, value: SI value
-    ind_valD['T'] = TSI_fromEng( 527.67 )
+    ind_valD['T'] = TSI_fromEng( 800.0) # 527.67 )
     ind_valD['D'] =  DSI_fromEng( 55 ) # 62.4273 )
     ind_valD['H'] = UHSI_fromEng( 0.0 )
     ind_valD['S'] = SSI_fromEng( 0.0 )
@@ -106,9 +110,7 @@ if __name__ == "__main__":
         for ind_name in ['T', 'D', 'H', 'S']: # TP, HP, SP, DP
             ind_si_val = ind_valD[ ind_name ]
 
-            Psi_val = PSI_fromEng(14.696)
-            # print( 'Psi_val =', Psi_val)
-
             prop_val, good_Psi_val = safe_get_INCOMP_prop( prop_desc, Psi_val=Psi_val, ind_name=ind_name, ind_si_val=ind_si_val, symbol='Water' )
 
-            print( prop_desc, 'Psi_val=%g'%Psi_val, '%s=%g'%(ind_name, ind_si_val), 'prop_val =', '%8g'%toEng_callD[prop_desc](prop_val), prop_desc )
+            print( '%s:'%prop_desc, 'at P=%g Pa'%Psi_val, 'and %s=%g'%(ind_name, ind_si_val), '(%s)'%si_unitsD[ind_name], 
+                   prop_desc + '=' + '%8g'%toEng_callD[prop_desc](prop_val), '(%s)'%si_unitsD[prop_desc] )
