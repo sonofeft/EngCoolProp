@@ -5,7 +5,8 @@ def f(x):
         raise ValueError("x is too large")
     return x
 
-def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10):
+def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10, 
+                         no_exception='lower_bound'):
     """
     Finds the value of x where f(x) does NOT throw an exception within the given tolerance.
 
@@ -14,6 +15,8 @@ def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10):
     tolerance (float): The tolerance within which to find the value of x.
     lower_bound (float): The lower bound of the search interval.
     upper_bound (float): The upper bound of the search interval.
+
+    no_exception(string): default="lower_bound": If no exceptions found return either lower_bound or upper_bound
 
     Returns:
     float: The value of x where f(x) does NOT throw an exception
@@ -32,13 +35,18 @@ def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10):
         
     # Exception boundary not included in bounds
     if bad_lower and bad_upper:
-        print( 'Both upper and lower limits throw Exception in find_exception_limit' )
+        print( '*** Both upper and lower limits throw Exception in find_exception_limit***' )
         return None
         
     # All good
     if not bad_lower and not bad_upper:
-        print( 'No Exception found in find_exception_limit' )
-        return None
+        # print( '***No Exception found in find_exception_limit***' )
+
+        # return either lower_bound or upper_bound if no exception found
+        if no_exception=='lower_bound':
+            return lower_bound
+        else:
+            return upper_bound
         
         
     while upper_bound - lower_bound > tolerance:

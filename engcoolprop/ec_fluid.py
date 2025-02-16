@@ -123,7 +123,7 @@ def Veng_fromSI( V ):
     return V * 0.6719689751 # convert from Pa*s to lbm/ft/sec
     
 def VSI_fromEng( V ):
-    return V * 32.174 / 0.6719689751
+    return V / 0.6719689751
 
 def CondEng_fromSI( Cond ):
     return Cond * 0.578176

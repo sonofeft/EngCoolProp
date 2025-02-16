@@ -52,7 +52,7 @@ class EC_Incomp_Fluid(object):
     
     fluidNameL = incomp_pure_fluidL
 
-    def __init__(self,symbol="DowQ" ,P=1000.0, child=1):
+    def __init__(self,symbol="DowQ", T=500 ,P=1000.0, child=1):
         '''Init generic Fluid'''
 
         if symbol not in self.fluidNameL:
@@ -72,35 +72,32 @@ class EC_Incomp_Fluid(object):
         self.Tmax =  Teng_fromSI( self.Tmax_si )
 
         # density is invariant with pressure for INCOMP
-        Psi = PSI_fromEng( 10000.0 )
+        Psi = PSI_fromEng( 10000.0 ) # set Psi very high to avoid any Psat issues
         self.Dmax_si =  PropsSI('D','T',self.Tmin_si,'P',Psi,'INCOMP::%s'%symbol) # Dmax at Tmin
         self.Dmin_si =  PropsSI('D','T',self.Tmax_si,'P',Psi,'INCOMP::%s'%symbol) # Dmin at Tmax
 
         self.Dmax = Deng_fromSI( self.Dmax_si )
         self.Dmin = Deng_fromSI( self.Dmin_si )
 
-
-        self.T = self.Tmin 
-
         # set Href by using SATP
         # self.Tref = 527.67 # 536.67R = (SATP, Standard Ambient T P) = 77F, 25C 
 
-        # H = 0.0 is the arbitrary ref for the fluid
+        # H = 0.0 is the arbitrary ref for the fluid (http://www.coolprop.org/fluid_properties/Incompressibles.html#)
         self.Pref = 14.696
-        Psi = PSI_fromEng( self.Pref )
-        self.Tref = Teng_fromSI( PropsSI('T','H',0.0,'P',Psi, self.fluid ) )
+        Psi_1_atm = PSI_fromEng( self.Pref )
+        self.Tref = Teng_fromSI( PropsSI('T','H',0.0,'P',Psi_1_atm, self.fluid ) ) # should be 20 degC (527.67 degR)
 
 
         # try to get Psat at Tref, Pref
-        if 1: #try:
+        try:
             self.Psat_ref = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.Tref ) ,'Q',0, self.fluid) )
             if self.Pref < self.Psat_ref:
                 # can't use 1 atm as Pref
                 self.Pref = 0.999 * self.Psat_ref
                 print( 'Changed Pref from 1 atm to: %g psia'%self.Pref )
-        # except:
-        #     self.Psat_ref = None
-        print( 'self.Psat_ref =', self.Psat_ref)
+        except:
+            self.Psat_ref = None
+        # print( 'self.Psat_ref =', self.Psat_ref)
 
 
         self.setTP(self.Tref,self.Pref)
@@ -118,6 +115,14 @@ class EC_Incomp_Fluid(object):
                 self.Tnbp = None 
         else:
             self.Tnbp = None 
+
+        # if input T is in range, use it... otherwise
+        if T<self.Tmin or T>self.Tmax:
+            # Each fluid has a different T range, so just set T to a mid point
+            self.T = int(self.Tmin  + (self.Tmax - self.Tmin) / 2)
+            print( 'NOTICE: input T out of range. Changed to: %g degR'%self.T )
+        else:
+            self.T = T
 
         # set properties to input T and P
         self.setTP(self.T, self.P)
@@ -181,6 +186,7 @@ class EC_Incomp_Fluid(object):
             if good_Psi != Psi:
                 changed_PsiL.append( good_Psi )
             return prop
+                    
 
         self.T = T
         self.P = P
@@ -440,9 +446,9 @@ class EC_Incomp_Fluid(object):
 
 if __name__ == '__main__':
     
-    C = EC_Incomp_Fluid( symbol='Water' )
+    C = EC_Incomp_Fluid( symbol='Water', T=500, P=100 )
     
-    C.setProps(T=800, P=1)
+    # C.setTP(T= (C.Tmin+C.Tmax)/2.0, P=100) # this temperature throws an exception ???
     
     C.printProps()
     print('='*55)
