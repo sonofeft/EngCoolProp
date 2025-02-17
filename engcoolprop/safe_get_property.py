@@ -34,7 +34,8 @@ def get_si_prop( Psi_val, targ_prop='H', ind_name='T', ind_si_val=1000.0, symbol
     return SI_prop
 
 
-def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=1000.0, symbol='Water' ):
+def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=1000.0, 
+                          symbol='Water', show_warnings=True ):
     """
     Return desired property from PropsSI for INCOMP fluid with Exception protection
     from an invalid Pressure. (e.g. below saturation pressure)
@@ -48,7 +49,8 @@ def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=10
             H = "J/kg"
             S = "J/kg/K"
             T = "K"
-
+        show_warnings (bool): will show warnings if == True
+            
     ...CoolProp Incompressible Properties...
     Temperature (T): Kelvin (K)
     Pressure (P): Pascal (Pa)
@@ -89,9 +91,11 @@ def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=10
             psia_2 = 10000.0 # psia
         else:
             psia_2  = Peng_fromSI(good_Psi_val)
-        s = ind_name + 'P'
-        print( s,'WARNING: P override (%i'%int(Psi_val) + '-->%i Pa)'%int(good_Psi_val), 
-              '(%.1f-->%.1f psia)'%(psia_in, psia_2), 'calculating:',prop_desc )
+
+        if show_warnings:
+            s = ind_name + 'P'
+            print( s,'WARNING: P override (%i'%int(Psi_val) + '-->%i Pa)'%int(good_Psi_val), 
+                '(%.1f-->%.1f psia)'%(psia_in, psia_2), 'calculating:',prop_desc )
 
         prop_val =  get_si_prop( good_Psi_val, targ_prop=prop_desc, ind_name=ind_name, ind_si_val=ind_si_val, symbol=symbol )
 
@@ -103,7 +107,7 @@ if __name__ == "__main__":
                                       UHSI_fromEng )
     from engcoolprop.parameter_units import si_unitsD
 
-    Psi_val = PSI_fromEng(14.696) # run through all possible calcs at 1 atm
+    Psi_val = 0 # PSI_fromEng(14.696) # run through all possible calcs at 1 atm
     # print( 'Psi_val =', Psi_val)
 
     ind_valD = {} # key:T, D, H or S, value: SI value
@@ -117,7 +121,8 @@ if __name__ == "__main__":
         for ind_name in ['T', 'D', 'H', 'S']: # TP, HP, SP, DP
             ind_si_val = ind_valD[ ind_name ]
 
-            prop_val, good_Psi_val = safe_get_INCOMP_prop( prop_desc, Psi_val=Psi_val, ind_name=ind_name, ind_si_val=ind_si_val, symbol='Water' )
+            prop_val, good_Psi_val = safe_get_INCOMP_prop( prop_desc, Psi_val=Psi_val, ind_name=ind_name, 
+                                                          ind_si_val=ind_si_val, symbol='Water', show_warnings=False )
 
-            print( '%s:'%prop_desc, 'at P=%g Pa'%Psi_val, 'and %s=%g'%(ind_name, ind_si_val), '(%s)'%si_unitsD[ind_name], 
+            print( '%s:'%prop_desc, 'at P=%g Pa'%good_Psi_val, 'and %s=%g'%(ind_name, ind_si_val), '(%s)'%si_unitsD[ind_name], 
                    prop_desc + '=' + '%8g'%toEng_callD[prop_desc](prop_val), '(%s)'%si_unitsD[prop_desc] )

@@ -52,16 +52,18 @@ class EC_Incomp_Fluid(object):
     
     fluidNameL = incomp_pure_fluidL
 
-    def __init__(self,symbol="DowQ", T=500 ,P=1000.0, child=1):
+    def __init__(self,symbol="DowQ", T=500 ,P=1000.0, Pmax=10000.0,
+                 show_warnings=True, child=1):
         '''Init generic Fluid'''
 
         if symbol not in self.fluidNameL:
             raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(self.fluidNameL) ) )
         
         self.symbol = symbol
+        self.Pmax = Pmax # highest pressure considered in any iterative calcs (can still input P > Pmax)
+        self.show_warnings = show_warnings # some calcs will issue warning statements if show_warnings == True
 
         self.fluid = 'INCOMP::%s'%symbol
-        self.P = P
         self.child = child
 
         # get temperature limits
@@ -72,20 +74,37 @@ class EC_Incomp_Fluid(object):
         self.Tmax =  Teng_fromSI( self.Tmax_si )
 
         # density is invariant with pressure for INCOMP
-        Psi = PSI_fromEng( 10000.0 ) # set Psi very high to avoid any Psat issues
+        Psi = PSI_fromEng( self.Pmax ) # set Psi very high to avoid any Psat issues
         self.Dmax_si =  PropsSI('D','T',self.Tmin_si,'P',Psi,'INCOMP::%s'%symbol) # Dmax at Tmin
         self.Dmin_si =  PropsSI('D','T',self.Tmax_si,'P',Psi,'INCOMP::%s'%symbol) # Dmin at Tmax
 
         self.Dmax = Deng_fromSI( self.Dmax_si )
         self.Dmin = Deng_fromSI( self.Dmin_si )
 
-        # set Href by using SATP
-        # self.Tref = 527.67 # 536.67R = (SATP, Standard Ambient T P) = 77F, 25C 
 
         # H = 0.0 is the arbitrary ref for the fluid (http://www.coolprop.org/fluid_properties/Incompressibles.html#)
-        self.Pref = 14.696
-        Psi_1_atm = PSI_fromEng( self.Pref )
-        self.Tref = Teng_fromSI( PropsSI('T','H',0.0,'P',Psi_1_atm, self.fluid ) ) # should be 20 degC (527.67 degR)
+        P_h_ref = 14.696 # 1 atm
+        T_h_ref = 527.67 # degR == 20 C
+
+        # desired ref temperature may not be in fluids temperature range
+        if T_h_ref <   self.Tmin:
+            T_h_ref =  self.Tmin + 0.001 # give a slight move into range
+        elif T_h_ref > self.Tmax:
+            T_h_ref =  self.Tmax - 0.001 # give a slight move into range
+
+        
+
+        Psi_1_atm = PSI_fromEng( 14.696 ) # SI for 1 atm (Pa)
+        try:
+            # try calculating T and P for H=0 (i.e. Tref and Pref)
+            prop, good_Psi = SC( T, Psi_val=Psi_1_atm, ind_name='H', ind_si_val=0, 
+                                             symbol=self.symbol, show_warnings=self.show_warnings )
+            self.Tref = Teng_fromSI( prop )
+            self.Pref = Peng_fromSI(good_Psi)
+        except:
+            # set ref P and T to best estimate of desired ref point
+            self.Pref = P_h_ref
+            self.Tref = T_h_ref
 
 
         # try to get Psat at Tref, Pref
@@ -93,17 +112,19 @@ class EC_Incomp_Fluid(object):
             self.Psat_ref = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.Tref ) ,'Q',0, self.fluid) )
             if self.Pref < self.Psat_ref:
                 # can't use 1 atm as Pref
-                self.Pref = 0.999 * self.Psat_ref
+                self.Pref = 1.001 * self.Psat_ref # give slight nudge into liquid P range
                 print( 'Changed Pref from 1 atm to: %g psia'%self.Pref )
         except:
-            self.Psat_ref = None
+            self.Psat_ref = None # Psat may not be supported by this INCOMP fluid
         # print( 'self.Psat_ref =', self.Psat_ref)
 
-
+        # print( "EC) self.Tref=%g, self.Pref=%g"%(self.Tref, self.Pref) )
         self.setTP(self.Tref,self.Pref)
         self.Href = self.H # CoolProp uses this Tref, Pref for setting Href and Sref to 0
         self.Sref = self.S
+        self.P = P
 
+        # If Psat is supported, try to get Tnbp
         if self.Psat_ref is not None:
             try:
                 Tnbp, error_code = calc_Tnbp( self )
@@ -117,10 +138,16 @@ class EC_Incomp_Fluid(object):
             self.Tnbp = None 
 
         # if input T is in range, use it... otherwise
-        if T<self.Tmin or T>self.Tmax:
+        if T<self.Tmin:
             # Each fluid has a different T range, so just set T to a mid point
-            self.T = int(self.Tmin  + (self.Tmax - self.Tmin) / 2)
-            print( 'NOTICE: input T out of range. Changed to: %g degR'%self.T )
+            self.T = self.Tmin + 0.001
+            print( 'NOTICE: input T too low. Changed from: %g to: %g degR'%(T, self.T) )
+            print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
+        elif T>self.Tmax:
+            # Each fluid has a different T range, so just set T to a mid point
+            self.T = self.Tmax - 0.001
+            print( 'NOTICE: input T too high. Changed from: %g to: %g degR'%(T, self.T) )
+            print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
         else:
             self.T = T
 
@@ -128,7 +155,8 @@ class EC_Incomp_Fluid(object):
         self.setTP(self.T, self.P)
             
         if child==1: 
-            self.dup = EC_Incomp_Fluid(symbol=self.symbol, P=self.P, child=0)
+            self.dup = EC_Incomp_Fluid(symbol=self.symbol, T=self.T, P=self.P, child=0, Pmax=self.Pmax, 
+                                       show_warnings=self.show_warnings)
 
     def setProps(self, **inpD):
         '''Generic call using any P with supported inputs T,D,S,H
@@ -182,11 +210,14 @@ class EC_Incomp_Fluid(object):
         Psi = PSI_fromEng( P )
         changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='H' ):
-            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='T', ind_si_val=Tsi, symbol=self.symbol )
-            if good_Psi != Psi:
-                changed_PsiL.append( good_Psi )
-            return prop
-                    
+            try:
+                prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='T', ind_si_val=Tsi, 
+                                    symbol=self.symbol, show_warnings=self.show_warnings )
+                if good_Psi != Psi:
+                    changed_PsiL.append( good_Psi )
+                return prop
+            except:
+                return float('inf')
 
         self.T = T
         self.P = P
@@ -234,10 +265,14 @@ class EC_Incomp_Fluid(object):
 
         changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='T' ):
-            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='H', ind_si_val=Hsi, symbol=self.symbol )
-            if good_Psi != Psi:
-                changed_PsiL.append( good_Psi )
-            return prop
+            try:
+                prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='H', ind_si_val=Hsi, 
+                                    symbol=self.symbol, show_warnings=self.show_warnings )
+                if good_Psi != Psi:
+                    changed_PsiL.append( good_Psi )
+                return prop
+            except:
+                return float('inf')
 
         self.T = Teng_fromSI( get_prop('T') )
 
@@ -272,10 +307,14 @@ class EC_Incomp_Fluid(object):
 
         changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='H' ):
-            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='S', ind_si_val=Ssi, symbol=self.symbol )
-            if good_Psi != Psi:
-                changed_PsiL.append( good_Psi )
-            return prop
+            try:
+                prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='S', ind_si_val=Ssi, 
+                                    symbol=self.symbol, show_warnings=self.show_warnings )
+                if good_Psi != Psi:
+                    changed_PsiL.append( good_Psi )
+                return prop
+            except:
+                return float('inf')
 
 
         self.T = Teng_fromSI( get_prop('T') )
@@ -321,10 +360,14 @@ class EC_Incomp_Fluid(object):
 
         changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='H' ):
-            prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='D', ind_si_val=Dsi, symbol=self.symbol )
-            if good_Psi != Psi:
-                changed_PsiL.append( good_Psi )
-            return prop
+            try:
+                prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='D', ind_si_val=Dsi, 
+                                    symbol=self.symbol, show_warnings=self.show_warnings )
+                if good_Psi != Psi:
+                    changed_PsiL.append( good_Psi )
+                return prop
+            except:
+                return float('inf')
 
         self.T = Teng_fromSI( get_prop('T') )
 
@@ -422,7 +465,7 @@ class EC_Incomp_Fluid(object):
         else:
             print("P =%8g OVERRIDE"%self.Poverride, '(Input P=%g psia)'%self.P, sep=' ')
 
-        print("D =%8g"%self.D," lbm/cu ft", sep=' ')
+        print("D =%8g"%self.D," lbm/cu ft",'(rho=%8g lbm/cuin)'%self.rho, sep=' ')
         print("E =%8g"%self.E," BTU/lbm", sep=' ')
         print("H =%8g"%self.H," BTU/lbm", sep=' ')
         print("S =%8g"%self.S," BTU/lbm degR", sep=' ')
