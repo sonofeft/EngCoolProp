@@ -123,7 +123,8 @@ class EC_Incomp_Fluid(object):
         self.Href = self.H # CoolProp uses this Tref, Pref for setting Href and Sref to 0
         self.Sref = self.S
         self.P = P
-
+        self.Pinput = P 
+        
         # If Psat is supported, try to get Tnbp
         if self.Psat_ref is not None:
             try:
@@ -221,6 +222,7 @@ class EC_Incomp_Fluid(object):
 
         self.T = T
         self.P = P
+        self.Pinput = P # save input P in case Psat changes it.
         self.Poverride = None
 
         self.D = Deng_fromSI( get_prop('D') )
@@ -235,7 +237,8 @@ class EC_Incomp_Fluid(object):
 
         # the Psi was overridden, set Poverride
         if changed_PsiL:
-            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
+            self.Poverride = Peng_fromSI( max(changed_PsiL) )
+            self.P = self.Poverride
 
 
         try:
@@ -257,6 +260,7 @@ class EC_Incomp_Fluid(object):
         '''Calc properties at P and H'''
 
         self.P = P 
+        self.Pinput = P # save input P in case Psat changes it.
         self.H = H
         self.Poverride = None
         
@@ -287,7 +291,8 @@ class EC_Incomp_Fluid(object):
 
         # the Psi was overridden, set Poverride
         if changed_PsiL:
-            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
+            self.Poverride = Peng_fromSI( max(changed_PsiL) )
+            self.P = self.Poverride
 
 
         try:
@@ -299,6 +304,7 @@ class EC_Incomp_Fluid(object):
         '''Calc properties at P and H'''
 
         self.P = P 
+        self.Pinput = P # save input P in case Psat changes it.
         self.S = S
         self.Poverride = None
         
@@ -331,7 +337,8 @@ class EC_Incomp_Fluid(object):
 
         # the Psi was overridden, set Poverride
         if changed_PsiL:
-            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
+            self.Poverride = Peng_fromSI( max(changed_PsiL) )
+            self.P = self.Poverride
 
 
         try:
@@ -351,6 +358,7 @@ class EC_Incomp_Fluid(object):
         '''
 
         self.P = P 
+        self.Pinput = P # save input P in case Psat changes it.
         self.D = D
         self.Poverride = None
         
@@ -381,7 +389,8 @@ class EC_Incomp_Fluid(object):
 
         # the Psi was overridden, set Poverride
         if changed_PsiL:
-            self.Poverride = Peng_fromSI( sum(changed_PsiL) / len(changed_PsiL) )
+            self.Poverride = Peng_fromSI( max(changed_PsiL) )
+            self.P = self.Poverride
 
 
         try:
@@ -463,7 +472,7 @@ class EC_Incomp_Fluid(object):
         if self.Poverride is None:
             print("P =%8g"%self.P," psia", sep=' ')
         else:
-            print("P =%8g OVERRIDE"%self.Poverride, '(Input P=%g psia)'%self.P, sep=' ')
+            print("P =%8g OVERRIDE"%self.Poverride, '(Input P=%g psia)'%self.Pinput, sep=' ')
 
         print("D =%8g"%self.D," lbm/cu ft",'(rho=%8g lbm/cuin)'%self.rho, sep=' ')
         print("E =%8g"%self.E," BTU/lbm", sep=' ')
@@ -489,7 +498,7 @@ class EC_Incomp_Fluid(object):
 
 if __name__ == '__main__':
     
-    C = EC_Incomp_Fluid( symbol='Water', T=500, P=100 )
+    C = EC_Incomp_Fluid( symbol='Water', T=851, P=0 )
     
     # C.setTP(T= (C.Tmin+C.Tmax)/2.0, P=100) # this temperature throws an exception ???
     
