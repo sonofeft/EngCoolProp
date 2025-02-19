@@ -30,6 +30,8 @@ from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP
 from engcoolprop.iteration_utils import calc_Tnbp
 from engcoolprop.safe_get_property import safe_get_INCOMP_prop as SC
+from engcoolprop.safe_get_property import get_si_prop
+
 
 # create simple look-up that is order-independent for input pairs
 
@@ -61,6 +63,7 @@ class EC_Incomp_Fluid(object):
         
         self.symbol = symbol
         self.Pmax = Pmax # highest pressure considered in any iterative calcs (can still input P > Pmax)
+        self.Pmin = 0
         self.show_warnings = show_warnings # some calcs will issue warning statements if show_warnings == True
 
         self.fluid = 'INCOMP::%s'%symbol
@@ -72,14 +75,6 @@ class EC_Incomp_Fluid(object):
 
         self.Tmin =  Teng_fromSI( self.Tmin_si  )
         self.Tmax =  Teng_fromSI( self.Tmax_si )
-
-        # density is invariant with pressure for INCOMP
-        Psi = PSI_fromEng( self.Pmax ) # set Psi very high to avoid any Psat issues
-        self.Dmax_si =  PropsSI('D','T',self.Tmin_si,'P',Psi,'INCOMP::%s'%symbol) # Dmax at Tmin
-        self.Dmin_si =  PropsSI('D','T',self.Tmax_si,'P',Psi,'INCOMP::%s'%symbol) # Dmin at Tmax
-
-        self.Dmax = Deng_fromSI( self.Dmax_si )
-        self.Dmin = Deng_fromSI( self.Dmin_si )
 
 
         # H = 0.0 is the arbitrary ref for the fluid (http://www.coolprop.org/fluid_properties/Incompressibles.html#)
@@ -124,7 +119,7 @@ class EC_Incomp_Fluid(object):
         self.Sref = self.S
         self.P = P
         self.Pinput = P 
-        
+
         # If Psat is supported, try to get Tnbp
         if self.Psat_ref is not None:
             try:
@@ -154,6 +149,8 @@ class EC_Incomp_Fluid(object):
 
         # set properties to input T and P
         self.setTP(self.T, self.P)
+
+        self.calc_min_max_props()
             
         if child==1: 
             self.dup = EC_Incomp_Fluid(symbol=self.symbol, T=self.T, P=self.P, child=0, Pmax=self.Pmax, 
@@ -203,29 +200,73 @@ class EC_Incomp_Fluid(object):
         """Calculate Enthalpy difference from self.Href"""
         return self.H - self.Href
 
+    def get_Psat(self, T):
+        """
+        Given T in degR (Engineering units) return Psat in psia (if supported)
+        NOTE: if not supported, return 0 for Psat
+        """
+        try:
+            Psat = Peng_fromSI( PropsSI('P','T', TSI_fromEng( T ) ,'Q',0, self.fluid) )
+        except:
+            Psat = 0
+        return Psat # psia
+
+
+    def adjust_P_for_Psat(self, P, ind_name='T', ind_val=None):
+        """
+        If Psat is greater than P, then to maintain liquid state, use Psat
+        
+        Given independent variable name and value, calc T and then Psat
+        NOTE: P is in Engineering units (psia)
+        NOTE: ind_val is in Engineering units (degR, lbm/cuft, etc.)
+        """
+
+        if ind_name == 'T':
+            Psat = self.get_Psat( ind_val ) # psia
+        elif ind_name == 'H':
+            T = Teng_fromSI( get_si_prop( PSI_fromEng( P ), targ_prop='T', 
+                                          ind_name='H', ind_si_val=UHSI_fromEng( ind_val ), symbol=self.symbol) )
+            Psat = self.get_Psat( T )
+        elif ind_name == 'D':
+            T = Teng_fromSI( get_si_prop( PSI_fromEng( P ), targ_prop='T', 
+                                          ind_name='D', ind_si_val=DSI_fromEng( ind_val ), symbol=self.symbol) )
+            Psat = self.get_Psat( T )
+        elif ind_name == 'S':
+            T = Teng_fromSI( get_si_prop( PSI_fromEng( P ), targ_prop='T', 
+                                          ind_name='S', ind_si_val=SSI_fromEng( ind_val ), symbol=self.symbol) )
+            Psat = self.get_Psat( T )
+        else:
+            raise ValueError( 'ind_name must be T, H, D or S')
+        
+        if Psat > P:
+            self.Padjusted = Psat + 0.001 # slight increase in Psat to stay in liquid region
+        else:
+            self.Padjusted = None
+
+        return max( P, Psat )
+
     def setTP(self,T=530.0,P=1000.0):
         '''Calc props from T and P'''
-        
 
+        self.Pinput = P # save input P in case Psat changes it.
+        P = self.adjust_P_for_Psat( P, ind_name='T', ind_val=T)
+        
         Tsi = TSI_fromEng( T )
         Psi = PSI_fromEng( P )
-        changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='H' ):
             try:
                 prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='T', ind_si_val=Tsi, 
                                     symbol=self.symbol, show_warnings=self.show_warnings )
-                if good_Psi != Psi:
-                    changed_PsiL.append( good_Psi )
                 return prop
             except:
                 return float('inf')
 
         self.T = T
         self.P = P
-        self.Pinput = P # save input P in case Psat changes it.
-        self.Poverride = None
+        self.adjusted = None
 
         self.D = Deng_fromSI( get_prop('D') )
+
         self.rho = self.D / 1728.0
 
         self.E = UHeng_fromSI( get_prop('U') )
@@ -234,11 +275,6 @@ class EC_Incomp_Fluid(object):
         self.Cp = CPeng_fromSI( get_prop('C') )
         self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
         self.Cond = CondEng_fromSI( get_prop('L') )
-
-        # the Psi was overridden, set Poverride
-        if changed_PsiL:
-            self.Poverride = Peng_fromSI( max(changed_PsiL) )
-            self.P = self.Poverride
 
 
         try:
@@ -259,21 +295,20 @@ class EC_Incomp_Fluid(object):
     def setPH(self,P,H):
         '''Calc properties at P and H'''
 
-        self.P = P 
+
         self.Pinput = P # save input P in case Psat changes it.
+        P = self.adjust_P_for_Psat( P, ind_name='H', ind_val=H)
+        
+        self.P = P 
         self.H = H
-        self.Poverride = None
         
         Psi = PSI_fromEng( P )
         Hsi = UHSI_fromEng( H )
 
-        changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='T' ):
             try:
                 prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='H', ind_si_val=Hsi, 
                                     symbol=self.symbol, show_warnings=self.show_warnings )
-                if good_Psi != Psi:
-                    changed_PsiL.append( good_Psi )
                 return prop
             except:
                 return float('inf')
@@ -289,12 +324,6 @@ class EC_Incomp_Fluid(object):
         self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
         self.Cond = CondEng_fromSI( get_prop('L') )
 
-        # the Psi was overridden, set Poverride
-        if changed_PsiL:
-            self.Poverride = Peng_fromSI( max(changed_PsiL) )
-            self.P = self.Poverride
-
-
         try:
             self.Psat = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.T ) ,'Q',0, self.fluid) )
         except:
@@ -303,21 +332,19 @@ class EC_Incomp_Fluid(object):
     def setPS(self,P,S):
         '''Calc properties at P and H'''
 
-        self.P = P 
         self.Pinput = P # save input P in case Psat changes it.
+        P = self.adjust_P_for_Psat( P, ind_name='S', ind_val=S)
+
+        self.P = P 
         self.S = S
-        self.Poverride = None
         
         Psi = PSI_fromEng( P )
         Ssi = SSI_fromEng( S )
 
-        changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='H' ):
             try:
                 prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='S', ind_si_val=Ssi, 
                                     symbol=self.symbol, show_warnings=self.show_warnings )
-                if good_Psi != Psi:
-                    changed_PsiL.append( good_Psi )
                 return prop
             except:
                 return float('inf')
@@ -334,12 +361,6 @@ class EC_Incomp_Fluid(object):
         self.Cp = CPeng_fromSI( get_prop('C') )
         self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
         self.Cond = CondEng_fromSI( get_prop('L') )
-
-        # the Psi was overridden, set Poverride
-        if changed_PsiL:
-            self.Poverride = Peng_fromSI( max(changed_PsiL) )
-            self.P = self.Poverride
-
 
         try:
             self.Psat = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.T ) ,'Q',0, self.fluid) )
@@ -357,22 +378,20 @@ class EC_Incomp_Fluid(object):
         NOTE: The pressure has NO EFFECT on incompressible density calc.
         '''
 
-        self.P = P 
         self.Pinput = P # save input P in case Psat changes it.
+        P = self.adjust_P_for_Psat( P, ind_name='D', ind_val=D)
+
+        self.P = P 
         self.D = D
-        self.Poverride = None
         
         Psi = PSI_fromEng( P )
         Dsi = DSI_fromEng( D )
         self.rho = self.D / 1728.0
 
-        changed_PsiL = [] # list of good_Psi that differs from input Psi
         def get_prop( prop_desc='H' ):
             try:
                 prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='D', ind_si_val=Dsi, 
                                     symbol=self.symbol, show_warnings=self.show_warnings )
-                if good_Psi != Psi:
-                    changed_PsiL.append( good_Psi )
                 return prop
             except:
                 return float('inf')
@@ -386,11 +405,6 @@ class EC_Incomp_Fluid(object):
         self.Cp = CPeng_fromSI( get_prop('C') )
         self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
         self.Cond = CondEng_fromSI( get_prop('L') )
-
-        # the Psi was overridden, set Poverride
-        if changed_PsiL:
-            self.Poverride = Peng_fromSI( max(changed_PsiL) )
-            self.P = self.Poverride
 
 
         try:
@@ -466,35 +480,92 @@ class EC_Incomp_Fluid(object):
 
     def printProps(self):
         '''print a multiline property summary with units'''
-        print("State Point for fluid",self.fluid,"("+self.symbol+")", sep=' ')
-        print("T =%8g"%self.T," degR,", sep=' ')
+        print("State Point for fluid",self.fluid,"("+ self.symbol +")")
+        print("T =%8g"%self.T," degR,",    '                             Range(%8g - %8g) degR'%(self.Tmin, self.Tmax))
 
-        if self.Poverride is None:
-            print("P =%8g"%self.P," psia", sep=' ')
-        else:
-            print("P =%8g OVERRIDE"%self.Poverride, '(Input P=%g psia)'%self.Pinput, sep=' ')
+        print("P =%8g"%self.P," psia",    '                              Range(%8g - %8g) psia'%(self.Pmin, self.Pmax))
+        if self.Padjusted is not None:
+            print("    Pinput =%8g"%self.Pinput, '(Adjusted due to Psat)')
 
-        print("D =%8g"%self.D," lbm/cu ft",'(rho=%8g lbm/cuin)'%self.rho, sep=' ')
-        print("E =%8g"%self.E," BTU/lbm", sep=' ')
-        print("H =%8g"%self.H," BTU/lbm", sep=' ')
-        print("S =%8g"%self.S," BTU/lbm degR", sep=' ')
-        print("Cp=%8g"%self.Cp," BTU/lbm degR", sep=' ')
-        print("V =%8g"%self.Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
-        print("C =%8g"%self.Cond," thermal conductivity [BTU/ft-hr-R]", sep=' ')
+        print("D =%8g"%self.D," lbm/cuft",    '                          Range(%8g - %8g) lbm/cuft'%(self.Dmin, self.Dmax))
+        print("   rho =%8g"%self.rho," lbm/cuin",   '                    Range(%.6f - %.6f) lbm/cuin'%(self.rho_min, self.rho_max))
 
-        print("    Tmin =%8g"%self.Tmin," degR,", sep=' ')
+        print("E =%8g"%self.E," BTU/lbm",    '                           Range(%8g - %8g) BTU/lbm'%(self.Emin, self.Emax))
+        print("H =%8g"%self.H," BTU/lbm",    '                           Range(%8g - %8g) BTU/lbm'%(self.Hmin, self.Hmax))
+        print("S =%8g"%self.S," BTU/lbm degR",    '                      Range(%.6f - %.6f) BTU/lbm degR'%(self.Smin, self.Smax))
+        print("Cp=%8g"%self.Cp," BTU/lbm degR",   '                      Range(%8g - %8g) BTU/lbm degR'%(self.Cpmin, self.Cpmax))
+        print("V =%8g"%self.Visc," viscosity [1.0E5 * lbm/ft-sec]", '    Range(%8g - %8g)'%(self.Viscmin, self.Viscmax) )
+        print("C =%8g"%self.Cond," thermal conductivity [BTU/ft-hr-R]", 'Range(%8g - %8g)'%(self.Condmin, self.Condmax) )
+
         if self.Tnbp is not None:
-            print("    Tnbp =%8g"%self.Tnbp," degR,", sep=' ')
-        print("    Tmax =%8g"%self.Tmax," degR,", sep=' ')
-        
-        print("    Dmin =%8g"%self.Dmin," lbm/cu ft,", sep=' ')
-        print("    Dmax =%8g"%self.Dmax," lbm/cu ft,", sep=' ')
+            print("    Tnbp =%8g"%self.Tnbp," degR,")
         
         if self.Psat is not None:
-            print("    Psat =%8g"%self.Psat," psia", sep=' ')
+            print("    Psat =%8g"%self.Psat," psia")
 
     def dH_FromHZero(self):
         return self.H - self.Href
+
+    def calc_min_max_props(self, do_print=False):
+
+        try:
+            Psat_Tmax = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.Tmax ) ,'Q',0, self.fluid) )
+        except:
+            Psat_Tmax = 0
+
+        # try:
+        #     Psat_Tmin = Peng_fromSI( PropsSI('P','T', TSI_fromEng( self.Tmin ) ,'Q',0, self.fluid) )
+        # except:
+        #     Psat_Tmin = 0
+
+
+        def get_prop( T, P, prop_desc='H' ):
+            Tsi = TSI_fromEng( T )
+            Psi = PSI_fromEng( P )
+            try:
+                prop, good_Psi = SC( prop_desc, Psi_val=Psi, ind_name='T', ind_si_val=Tsi, 
+                                    symbol=self.symbol, show_warnings=self.show_warnings )
+                return prop
+            except:
+                return float('inf')
+
+
+        self.Dmin = Deng_fromSI( get_prop(self.Tmax, self.Pmin,'D') )
+        self.Dmax = Deng_fromSI( get_prop(self.Tmin, self.Pmax,'D') )
+        self.rho_min = self.Dmin / 1728.0
+        self.rho_max = self.Dmax / 1728.0
+
+        self.Emin = UHeng_fromSI( get_prop(self.Tmin, self.Pmax,'U') )
+        self.Emax = UHeng_fromSI(  get_prop(self.Tmax, Psat_Tmax, 'U') )
+
+        self.Hmin = UHeng_fromSI( get_prop(self.Tmin, self.Pmin, 'H') )
+        self.Hmax = UHeng_fromSI( get_prop(self.Tmax, self.Pmax, 'H') )
+        
+        self.Smin = Seng_fromSI( get_prop(self.Tmin, self.Pmax, 'S') )
+        self.Smax = Seng_fromSI( get_prop(self.Tmax, Psat_Tmax, 'S') )
+        
+        self.Cpmin = CPeng_fromSI( get_prop(self.Tmin, self.Pmax, 'C') )
+        self.Cpmax = CPeng_fromSI( get_prop(self.Tmax, self.Pmax, 'C') )
+
+        self.Viscmin = Veng_fromSI( get_prop(self.Tmax, self.Pmax, 'V') ) * 1.0E5
+        self.Viscmax = Veng_fromSI( get_prop(self.Tmin, self.Pmax, 'V') ) * 1.0E5
+        if self.Viscmin is None:
+            self.Viscmin = float('inf')
+        if self.Viscmax is None:
+            self.Viscmax = float('inf')
+        
+        self.Condmin = CondEng_fromSI( get_prop(self.Tmin, self.Pmax, 'L') )
+        self.Condmax = CondEng_fromSI( get_prop(self.Tmax, self.Pmax, 'L') )
+        
+        if do_print:
+            minmaxL = ['Cond', "Cp", 'D', 'E', 'H', 'P', 'S', 'T', 'Visc']
+
+            for name in minmaxL:
+                max_name = name + 'max'
+                print( '%10s'%max_name, '%9g'%getattr(self, max_name) )
+                min_name = name + 'min'
+                print( '%10s'%min_name, '%9g'%getattr(self, min_name) )
+
 
 if __name__ == '__main__':
     
@@ -548,5 +619,7 @@ if __name__ == '__main__':
     
     C.setPD(P=800.0,D=C.D*0.9)
     C.printTPD()
-    
-    
+
+    print('='*55)
+    C.calc_min_max_props( do_print=True )    
+    C.printProps()
