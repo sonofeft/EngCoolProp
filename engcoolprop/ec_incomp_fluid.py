@@ -28,11 +28,13 @@ from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )
 from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP
-from engcoolprop.iteration_utils import calc_Tnbp
 from engcoolprop.safe_get_property import safe_get_INCOMP_prop as safe_get_prop
-
 from engcoolprop.find_exception_threshold import find_exception_limit
+
 from engcoolprop.iteration_utils import find_T_from_D
+from engcoolprop.iteration_utils import calc_Tnbp
+from engcoolprop.utils import Same_g_len
+
 
 # create simple look-up that is order-independent for input pairs
 
@@ -509,34 +511,39 @@ class EC_Incomp_Fluid(object):
 
     def printProps(self):
         '''print a multiline property summary with units'''
-        print("State Point for fluid",self.fluid,"("+ self.symbol +")")
-        print("T =%8g"%self.T," degR,",    '                             Range(%8g - %8g) degR'%(self.Tmin, self.Tmax))
 
-        print("P =%8g"%self.P," psia",    '                              Range(%8g - %8g) psia'%(self.Pmin, self.Pmax))
+        # get formatted floats that are same length to help the look of table
+        SGL = Same_g_len(self, ['Cond', "Cp", 'D', 'E', 'H', 'P', 'S', 'T', 'Visc', 'rho', 'Tnbp', 'Psat', 'Tsat'] )
+
+
+        print("State Point for fluid",self.fluid,"("+ self.symbol +")")
+        print("T =%s"%SGL.T," degR,",    '                             Range(%8g - %8g) degR'%(self.Tmin, self.Tmax))
+
+        print("P =%s"%SGL.P," psia",    '                              Range(%8g - %8g) psia'%(self.Pmin, self.Pmax))
         if self.Pinput != self.P:
             print("    Pinput =%8g"%self.Pinput, '(Adjusted due to Psat)')
 
-        print("D =%8g"%self.D," lbm/cuft",    '                          Range(%8g - %8g) lbm/cuft'%(self.Dmin, self.Dmax))
-        print("    rho =%8g"%self.rho," lbm/cuin",   '                    Range(%.6f - %.6f) lbm/cuin'%(self.rho_min, self.rho_max))
+        print("D =%s"%SGL.D," lbm/cuft",    '                          Range(%8g - %8g) lbm/cuft'%(self.Dmin, self.Dmax))
 
-        print("E =%8g"%self.E," BTU/lbm",    '                           Range(%8g - %8g) BTU/lbm'%(self.Emin, self.Emax))
-        print("H =%8g"%self.H," BTU/lbm",    '                           Range(%8g - %8g) BTU/lbm'%(self.Hmin, self.Hmax))
-        print("S =%8g"%self.S," BTU/lbm degR",    '                      Range(%.6f - %.6f) BTU/lbm degR'%(self.Smin, self.Smax))
-        print("Cp=%8g"%self.Cp," BTU/lbm degR",   '                      Range(%8g - %8g) BTU/lbm degR'%(self.Cpmin, self.Cpmax))
+        print("E =%s"%SGL.E," BTU/lbm",    '                           Range(%8g - %8g) BTU/lbm'%(self.Emin, self.Emax))
+        print("H =%s"%SGL.H," BTU/lbm",    '                           Range(%8g - %8g) BTU/lbm'%(self.Hmin, self.Hmax))
+        print("S =%s"%SGL.S," BTU/lbm degR",    '                      Range(%.6f - %.6f) BTU/lbm degR'%(self.Smin, self.Smax))
+        print("Cp=%s"%SGL.Cp," BTU/lbm degR",   '                      Range(%8g - %8g) BTU/lbm degR'%(self.Cpmin, self.Cpmax))
 
         if self.Visc < float('inf'):
-            print("V =%8g"%self.Visc," viscosity [1.0E5 * lbm/ft-sec]", '    Range(%8g - %8g)'%(self.Viscmin, self.Viscmax) )
+            print("V =%s"%SGL.Visc," viscosity [1.0E5 * lbm/ft-sec]", '    Range(%8g - %8g)'%(self.Viscmin, self.Viscmax) )
         else:
             print("V =UNDEFINED","viscosity [1.0E5 * lbm/ft-sec]" )
 
-        print("C =%8g"%self.Cond," thermal conductivity [BTU/ft-hr-R]", 'Range(%8g - %8g)'%(self.Condmin, self.Condmax) )
+        print("C =%s"%SGL.Cond," thermal conductivity [BTU/ft-hr-R]", 'Range(%8g - %8g)'%(self.Condmin, self.Condmax) )
 
         if self.Tnbp is not None:
-            print("    Tnbp =%8g"%self.Tnbp," degR,")
+            print("    Tnbp =%s"%SGL.Tnbp," degR,")
+        print("    rho  =%s"%SGL.rho," lbm/cuin",   '                   Range(%.6f - %.6f) lbm/cuin'%(self.rho_min, self.rho_max))
         
         if self.Psat is not None and self.Psat_max > 0:
-            print("    Psat =%8g"%self.Psat," psia", '                       Range(%g - %g) psia'%(self.Psat_min, self.Psat_max))
-            print("    Tsat =%8g"%self.Tsat," degR", '                       Range(%g - %g) degR'%(self.Tsat_min, self.Tsat_max))
+            print("    Psat =%s"%SGL.Psat," psia", '                       Range(%g - %g) psia'%(self.Psat_min, self.Psat_max))
+            print("    Tsat =%s"%SGL.Tsat," degR", '                       Range(%g - %g) degR'%(self.Tsat_min, self.Tsat_max))
 
     def calc_min_max_props(self, do_print=False):
         # print( '.......................Entered calc_min_max_props ..........................')
@@ -614,7 +621,7 @@ if __name__ == '__main__':
     'ZS25', 'ZS40', 'ZS45', 'ZS55']
     """
 
-    symbol = 'PMR'
+    symbol = 'Water'
     
     print( '='*22, "%s at Pressure = 0"%symbol, '='*22 )
     C = EC_Incomp_Fluid( symbol=symbol, T=None, P=0 )

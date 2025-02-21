@@ -20,6 +20,45 @@ def format_float(float_val, output_len=9, sig_digits=4):
     
     return result.ljust(output_len)
 
+class Same_g_len:
+    def __init__(self, obj, properties):
+        """
+        Initialize Same_g_len with an object and a list of property names.
+
+        Parameters:
+        obj (object): The object from which to get the property values.
+        properties (list): A list of strings that are the names of the object's properties.
+        
+        Returns: properties padded with spaces to _max_length
+        """
+        self._max_length = 0
+        self._properties = {}
+
+        for prop in properties:
+            if hasattr(obj, prop):
+                value = getattr(obj, prop)
+                try:
+                    formatted_value = f"{value:g}"
+                except:
+                    formatted_value = str( value )
+                self._properties[prop] = formatted_value
+                self._max_length = max(self._max_length, len(formatted_value))
+
+    def __getattr__(self, name):
+        """
+        Override __getattr__ to return right justified string of the maximum length.
+
+        Parameters:
+        name (str): The name of the attribute to access.
+
+        Returns:
+        str: The right justified string of the maximum length.
+        """
+        if name in self._properties:
+            return self._properties[name].rjust(self._max_length)
+        else:
+            return '?'*self._max_length
+
 def in_between(value, val1, val2):
     """
     Check if a value is between val1 and val2 inclusive, regardless of the order of val1 and val2.
