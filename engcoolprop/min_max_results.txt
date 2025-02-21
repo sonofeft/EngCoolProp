@@ -1,0 +1,44 @@
+
+# delta = diff between resultD min/max and e_Thi_Phi min/max values 
+#        (should == 0 in all cases)
+====================== Water ======================
+   Condmax    0.3845 ('Tmax_Psat', 'Tmax_Pmax')    0.3845 delta = 0
+   Condmin  0.324617 ('Tmin_Pmin', 'Tmin_Pmax')  0.324617 delta = 0
+     Cpmax   1.06583 ('Tmax_Psat', 'Tmax_Pmax')   1.06583 delta = 0
+     Cpmin  0.999244 ('Tmin_Pmin', 'Tmin_Pmax')  0.999244 delta = 0
+      Dmax   62.6328 ('Tmin_Pmin', 'Tmin_Pmax')   62.6328 delta = 0
+      Dmin   54.2479 ('Tmax_Psat', 'Tmax_Pmax')   54.2479 delta = 0
+      Emax   328.172 ('Tmax_Psat',)   328.172 delta = 0
+      Emin  -36.7331 ('Tmin_Pmax',)  -36.7331 delta = 0
+      Hmax   342.116 ('Tmax_Pmax',)   342.116 delta = 0
+      Hmin  -35.9729 ('Tmin_Pmin',)  -35.9729 delta = 0
+      Pmax     10000 ('Tmin_Pmax', 'Tmax_Pmax')     10000 delta = 0
+      Pmin         0 ('Tmin_Pmin',)         0 delta = 0
+      Smax  0.483928 ('Tmax_Psat',)  0.483928 delta = 0
+      Smin -0.072072 ('Tmin_Pmax',) -0.072072 delta = 0
+      Tmax    851.67 ('Tmax_Psat', 'Tmax_Pmax')    851.67 delta = 0
+      Tmin    491.67 ('Tmin_Pmin', 'Tmin_Pmax')    491.67 delta = 0
+   Viscmax   118.181 ('Tmin_Pmin', 'Tmin_Pmax')   118.181 delta = 0
+   Viscmin   9.17101 ('Tmax_Psat', 'Tmax_Pmax')   9.17101 delta = 0
+
+====================== ZS55 ======================
+   Condmax  0.298993 ('Tmax_Pmin', 'Tmax_Pmax')  0.298993 delta = 0
+   Condmin  0.226423 ('Tmin_Pmin', 'Tmin_Pmax')  0.226423 delta = 0
+     Cpmax  0.651238 ('Tmax_Pmin', 'Tmax_Pmax')  0.651238 delta = 0
+     Cpmin  0.582142 ('Tmin_Pmin', 'Tmin_Pmax')  0.582142 delta = 0
+      Dmax   84.7129 ('Tmin_Pmin', 'Tmin_Pmax')   84.7129 delta = 0
+      Dmin   79.2416 ('Tmax_Pmin', 'Tmax_Pmax')   79.2416 delta = 0
+      Emax   79.4345 ('Tmax_Pmin',)   79.4345 delta = 0
+      Emin   -82.608 ('Tmin_Pmax',)   -82.608 delta = 0
+      Hmax   98.7489 ('Tmax_Pmax',)   98.7489 delta = 0
+      Hmin  -80.4854 ('Tmin_Pmin',)  -80.4854 delta = 0
+      Pmax     10000 ('Tmin_Pmax', 'Tmax_Pmax')     10000 delta = 0
+      Pmin         0 ('Tmin_Pmin', 'Tmax_Pmin')         0 delta = 0
+      Smax  0.134903 ('Tmax_Pmin',)  0.134903 delta = 0
+      Smin -0.181293 ('Tmin_Pmax',) -0.181293 delta = 0
+      Tmax    653.67 ('Tmax_Pmin', 'Tmax_Pmax')    653.67 delta = 0
+      Tmin    392.67 ('Tmin_Pmin', 'Tmin_Pmax')    392.67 delta = 0
+   Viscmax   11395.7 ('Tmin_Pmin', 'Tmin_Pmax')   11395.7 delta = 0
+   Viscmin    76.572 ('Tmax_Pmin', 'Tmax_Pmax')    76.572 delta = 0
+   
+   

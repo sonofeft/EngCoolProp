@@ -6,7 +6,7 @@ def f(x):
     return x
 
 def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10, 
-                         no_exception='lower_bound'):
+                         no_exception='lower_bound', show_warnings=True):
     """
     Finds the value of x where f(x) does NOT throw an exception within the given tolerance.
 
@@ -35,7 +35,8 @@ def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10,
         
     # Exception boundary not included in bounds
     if bad_lower and bad_upper:
-        print( '*** Both upper and lower limits throw Exception in find_exception_limit***' )
+        if show_warnings:
+            print( '*** Both upper and lower limits throw Exception in find_exception_limit***' )
         return None
         
     # All good
@@ -76,5 +77,5 @@ def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10,
 
 if __name__ == "__main__":
     tolerance = 1e-6
-    exception_value = find_exception_limit(f, tolerance)
+    exception_value = find_exception_limit(f, toleranceshow_warnings=True)
     print(f"The value of x where f(x) throws an exception is approximately: {exception_value}")
