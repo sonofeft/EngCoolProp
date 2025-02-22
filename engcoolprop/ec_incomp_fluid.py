@@ -80,8 +80,8 @@ class EC_Incomp_Fluid(object):
         self.Tmin_si =   PropsSI('Tmin','T',0,'P',0,'INCOMP::%s'%symbol)  
         self.Tmax_si =   PropsSI('Tmax','T',0,'P',0,'INCOMP::%s'%symbol) 
 
-        self.Tmin =  Teng_fromSI( self.Tmin_si  )
-        self.Tmax =  Teng_fromSI( self.Tmax_si )
+        self.Tmin =  Teng_fromSI( self.Tmin_si  ) + 0.0000001 # adjust slightly for round off
+        self.Tmax =  Teng_fromSI( self.Tmax_si ) - 0.0000001 # adjust slightly for round off
 
         self.Tmid = (self.Tmin + self.Tmax) / 2.0
 
@@ -221,11 +221,12 @@ class EC_Incomp_Fluid(object):
 
         if ind_param == 'T':
             Psat = self.get_Psat( ind_val ) # ind_val == T
-        else:        
+        else:
+            # to stay liquid, P will need to be above Psat
             Tsat = self.get_Tsat( P )
             Psat = self.get_Psat( Tsat )
 
-        return max( P, Psat )
+        return max( P, Psat )# Warning shown below if Psat > P
 
     def setTP(self,T=530.0,P=1000.0):
         '''Calc props from T and P'''
@@ -235,7 +236,8 @@ class EC_Incomp_Fluid(object):
                 print( 'T too low in setTP. Changed T=%g to T=%g'%( T, self.Tmin ))
             T = self.Tmin
         if T > self.Tmax:
-            if self.show_warnings and T -self.Tmax  > 0.01:
+            # if self.show_warnings and T - self.Tmax  > 0.01:
+            if self.show_warnings and T > self.Tmax + 0.1 :
                 print( 'T too high in setTP. Changed T=%g to T=%g'%( T, self.Tmax ))
             T = self.Tmax
 
@@ -281,6 +283,10 @@ class EC_Incomp_Fluid(object):
         self.Psat = self.get_Psat( self.T )
         self.Tsat = self.get_Tsat( self.P )
 
+        # ============== Debug prints ================
+        if self.H > self.Hmax:
+            print( '...... WARNING: in setTP got H=%g > Hmax=%g ..................'%(self.H, self.Hmax))
+
         # print( '.......................EXITING setTP..........................')
         
     def constP_newH(self,H):
@@ -307,7 +313,7 @@ class EC_Incomp_Fluid(object):
 
 
         self.Pinput = P # save input P in case Psat changes it.
-        P = self.adjust_P_for_Psat( P )
+        P = self.adjust_P_for_Psat( P, ind_param="H", ind_val=H )
 
         if P > self.Pinput:
             if self.show_warnings:
@@ -363,7 +369,7 @@ class EC_Incomp_Fluid(object):
             S = self.Smax
 
         self.Pinput = P # save input P in case Psat changes it.
-        P = self.adjust_P_for_Psat( P )
+        P = self.adjust_P_for_Psat( P, ind_param="S", ind_val=S )
 
         if P > self.Pinput:
             if self.show_warnings:
@@ -427,7 +433,7 @@ class EC_Incomp_Fluid(object):
 
 
         self.Pinput = P # save input P in case Psat changes it.
-        P = self.adjust_P_for_Psat( P )
+        P = self.adjust_P_for_Psat( P, ind_param="D", ind_val=D )
 
         if P > self.Pinput:
             if self.show_warnings:
@@ -564,11 +570,11 @@ class EC_Incomp_Fluid(object):
             except:
                 return float('inf')
 
-        self.Dmin_si = get_prop(self.Tmax, self.Psat_max,'D')
-        self.Dmax_si =get_prop(self.Tmin, self.Pmax,'D')
+        Dmin_si = get_prop(self.Tmax, self.Psat_max,'D')
+        Dmax_si =get_prop(self.Tmin, self.Pmax,'D')
 
-        self.Dmin = Deng_fromSI( self.Dmin_si )
-        self.Dmax = Deng_fromSI( self.Dmax_si )
+        self.Dmin = Deng_fromSI( Dmin_si )
+        self.Dmax = Deng_fromSI( Dmax_si )
 
         self.rho_min = self.Dmin / 1728.0
         self.rho_max = self.Dmax / 1728.0
@@ -576,7 +582,7 @@ class EC_Incomp_Fluid(object):
         self.Emin = UHeng_fromSI( get_prop(self.Tmin, self.Pmax,'U') )
         self.Emax = UHeng_fromSI(  get_prop(self.Tmax, self.Psat_max, 'U') )
 
-        self.Hmin = UHeng_fromSI( get_prop(self.Tmin, self.Pmin, 'H') )
+        self.Hmin = UHeng_fromSI( get_prop(self.Tmin, self.Psat_min, 'H') )
         self.Hmax = UHeng_fromSI( get_prop(self.Tmax, self.Pmax, 'H') )
         
         self.Smin = Seng_fromSI( get_prop(self.Tmin, self.Pmax, 'S') )

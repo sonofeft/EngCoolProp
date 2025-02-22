@@ -348,6 +348,7 @@ class EC_Fluid(object):
             self.good_nbp = False
             self.Tnbp = 'N/A'
             
+        # set Tref value (used to get Href)
         if self.good_nbp:
             if self.Tnbp < 536.67:
                 self.Tref = self.Tnbp # if NBP is low, use NBP as ref
