@@ -18,7 +18,7 @@ Create a listing of properties at a given T and D::
 
     ec.printProps() # Print state point at given T,P
 
-Ouput::
+Output::
     
     State Point for fluid Nitrogen (N2)
     T =     500  degR (Tc= 227.146 , Tnbp= 139.239 Ttriple= 113.672 )

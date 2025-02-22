@@ -1,0 +1,27 @@
+
+# In a ReadtheDocs document page created by a *.rst file, can a link on a page
+# cause an image on the page to change.
+
+# In other words, instead of jumping to a new page, simply change an image being displayed
+
+# RST File script: Include the JavaScript in your reST file:
+.. raw:: html
+
+    <script type="text/javascript">
+    function changeImage(imageId, newImageSrc) {
+        document.getElementById(imageId).src = newImageSrc;
+    }
+    </script>
+
+
+# RST File Initial Image: Add the images and links to your reST file:
+    .. image:: initial_image.png
+   :id: myImage
+   :alt: Initial Image
+
+# HTML in RST File to call script and change image 
+.. raw:: html
+
+    <a href="javascript:void(0);" onclick="changeImage('myImage', 'new_image1.png');">Change to Image 1</a>
+    <br>
+    <a href="javascript:void(0);" onclick="changeImage('myImage', 'new_image2.png');">Change to Image 2</a>

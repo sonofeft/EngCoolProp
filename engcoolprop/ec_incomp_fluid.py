@@ -1,24 +1,25 @@
 #!/usr/bin/env python
 # -*- coding: ascii -*-
 
+
 r"""
 CoolProps has a set of incompressible fluids
 EC_Incomp_Fluid is a wrapper of those fluids using Engineering Units.
 
-EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and hour).
+EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and hour).::
 
-    The following are the default units for each property of Incompressible Fluids.
-
-    T = Temperature = degR
-    P = Pressure = psia
-    D = Density = lbm/cu ft
-    rho = Density = lbm/cu inch
-    E = Internal Energy = BTU/lbm
-    H = Enthalpy = BTU/lbm
-    S = Entropy = BTU/lbm degR
-    Cp = Heat Capacity (const. P) = BTU/lbm degR
-    V = Viscosity = 1.0E5 * lbm/ft-sec
-    C = Thermal Conductivity = BTU/ft-hr-R
+    #:c     The following are the default units for each property of Incompressible Fluids.
+    #:c 
+    #:c     T = Temperature = degR
+    #:c     P = Pressure = psia
+    #:c     D = Density = lbm/cu ft
+    #:c     rho = Density = lbm/cu inch
+    #:c     E = Internal Energy = BTU/lbm
+    #:c     H = Enthalpy = BTU/lbm
+    #:c     S = Entropy = BTU/lbm degR
+    #:c     Cp = Heat Capacity (const. P) = BTU/lbm degR
+    #:c     V = Viscosity = 1.0E5 * lbm/ft-sec
+    #:c     C = Thermal Conductivity = BTU/ft-hr-R
 
 """
 import os
@@ -136,16 +137,16 @@ class EC_Incomp_Fluid(object):
     
 
     def setProps(self, **inpD):
-        '''Generic call using any P with supported inputs T,D,S,H
+        '''Generic call using any P with supported inputs T,D,S,H::
         
         #: for example
         #: ec.setProps(T=100, P=200)
         #: ec.setProps(D=0.1, P=100)
         #: ec.setProps(P=100, H=20)
-
-        # Make so both:
-        # setProps(T=530, P=100)  AND  
-        # setProps(P=100, T=530) will work
+        #:
+        #: Made so both:
+        #: setProps(T=530, P=100)  AND  
+        #: setProps(P=100, T=530) will work
 
         '''
         
@@ -258,7 +259,6 @@ class EC_Incomp_Fluid(object):
 
         self.T = T
         self.P = P
-        self.adjusted = None
 
         self.D = Deng_fromSI( get_prop('D') )
 

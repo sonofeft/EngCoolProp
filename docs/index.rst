@@ -59,6 +59,7 @@ Contents:
 
    quickstart
    examples
+   incompressible
    functions
    copyright
    authors

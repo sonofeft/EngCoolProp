@@ -5,7 +5,8 @@ from engcoolprop.ec_fluid import ( Peng_fromSI, PropsSI , TSI_fromEng, PSI_fromE
 # from engcoolprop.find_exception_threshold import find_exception_limit
 from engcoolprop.safe_get_property import safe_get_INCOMP_prop as safe_get_prop
 from engcoolprop.ec_fluid import toSI_callD
-from scipy import optimize
+
+from engcoolprop.root_solver import brentq
 
 # ==================================================================================
 def calc_Psat_psia( TdegR, fluid ):
@@ -92,7 +93,7 @@ def find_T_at_P( ec_inc, P, dep_name='H', dep_val=0, tol=1.0E-7):
     except:
         pass
 
-    sol = optimize.root_scalar(get_opt_targ_of_T, bracket=[ec_inc.Tmin, ec_inc.Tmax], xtol=tol )
+    sol = brentq(get_opt_targ_of_T, ec_inc.Tmin, ec_inc.Tmax, xtol=tol )
 
     # print( "sol.function_calls=%s, sol.iterations=%s"%(sol.function_calls, sol.iterations),
     #        'for', "dep_name=%s, dep_val=%s"%(dep_name, dep_val) )
@@ -108,9 +109,11 @@ def find_T_at_P( ec_inc, P, dep_name='H', dep_val=0, tol=1.0E-7):
 # ==================================================================================
 def calc_Tnbp( ec_inc, method=None  ):
     """ 
+    Use brentq method to solve for Tnbp
+    (code taken from scipy)
     see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root_scalar.html
-    for method options.
-    If method == None, uses "brentq"
+    or: https://en.wikipedia.org/wiki/Brent%27s_method
+    for background info.
     """
 
     # find Tnbp where Psat = 1 atm (14.6959 psia)
@@ -118,7 +121,7 @@ def calc_Tnbp( ec_inc, method=None  ):
     f = lambda T: calc_Psat_psia( T, ec_inc.fluid) - 14.6959 # find t(T) == 0
 
     tol=1.0e-6
-    sol = optimize.root_scalar(f, bracket=[ec_inc.Tmin, ec_inc.Tmax], xtol=tol )
+    sol = brentq(f, ec_inc.Tmin, ec_inc.Tmax, xtol=tol )
 
     Tnbp = sol.root
 

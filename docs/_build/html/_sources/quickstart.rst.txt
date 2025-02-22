@@ -61,7 +61,7 @@ A simple usage of EngCoolProp is shown here::
 pip Error Messages
 ------------------
 
-If you get an error message that ``pip`` is not found, see `<https://pip.pypa.io/en/latest/installing.html>`_ for full description of ``pip`` installation.
+If you get an error message that ``pip`` is not found, see `<https://pip.pypa.io/en/latest/installation/>`_ for full description of ``pip`` installation.
 
 There might be issues with ``pip`` failing on Linux with a message like::
 
@@ -70,7 +70,8 @@ There might be issues with ``pip`` failing on Linux with a message like::
             or    
     Cannot fetch index base URL https://pypi.python.org/simple/
 
-Certain Python platforms (specifically, versions of Python earlier than 2.7.9) have the InsecurePlatformWarning. If you encounter this warning, it is strongly recommended you upgrade to a newer Python version, or that you use pyOpenSSL.    
+Certain Python platforms (specifically, versions of Python earlier than 2.7.9) have the InsecurePlatformWarning. 
+If you encounter this warning, it is strongly recommended you upgrade to a newer Python version, or that you use pyOpenSSL.    
 
 Also ``pip`` may be mis-configured and point to the wrong PyPI repository.
 You need to fix this global problem with ``pip`` just to make python usable on your system.

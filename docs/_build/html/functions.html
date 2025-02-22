@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>EngCoolProp Functions &#8212; EngCoolProp 0.1.7 documentation</title>
+    <title>EngCoolProp Functions &#8212; EngCoolProp 0.1.8 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
@@ -19,7 +19,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="copyright" title="Copyright" href="copyright.html" />
     <link rel="next" title="Copyright" href="copyright.html" />
-    <link rel="prev" title="Examples" href="examples.html" />
+    <link rel="prev" title="Incompressible Fluids" href="incompressible.html" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <!--[if lt IE 9]>
     <script src="_static/css3-mediaqueries.js"></script>
@@ -38,9 +38,9 @@
           <a href="copyright.html" title="Copyright"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="examples.html" title="Examples"
+          <a href="incompressible.html" title="Incompressible Fluids"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">EngCoolProp Functions</a></li> 
       </ul>
     </div>  
@@ -50,8 +50,10 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="module-engcoolprop.ec_fluid">
-<span id="engcoolprop-functions"></span><h1>EngCoolProp Functions<a class="headerlink" href="#module-engcoolprop.ec_fluid" title="Permalink to this heading">¶</a></h1>
+  <section id="engcoolprop-functions">
+<h1>EngCoolProp Functions<a class="headerlink" href="#engcoolprop-functions" title="Permalink to this heading">¶</a></h1>
+<section id="module-engcoolprop.ec_fluid">
+<span id="ec-fluid-functions"></span><span id="link-ec-fluid-functions"></span><h2>EC_Fluid Functions<a class="headerlink" href="#module-engcoolprop.ec_fluid" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="engcoolprop.ec_fluid.EC_Fluid">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">engcoolprop.ec_fluid.</span></span><span class="sig-name descname"><span class="pre">EC_Fluid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'N2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">530.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_fluid.EC_Fluid" title="Permalink to this definition">¶</a></dt>
@@ -272,6 +274,162 @@
 </dd></dl>
 
 </section>
+<section id="module-engcoolprop.ec_incomp_fluid">
+<span id="ec-incomp-fluid-functions"></span><span id="link-ec-incomp-fluid-functions"></span><h2>EC_Incomp_Fluid Functions<a class="headerlink" href="#module-engcoolprop.ec_incomp_fluid" title="Permalink to this heading">¶</a></h2>
+<p>CoolProps has a set of incompressible fluids
+EC_Incomp_Fluid is a wrapper of those fluids using Engineering Units.</p>
+<p>EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and hour).:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#:c     The following are the default units for each property of Incompressible Fluids.</span>
+<span class="c1">#:c </span>
+<span class="c1">#:c     T = Temperature = degR</span>
+<span class="c1">#:c     P = Pressure = psia</span>
+<span class="c1">#:c     D = Density = lbm/cu ft</span>
+<span class="c1">#:c     rho = Density = lbm/cu inch</span>
+<span class="c1">#:c     E = Internal Energy = BTU/lbm</span>
+<span class="c1">#:c     H = Enthalpy = BTU/lbm</span>
+<span class="c1">#:c     S = Entropy = BTU/lbm degR</span>
+<span class="c1">#:c     Cp = Heat Capacity (const. P) = BTU/lbm degR</span>
+<span class="c1">#:c     V = Viscosity = 1.0E5 * lbm/ft-sec</span>
+<span class="c1">#:c     C = Thermal Conductivity = BTU/ft-hr-R</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">engcoolprop.ec_incomp_fluid.</span></span><span class="sig-name descname"><span class="pre">EC_Incomp_Fluid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'DowQ'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Pmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">child</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.adjust_P_for_Psat">
+<span class="sig-name descname"><span class="pre">adjust_P_for_Psat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_param</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'T'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ind_val</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">530.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.adjust_P_for_Psat" title="Permalink to this definition">¶</a></dt>
+<dd><p>If Psat is greater than P, then to maintain liquid state, use Psat</p>
+<p>Given independent variable name and value, calc T and then Psat
+NOTE: P is in Engineering units (psia)
+NOTE: ind_val is in Engineering units (degR, lbm/cuft, etc.)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constH_newP">
+<span class="sig-name descname"><span class="pre">constH_newP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constH_newP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at new P with same H</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constP_newH">
+<span class="sig-name descname"><span class="pre">constP_newH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constP_newH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at new H with same P</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constS_newP">
+<span class="sig-name descname"><span class="pre">constS_newP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constS_newP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at new P with same S</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTPD">
+<span class="sig-name descname"><span class="pre">getStrTPD</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTPD" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a string from the TPDEHS properties</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTPDphase">
+<span class="sig-name descname"><span class="pre">getStrTPDphase</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTPDphase" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a string from the TPDEHS properties</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTransport">
+<span class="sig-name descname"><span class="pre">getStrTransport</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a string from the Transport properties</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Psat">
+<span class="sig-name descname"><span class="pre">get_Psat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Psat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given T in degR (Engineering units) return Psat in psia (if supported)
+NOTE: if not supported, return 0 for Psat</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Tsat">
+<span class="sig-name descname"><span class="pre">get_Tsat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Tsat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate Tsat at given P (psia).
+If P is greater than max Psat, simply return Tmax.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.initFromObj">
+<span class="sig-name descname"><span class="pre">initFromObj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.initFromObj" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize properties from another n_fluid object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.printProps">
+<span class="sig-name descname"><span class="pre">printProps</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.printProps" title="Permalink to this definition">¶</a></dt>
+<dd><p>print a multiline property summary with units</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.printTPD">
+<span class="sig-name descname"><span class="pre">printTPD</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.printTPD" title="Permalink to this definition">¶</a></dt>
+<dd><p>print a string from the TPDEHS properties</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.restoreFromDup">
+<span class="sig-name descname"><span class="pre">restoreFromDup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.restoreFromDup" title="Permalink to this definition">¶</a></dt>
+<dd><p>restore properties from duplicate n_fluid</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.saveToDup">
+<span class="sig-name descname"><span class="pre">saveToDup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.saveToDup" title="Permalink to this definition">¶</a></dt>
+<dd><p>save properties to duplicate n_fluid</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPD">
+<span class="sig-name descname"><span class="pre">setPD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">D</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc props from P and D
+NOTE: The pressure has NO EFFECT on incompressible density calc.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPH">
+<span class="sig-name descname"><span class="pre">setPH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">H</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPH" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at P and H</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPS">
+<span class="sig-name descname"><span class="pre">setPS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">P</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc properties at P and H</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setProps">
+<span class="sig-name descname"><span class="pre">setProps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">inpD</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setProps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generic call using any P with supported inputs T,D,S,H:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#: for example</span>
+<span class="c1">#: ec.setProps(T=100, P=200)</span>
+<span class="c1">#: ec.setProps(D=0.1, P=100)</span>
+<span class="c1">#: ec.setProps(P=100, H=20)</span>
+<span class="c1">#:</span>
+<span class="c1">#: Made so both:</span>
+<span class="c1">#: setProps(T=530, P=100)  AND  </span>
+<span class="c1">#: setProps(P=100, T=530) will work</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setTP">
+<span class="sig-name descname"><span class="pre">setTP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">530.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">P</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setTP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calc props from T and P</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
 
 
             <div class="clearer"></div>
@@ -288,38 +446,67 @@
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">QuickStart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="incompressible.html">Incompressible Fluids</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">EngCoolProp Functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid"><code class="docutils literal notranslate"><span class="pre">EC_Fluid</span></code></a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.Qdescription"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.Qdescription()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.compressibility"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.compressibility()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.constH_newP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.constH_newP()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.constP_newH"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.constP_newH()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.constS_newP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.constS_newP()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.dH_FromHref"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.dH_FromHref()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.dHvap"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.dHvap()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.gamma"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.gamma()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatP()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatPandDens"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatPandDens()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatT"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatT()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatTandDens"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatTandDens()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTPD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getStrTPD()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTPDphase"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getStrTPDphase()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTransport"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getStrTransport()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.html_desc"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.html_desc()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.initFromObj"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.initFromObj()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.newDE"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.newDE()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.printCriticalProps"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.printCriticalProps()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.printProps"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.printProps()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.printTPD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.printTPD()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.restoreFromDup"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.restoreFromDup()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.saveToDup"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.saveToDup()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setPD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setPD()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setPH"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setPH()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setProps"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setProps()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setPropsFromAS"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setPropsFromAS()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setTD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setTD()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setTP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setTP()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.surfTen"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.surfTen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-engcoolprop.ec_fluid">EC_Fluid Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid"><code class="docutils literal notranslate"><span class="pre">EC_Fluid</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.Qdescription"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.Qdescription()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.compressibility"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.compressibility()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.constH_newP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.constH_newP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.constP_newH"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.constP_newH()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.constS_newP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.constS_newP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.dH_FromHref"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.dH_FromHref()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.dHvap"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.dHvap()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.gamma"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.gamma()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatPandDens"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatPandDens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatT"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatT()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getSatTandDens"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getSatTandDens()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTPD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getStrTPD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTPDphase"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getStrTPDphase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.getStrTransport"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.getStrTransport()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.html_desc"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.html_desc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.initFromObj"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.initFromObj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.newDE"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.newDE()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.printCriticalProps"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.printCriticalProps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.printProps"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.printProps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.printTPD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.printTPD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.restoreFromDup"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.restoreFromDup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.saveToDup"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.saveToDup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setPD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setPD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setPH"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setPH()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setProps"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setProps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setPropsFromAS"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setPropsFromAS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setTD"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setTD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.setTP"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.setTP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_fluid.EC_Fluid.surfTen"><code class="docutils literal notranslate"><span class="pre">EC_Fluid.surfTen()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-engcoolprop.ec_incomp_fluid">EC_Incomp_Fluid Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.adjust_P_for_Psat"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.adjust_P_for_Psat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constH_newP"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.constH_newP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constP_newH"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.constP_newH()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.constS_newP"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.constS_newP()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTPD"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.getStrTPD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTPDphase"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.getStrTPDphase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.getStrTransport"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.getStrTransport()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Psat"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.get_Psat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Tsat"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.get_Tsat()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.initFromObj"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.initFromObj()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.printProps"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.printProps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.printTPD"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.printTPD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.restoreFromDup"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.restoreFromDup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.saveToDup"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.saveToDup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPD"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.setPD()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPH"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.setPH()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPS"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.setPS()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setProps"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.setProps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setTP"><code class="docutils literal notranslate"><span class="pre">EC_Incomp_Fluid.setTP()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -332,8 +519,8 @@
   </div>
   <div>
     <h4>Previous topic</h4>
-    <p class="topless"><a href="examples.html"
-                          title="previous chapter">Examples</a></p>
+    <p class="topless"><a href="incompressible.html"
+                          title="previous chapter">Incompressible Fluids</a></p>
   </div>
   <div>
     <h4>Next topic</h4>
@@ -374,9 +561,9 @@
           <a href="copyright.html" title="Copyright"
              >next</a> |</li>
         <li class="right" >
-          <a href="examples.html" title="Examples"
+          <a href="incompressible.html" title="Incompressible Fluids"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.7 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">EngCoolProp Functions</a></li> 
       </ul>
     </div>
