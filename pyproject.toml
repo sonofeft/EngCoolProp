@@ -20,6 +20,7 @@ python = "*"
 coverage = {optional = true, version = "*"}
 numpy = "*"
 coolprop = "*"
+scipy = "*"
 
 [tool.poetry.dev-dependencies]
 check-manifest = "*"

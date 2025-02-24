@@ -1,4 +1,6 @@
 
+
+
 @echo off
 setlocal
 
@@ -9,8 +11,10 @@ set "do_the_upload=FALSE"
 if "%do_the_upload%" == "TRUE" (
     echo ...............................................................
     echo doing the upload
+    echo NOTE: twine on WSL Ubuntu works MUCH better with testpypi
+    echo twine upload --config-file "/mnt/c/Users/Charlie Taylor/.pypirc"  --repository testpypi --skip-existing dist/*.*
     echo ...............................................................
-    C:\Python310\Scripts\twine.exe upload --config-file "%HOMEPATh%\.pypirc" --skip-existing dist/*.*
+    C:\Python310\Scripts\twine.exe upload --config-file "%HOMEPATh%\.pypirc" --repository testpypi --skip-existing dist/*.*
     echo ....................... DONE ..................................
 ) else (
     echo ...................... CHECK LIST .............................
@@ -20,14 +24,9 @@ if "%do_the_upload%" == "TRUE" (
     echo ...............................................................
     echo RUN pytest
     echo ...............................................................
-    echo Update HISTORY.rst    README.rst    AUTHORS.rst
-    echo ...............................................................
     echo Make sure that sphinx HTML is built with _BUILD_SPHINX_HTML.BAT
     echo ...............................................................
     echo COMMIT all files in git
-    echo        AND Tag IF a new version release
-    echo        git tag -a v1.x.x -m "EngCoolProps 1.x.x"
-    echo        git push --follow-tags
     echo ...............................................................
     echo Make sure that "python -m build" has been executed
     echo        AND any "python -m build --wheel"
@@ -37,8 +36,17 @@ if "%do_the_upload%" == "TRUE" (
     echo twine check dist/*24.tar.gz (where: 24 is current version)
     echo ...............................................................
     echo THEN: set "do_the_upload=TRUE" to run the upload
-    echo           AFTER UPLOAD: set "do_the_upload=FALSE"
+    echo AFTER UPLOAD: set "do_the_upload=FALSE"
     echo ...............................................................
 )
 
 endlocal
+
+
+
+rem only upload source to PyPI
+rem twine upload --repository testpypi --skip-existing dist/*.gz
+
+
+rem To install from testpypi
+rem  python -m pip install --index-url https://test.pypi.org/simple/ rocketcea

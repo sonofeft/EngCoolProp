@@ -14,6 +14,40 @@ def calc_Psat_psia( TdegR, fluid ):
     return Psat_psia
 
 # ==================================================================================
+def find_T_from_Dterp(ec_inc, Dtarg, tol=1e-12, max_iter=1000):
+    """
+    Using the Interpolator ec_inc.Dterp (D=f(T)), calculate T for a target D
+    Dtarg = Lbm/cuft
+    Return T = degR
+    """
+
+
+    D_low = ec_inc.Dmin
+    D_high = ec_inc.Dmax
+
+    if Dtarg < D_low:
+        print( 'WARNING: Dtarg=%g too low in find_T_from_D. Returning Tmax=%g R'%( Dtarg, ec_inc.Tmax ))
+        return ec_inc.Tmax, 0 # all good (returning TdegR)
+    if Dtarg > D_high:
+        print( 'WARNING: Dtarg=%g too high in find_T_from_D. Returning Tmin=%g R'%( Dtarg, ec_inc.Tmin ))
+        return ec_inc.Tmin, 0 # all good (returning TdegR)
+    # ............................................................
+
+    def get_d_param_at_T( T ):
+            D = ec_inc.Dterp( T )
+            return D - Dtarg # finds 0 point
+
+    sol = brentq(get_d_param_at_T, ec_inc.Tmin, ec_inc.Tmax, xtol=tol )
+
+    TdegR = sol.root
+
+    if sol.converged:
+        return TdegR, 0 # all good
+    else:
+        return TdegR, 1 # error
+
+
+# ==================================================================================
 def find_T_from_D(ec_inc, D, tol=1e-7, max_iter=1000):
     # Define the search range for temperature in Kelvin
     T_low_si = ec_inc.Tmin_si  # Lower bound of temperature in K
@@ -30,30 +64,25 @@ def find_T_from_D(ec_inc, D, tol=1e-7, max_iter=1000):
     if Dtarg_si > D_high_si:
         print( 'WARNING: Dtarg_si=%g too high in find_T_from_D. Returning Tmin=%g R'%( Dtarg_si, ec_inc.Tmin ))
         return ec_inc.Tmin, 0 # all good (returning TdegR)
+    # ............................................................
+
+    def get_d_param_at_T( Tsi ):
+        if 1:#try:
+            Dsi = CP.PropsSI('D', 'T', Tsi, 'P', ec_inc.Pmax_si, ec_inc.fluid)
+            return Dsi - Dtarg_si # finds 0 point
+        # except:
+        #     return float('inf')
+
+    sol = brentq(get_d_param_at_T, ec_inc.Tmin_si, ec_inc.Tmax_si, xtol=tol )
+
+    TdegR = Teng_fromSI(sol.root)
+
+    if sol.converged:
+        return TdegR, 0 # all good
+    else:
+        return TdegR, 1 # error
 
 
-    for i in range(max_iter):
-        T_mid_si = (T_low_si + T_high_si) / 2
-        try:
-            density = CP.PropsSI('D', 'T', T_mid_si, 'P', ec_inc.Pmax_si, ec_inc.fluid)
-        except ValueError as e:
-            if "below the freezing point" in str(e):
-                print(T_mid_si, "below the freezing point")
-                T_low_si = T_mid_si
-                continue
-            else:
-                raise e
-        
-        if abs(density - Dtarg_si) < tol:
-            # print( 'Number of iterations in find_T_from_D =', i)
-            return Teng_fromSI(T_mid_si), 0 # all good (returning TdegR)
-        elif density < Dtarg_si:
-            T_high_si = T_mid_si
-        else:
-            T_low_si = T_mid_si
-
-    # print( 'Number of iterations in find_T_from_D =', i)
-    return Teng_fromSI(T_mid_si), 1 # Failed (returning TdegR)
 
 
 # ==================================================================================
@@ -62,36 +91,16 @@ def find_T_at_P( ec_inc, P, dep_name='H', dep_val=0, tol=1.0E-7):
     Iterate on T to find the value of the dependent variable for given P
     """
 
-    P = max( P, ec_inc.get_Psat(T) )
+    TargSI = toSI_callD[dep_name]( dep_val ) # get target from Eng units to SI
 
-    Psi = PSI_fromEng( P )
-    TargSI = toSI_callD[dep_name]( dep_val )
-    def get_opt_targ_of_T( T ):
+    def get_opt_targ_of_T( T ): # T in degR
+        Psat = ec_inc.get_Psat( T )
+        Psi = PSI_fromEng( max(P, Psat + 0.001) ) # force fluid to Liquid if below Psat line
         try:
             SI_prop = PropsSI(dep_name, 'T',TSI_fromEng(T),'P',Psi,'INCOMP::%s'%ec_inc.symbol)
             return SI_prop - TargSI # finds 0 point
         except:
             return float('inf')
-    
-    try:
-        opt_targ = get_opt_targ_of_T(ec_inc.Tmin  )
-        # print( "Tmin opt_targ=%s at Tmin"%opt_targ,
-        #        "dep_name=%s, dep_val=%s"%(dep_name, dep_val) )
-        if abs(opt_targ) <= tol:
-            # print( "opt_targ=%g at Tmin"%opt_targ )
-            return ec_inc.Tmin, 0 # all good
-    except:
-        pass
-
-    try:
-        opt_targ = get_opt_targ_of_T(ec_inc.Tmax  )
-        # print( "Tmax opt_targ=%s at Tmin"%opt_targ,
-        #        "dep_name=%s, dep_val=%s"%(dep_name, dep_val) )
-        if abs(opt_targ) <= tol:
-            # print( "opt_targ=%g at Tmax"%opt_targ )
-            return ec_inc.Tmax, 0 # all good
-    except:
-        pass
 
     sol = brentq(get_opt_targ_of_T, ec_inc.Tmin, ec_inc.Tmax, xtol=tol )
 
@@ -177,7 +186,7 @@ if __name__ == "__main__":
             
             ec_inc.setTP( T, P)
 
-            TdegR, err_flag = find_T_from_D(ec_inc, ec_inc.D, max_iter=1000)
+            TdegR, err_flag = find_T_from_Dterp(ec_inc, ec_inc.D, max_iter=1000)
 
             error = T - TdegR
             if abs(error) > EPSILON:

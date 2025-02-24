@@ -1,3 +1,5 @@
+import traceback
+
 def f(x):
     # Dummy implementation of the function that may throw an exception.
     # Replace this with the actual function implementation as needed.
@@ -21,22 +23,26 @@ def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10,
     Returns:
     float: The value of x where f(x) does NOT throw an exception
     """
+    tb_str = ''
     try:
         f( lower_bound )
         bad_lower = False
     except:
         bad_lower = True
+        tb_str = traceback.format_exc()
         
     try:
         f( upper_bound )
         bad_upper = False
     except:
         bad_upper = True
+        tb_str += '\n\n' + traceback.format_exc()
         
     # Exception boundary not included in bounds
     if bad_lower and bad_upper:
         if show_warnings:
             print( '*** Both upper and lower limits throw Exception in find_exception_limit***' )
+            print( '    TRACEBACK:', tb_str)
         return None
         
     # All good
