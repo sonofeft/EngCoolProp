@@ -82,19 +82,22 @@ class EC_Incomp_Fluid(object):
         self.Tmax_si =   PropsSI('Tmax','T',0,'P',0,'INCOMP::%s'%symbol) * 0.9999999999999999
 
         # ==== some fluids have min or max point in density curve ( screws up state = f(P, D) ) ====
-        #      For now, these warnings can not be suppressed by show_warnings
         if self.symbol == 'PMR':
             self.Tmax_si = 500.0 # degK # has minimum in D=f(T) curve.
-            print( 'WARNING: PMR Tmax reduced to 500K due to error in CoolProp equation for Density' )
+            if show_warnings > 0:
+                print( 'WARNING: PMR Tmax reduced to 500K due to error in CoolProp equation for Density' )
         elif self.symbol == 'NBS':
             self.Tmin_si = 275.0 # degK # has maximum in D=f(T) curve.
-            print( 'WARNING: NBS Tmin increased to 275K due to error in CoolProp equation for Density' )
+            if show_warnings > 0:
+                print( 'WARNING: NBS Tmin increased to 275K due to error in CoolProp equation for Density' )
         elif self.symbol == 'FoodWater':
             self.Tmin_si =  280.0 # degK # has maximum in D=f(T) curve.
-            print( 'WARNING: FoodWater Tmin increased to 280K due to error in CoolProp equation for Density' )
+            if show_warnings > 0:
+                print( 'WARNING: FoodWater Tmin increased to 280K due to error in CoolProp equation for Density' )
         elif self.symbol == 'LiqNa':
             self.Tmax_si = 2455.0 # degK # has maximum in H=f(T,P) curve.
-            print( 'WARNING: LiqNa Tmax reduced to 2455 due to error in CoolProp equation for Enthalpy' )
+            if show_warnings > 0:
+                print( 'WARNING: LiqNa Tmax reduced to 2455 due to error in CoolProp equation for Enthalpy' )
 
 
 
@@ -105,10 +108,13 @@ class EC_Incomp_Fluid(object):
 
         self.Dterp = get_density_interpolator( self )
 
+        self.check_visc_support()
+
         self.Pmin = self.get_Psat( self.Tmin ) #+ 0.0001
 
         if T is None:
             T = int((self.Tmin + self.Tmax) / 2.0)
+            # else: T = input T
         
         self.P = P
         self.Pinput = P # in setTP, if P is below Psat, P will be increased to Psat
@@ -136,15 +142,33 @@ class EC_Incomp_Fluid(object):
         else:
             self.T = T
 
+        T_save = self.T
+        P_save = self.P
         self.calc_min_max_props()
+        self.T = T_save
+        self.P = P_save
 
         # set properties to input T and P
+        # print( 'First call to setTP')
         self.setTP(self.T, self.P)
+        # print( 'Back from: First call to setTP')
             
         if child==1: 
             self.dup = EC_Incomp_Fluid(symbol=self.symbol, T=self.T, P=self.P, child=0, Pmax=self.Pmax, 
                                        show_warnings=0)
             
+    def check_visc_support(self):
+        try:
+            _ =  PropsSI('V','T',self.Tmin_si,'P',self.Pmax_si, self.fluid ) # Vmax at Tmin
+            _ =  PropsSI('V','T',self.Tmax_si,'P',self.Pmax_si, self.fluid ) # Vmin at Tmax
+            self.visc_is_supported = True
+        except:
+            self.visc_is_supported = False
+            if self.show_warnings:
+                print( 'check_visc_support: Visc NOT supported for fluid:', self.symbol)
+
+        # print( 'Found visc_is_supported =', self.visc_is_supported)
+
 
 
     def set_warnings(self, show_warnings=2):
@@ -241,6 +265,7 @@ class EC_Incomp_Fluid(object):
     def setTP(self,T=530.0,P=1000.0):
         '''Calc props from T and P'''
 
+
         if T < self.Tmin:
             if self.show_warnings and self.Tmin - T > 0.01:
                 print( 'T too low in setTP. Changed T=%g to T=%g'%( T, self.Tmin ))
@@ -286,15 +311,16 @@ class EC_Incomp_Fluid(object):
         self.Cp = CPeng_fromSI( get_prop('C') )
 
         # Some INCOMP fluids have no viscosity data
-        if self.Viscmax < float('inf'):
+        if self.visc_is_supported:
             self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
         else:
-            self.Visc = self.Viscmax
+            self.Visc = float('inf')
 
         self.Cond = CondEng_fromSI( get_prop('L') )
 
 
         self.Psat = self.get_Psat( self.T )
+
         # self.Tsat = self.get_Tsat( self.P )
 
         # ============== Debug prints ================
@@ -576,8 +602,6 @@ class EC_Incomp_Fluid(object):
         # self.Tsat_min = self.get_Tsat( self.Pmin )
         # self.Tsat_max = self.get_Tsat( self.Pmax )
 
-        # Visc might not be supported
-        self.Viscmax = float('inf') # will be reset below if Visc is OK
 
         # make a list of the four corners of the T,P space
         tpL = [(self.Tmin, 0), (self.Tmin, self.Pmax), (self.Tmax, 0), (self.Tmax, self.Pmax)]
@@ -589,6 +613,7 @@ class EC_Incomp_Fluid(object):
             resultD[prop_name+'min'] = float('inf')
             resultD[prop_name+'max'] = float('-inf')
 
+        self.pause_warnings()
         for T,P in tpL:
             self.setTP( T, P )
 
@@ -598,6 +623,7 @@ class EC_Incomp_Fluid(object):
 
                 if getattr(self, prop_name) > resultD[prop_name+'max']:
                     resultD[prop_name+'max'] = getattr(self, prop_name)
+        self.restore_warnings()
 
         # set min/max values found in resultD
         for prop_name, value in resultD.items():
