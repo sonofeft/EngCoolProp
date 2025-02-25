@@ -29,7 +29,7 @@ from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )
 from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP
-from engcoolprop.safe_get_property import safe_get_INCOMP_prop as safe_get_prop
+from engcoolprop.safe_get_property import safe_get_INCOMP_prop
 from engcoolprop.find_exception_threshold import find_exception_limit
 
 from engcoolprop.InterpProp_scipy import get_density_interpolator
@@ -81,8 +81,8 @@ class EC_Incomp_Fluid(object):
         self.Tmin_si =   PropsSI('Tmin','T',0,'P',0,'INCOMP::%s'%symbol) * 1.0000000000000002
         self.Tmax_si =   PropsSI('Tmax','T',0,'P',0,'INCOMP::%s'%symbol) * 0.9999999999999999
 
-        # ==== some fluids have min or max point in density curve ====
-        # ( That screws up state = f(P, D) )
+        # ==== some fluids have min or max point in density curve ( screws up state = f(P, D) ) ====
+        #      For now, these warnings can not be suppressed by show_warnings
         if self.symbol == 'PMR':
             self.Tmax_si = 500.0 # degK # has minimum in D=f(T) curve.
             print( 'WARNING: PMR Tmax reduced to 500K due to error in CoolProp equation for Density' )
@@ -90,7 +90,7 @@ class EC_Incomp_Fluid(object):
             self.Tmin_si = 275.0 # degK # has maximum in D=f(T) curve.
             print( 'WARNING: NBS Tmin increased to 275K due to error in CoolProp equation for Density' )
         elif self.symbol == 'FoodWater':
-            self.Tmin_si = 280.0 # degK # has maximum in D=f(T) curve.
+            self.Tmin_si =  280.0 # degK # has maximum in D=f(T) curve.
             print( 'WARNING: FoodWater Tmin increased to 280K due to error in CoolProp equation for Density' )
         elif self.symbol == 'LiqNa':
             self.Tmax_si = 2455.0 # degK # has maximum in H=f(T,P) curve.
@@ -111,7 +111,7 @@ class EC_Incomp_Fluid(object):
             T = int((self.Tmin + self.Tmax) / 2.0)
         
         self.P = P
-        self.Pinput = P 
+        self.Pinput = P # in setTP, if P is below Psat, P will be increased to Psat
 
         try:
             Tnbp, error_code = calc_Tnbp( self )
@@ -252,7 +252,8 @@ class EC_Incomp_Fluid(object):
             T = self.Tmax
 
         self.Pinput = P # save input P in case Psat changes it.
-        # Don't allow Vapor phase... increase P to phase line
+
+        # === Don't allow Vapor phase... increase P to phase line ===
         P = max( P,  self.get_Psat( T ))
 
         if P > self.Pinput:
@@ -264,8 +265,9 @@ class EC_Incomp_Fluid(object):
         Psi = PSI_fromEng( P )
         def get_prop( prop_desc='H' ):
             try:
-                prop, good_Psi = safe_get_prop( prop_desc, Psi_val=Psi, ind_name='T', ind_si_val=Tsi, 
-                                                symbol=self.symbol, show_warnings=self.show_warnings>1 )
+                prop, good_Psi = safe_get_INCOMP_prop( prop_desc, Psi_val=Psi, ind_name='T', ind_si_val=Tsi, 
+                                                       symbol=self.symbol, show_warnings=self.show_warnings>1,
+                                                       Pmax=self.Pmax )
                 return prop
             except:
                 return float('inf')
@@ -329,10 +331,9 @@ class EC_Incomp_Fluid(object):
 
         self.Pinput = P # save input P in case Psat changes it.
         # P = self.adjust_P_for_Psat( P, ind_param="H", ind_val=H )
-
-        if P > self.Pinput:
-            if self.show_warnings:
-                print( 'P too low in setPH. Changed P=%g to Psat=%g'%( self.Pinput, P ))
+        # if P > self.Pinput:
+        #     if self.show_warnings:
+        #         print( 'P too low in setPH. Changed P=%g to Psat=%g'%( self.Pinput, P ))
         
         self.P = P 
         self.H = H
@@ -340,14 +341,16 @@ class EC_Incomp_Fluid(object):
         Psi = PSI_fromEng( P )
         Hsi = UHSI_fromEng( H )
 
+        # This approach worked for PS, but not PH
         # self.T, err_flag = find_T_at_P(self, P, dep_name='H', dep_val=H, tol=1.0E-12)
         # self.setTP( self.T, self.P)
         # return
 
         def get_prop( prop_desc='T' ):
             try:
-                prop, good_Psi = safe_get_prop( prop_desc, Psi_val=Psi, ind_name='H', ind_si_val=Hsi, 
-                                                symbol=self.symbol, show_warnings=self.show_warnings>1 )
+                prop, good_Psi = safe_get_INCOMP_prop( prop_desc, Psi_val=Psi, ind_name='H', ind_si_val=Hsi, 
+                                                       symbol=self.symbol, show_warnings=self.show_warnings>1,
+                                                       Pmax=self.Pmax )
                 return prop
             except:
                 return float('inf')
@@ -374,10 +377,9 @@ class EC_Incomp_Fluid(object):
 
         self.Pinput = P # save input P in case Psat changes it.
         # P = self.adjust_P_for_Psat( P, ind_param="S", ind_val=S )
-
-        if P > self.Pinput:
-            if self.show_warnings:
-                print( 'P too low in setPS. Changed P=%g to Psat=%g'%( self.Pinput, P ))
+        # if P > self.Pinput:
+        #     if self.show_warnings:
+        #         print( 'P too low in setPS. Changed P=%g to Psat=%g'%( self.Pinput, P ))
 
         self.P = P 
         self.S = S
@@ -391,8 +393,9 @@ class EC_Incomp_Fluid(object):
 
         # def get_prop( prop_desc='H' ):
         #     try:
-        #         prop, good_Psi = safe_get_prop( prop_desc, Psi_val=Psi, ind_name='S', ind_si_val=Ssi, 
-        #                                         symbol=self.symbol, show_warnings=self.show_warnings>1 )
+        #         prop, good_Psi = safe_get_INCOMP_prop( prop_desc, Psi_val=Psi, ind_name='S', ind_si_val=Ssi, 
+        #                                                symbol=self.symbol, show_warnings=self.show_warnings>1,
+        #                                                Pmax=self.Pmax )
         #         return prop
         #     except:
         #         return float('inf')
@@ -574,13 +577,14 @@ class EC_Incomp_Fluid(object):
         # self.Tsat_max = self.get_Tsat( self.Pmax )
 
         # Visc might not be supported
-        self.Viscmax = 0
+        self.Viscmax = float('inf') # will be reset below if Visc is OK
 
         # make a list of the four corners of the T,P space
         tpL = [(self.Tmin, 0), (self.Tmin, self.Pmax), (self.Tmax, 0), (self.Tmax, self.Pmax)]
 
         resultD = {} # key:min/max name (e.g. Dmin, Cpmax), value:float value
 
+        # set starting values for min/max of these properties
         for prop_name in [ 'D', 'E', 'H', 'S', 'Cp', 'Visc', 'Cond' ]:
             resultD[prop_name+'min'] = float('inf')
             resultD[prop_name+'max'] = float('-inf')
@@ -589,16 +593,13 @@ class EC_Incomp_Fluid(object):
             self.setTP( T, P )
 
             for prop_name in [ 'D', 'E', 'H', 'S', 'Cp', 'Visc', 'Cond' ]:
-                if 1:#try:
-                    if getattr(self, prop_name) < resultD[prop_name+'min']:
-                        resultD[prop_name+'min'] = getattr(self, prop_name)
+                if getattr(self, prop_name) < resultD[prop_name+'min']:
+                    resultD[prop_name+'min'] = getattr(self, prop_name)
 
-                    if getattr(self, prop_name) > resultD[prop_name+'max']:
-                        resultD[prop_name+'max'] = getattr(self, prop_name)
-                # except:
-                #     resultD[prop_name+'min'] = float('inf')
-                #     resultD[prop_name+'max'] = float('inf')
+                if getattr(self, prop_name) > resultD[prop_name+'max']:
+                    resultD[prop_name+'max'] = getattr(self, prop_name)
 
+        # set min/max values found in resultD
         for prop_name, value in resultD.items():
             # print( 'setting ', prop_name, value)
             setattr( self, prop_name, value )

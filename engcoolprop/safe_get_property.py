@@ -36,7 +36,7 @@ def get_si_prop( Psi_val, targ_prop='H', ind_name='T', ind_si_val=1000.0, symbol
 
 
 def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=1000.0, 
-                          symbol='Water', show_warnings=True ):
+                          symbol='Water', show_warnings=True, Pmax=10000 ):
     """
     Return desired property from PropsSI for INCOMP fluid with Exception protection
     from an invalid Pressure. (e.g. below saturation pressure)
@@ -51,6 +51,7 @@ def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=10
             S = "J/kg/K"
             T = "K"
         show_warnings (bool): will show warnings if == True
+        Pmax (float): psia max pressure searched 
             
     ...CoolProp Incompressible Properties...
     Temperature (T): Kelvin (K)
@@ -90,7 +91,7 @@ def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=10
         
         f = lambda P: get_si_prop( P, targ_prop=prop_desc, ind_name=ind_name, ind_si_val=ind_si_val, symbol=symbol )
 
-        good_Psi_val = find_exception_limit(f, tolerance=1e-4, lower_bound=1.0e-9, upper_bound=PSI_fromEng(5000),
+        good_Psi_val = find_exception_limit(f, tolerance=1e-4, lower_bound=1.0e-9, upper_bound=PSI_fromEng(Pmax),
                                              show_warnings=show_warnings )
 
         # start interpreting the output of find_exception_limit

@@ -51,6 +51,8 @@ def brentq(f, a, b, args=(), xtol=1e-12, rtol=4*np.finfo(float).eps, maxiter=100
         return RootResults(root=b, iterations=iters, function_calls=funcalls, flag=0, converged=True)
 
     if fa * fb > 0:
+        print( ' === in brentq, fa=', fa, 'with a=',a)
+        print( ' === in brentq, fb=', fb, 'with b=',b)
         raise ValueError("f(a) and f(b) must have different signs")
 
     c, fc = a, fa

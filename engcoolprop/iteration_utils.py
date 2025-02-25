@@ -3,7 +3,7 @@ import CoolProp.CoolProp as CP
 from engcoolprop.ec_fluid import ( Peng_fromSI, PropsSI , TSI_fromEng, PSI_fromEng, UHeng_fromSI,
                                    Teng_fromSI, Deng_fromSI, UHSI_fromEng, DSI_fromEng  )
 # from engcoolprop.find_exception_threshold import find_exception_limit
-from engcoolprop.safe_get_property import safe_get_INCOMP_prop as safe_get_prop
+
 from engcoolprop.ec_fluid import toSI_callD
 
 from engcoolprop.root_solver import brentq
@@ -50,8 +50,8 @@ def find_T_from_Dterp(ec_inc, Dtarg, tol=1e-12, max_iter=1000):
 # ==================================================================================
 def find_T_from_D(ec_inc, D, tol=1e-7, max_iter=1000):
     # Define the search range for temperature in Kelvin
-    T_low_si = ec_inc.Tmin_si  # Lower bound of temperature in K
-    T_high_si = ec_inc.Tmax_si  # Upper bound of temperature in K
+    # T_low_si = ec_inc.Tmin_si  # Lower bound of temperature in K
+    # T_high_si = ec_inc.Tmax_si  # Upper bound of temperature in K
 
     Dtarg_si = DSI_fromEng( D  ) # Do calcs in SI
 
@@ -86,7 +86,7 @@ def find_T_from_D(ec_inc, D, tol=1e-7, max_iter=1000):
 
 
 # ==================================================================================
-def find_T_at_P( ec_inc, P, dep_name='H', dep_val=0, tol=1.0E-7):
+def find_T_at_P( ec_inc, P, dep_name='H', dep_val=0, tol=1.0E-6):
     """
     Iterate on T to find the value of the dependent variable for given P
     """
@@ -95,7 +95,7 @@ def find_T_at_P( ec_inc, P, dep_name='H', dep_val=0, tol=1.0E-7):
 
     def get_opt_targ_of_T( T ): # T in degR
         Psat = ec_inc.get_Psat( T )
-        Psi = PSI_fromEng( max(P, Psat + 0.001) ) # force fluid to Liquid if below Psat line
+        Psi = PSI_fromEng( max(P, Psat + 0.0000001) ) # force fluid to Liquid if below Psat line
         try:
             SI_prop = PropsSI(dep_name, 'T',TSI_fromEng(T),'P',Psi,'INCOMP::%s'%ec_inc.symbol)
             return SI_prop - TargSI # finds 0 point
@@ -124,6 +124,9 @@ def calc_Tnbp( ec_inc, method=None  ):
     or: https://en.wikipedia.org/wiki/Brent%27s_method
     for background info.
     """
+    # only calc Tnbp if Psat is supported for ec_inc
+    if ec_inc.Psat_max == 0.0:
+        return 0.0, 1 # error
 
     # find Tnbp where Psat = 1 atm (14.6959 psia)
 

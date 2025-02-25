@@ -1,11 +1,5 @@
 import traceback
 
-def f(x):
-    # Dummy implementation of the function that may throw an exception.
-    # Replace this with the actual function implementation as needed.
-    if x >= 5:
-        raise ValueError("x is too large")
-    return x
 
 def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10, 
                          no_exception='lower_bound', show_warnings=True):
@@ -82,6 +76,13 @@ def find_exception_limit(f, tolerance=1e-6, lower_bound=0, upper_bound=10,
     #    return upper_bound
 
 if __name__ == "__main__":
+    def f(x):
+        # Dummy implementation of the function that may throw an exception.
+        # Replace this with the actual function implementation as needed.
+        if x >= 5:
+            raise ValueError("x is too large")
+        return x
+
     tolerance = 1e-6
-    exception_value = find_exception_limit(f, toleranceshow_warnings=True)
+    exception_value = find_exception_limit(f, tolerance, show_warnings=True)
     print(f"The value of x where f(x) throws an exception is approximately: {exception_value}")
