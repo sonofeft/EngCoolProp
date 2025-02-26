@@ -125,7 +125,7 @@ def calc_Tnbp( ec_inc, method=None  ):
     for background info.
     """
     # only calc Tnbp if Psat is supported for ec_inc
-    if ec_inc.Psat_max == 0.0:
+    if not  ec_inc.get_Psat( ec_inc.Tmax ) > 0:
         return 0.0, 1 # error
 
     # find Tnbp where Psat = 1 atm (14.6959 psia)

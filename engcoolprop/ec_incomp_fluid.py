@@ -110,6 +110,7 @@ class EC_Incomp_Fluid(object):
 
         self.check_visc_support()
 
+        # Note that Psat_min and Psat_max are calculated in calc_min_max_props
         self.Pmin = self.get_Psat( self.Tmin ) #+ 0.0001
 
         if T is None:
@@ -408,46 +409,6 @@ class EC_Incomp_Fluid(object):
 
         self.T, err_flag = find_T_at_P(self, P, dep_name='S', dep_val=S, tol=1.0E-12)
         self.setTP( self.T, self.P)
-        # return
-        
-        # Psi = PSI_fromEng( P )
-        # Ssi = SSI_fromEng( S )
-
-        # def get_prop( prop_desc='H' ):
-        #     try:
-        #         prop, good_Psi = safe_get_INCOMP_prop( prop_desc, Psi_val=Psi, ind_name='S', ind_si_val=Ssi, 
-        #                                                symbol=self.symbol, show_warnings=self.show_warnings>1,
-        #                                                Pmax=self.Pmax )
-        #         return prop
-        #     except:
-        #         return float('inf')
-
-
-        # self.T = Teng_fromSI( get_prop('T') )
-        # if self.T == float('inf'):
-        #     print( 'ERROR: got T=inf in setPS.')
-        
-        # # self.setTP( self.T, self.P)
-        # # return
-
-        # self.D = Deng_fromSI( get_prop('D') )
-        # self.rho = self.D / 1728.0
-
-        # self.H = UHeng_fromSI( get_prop('H') )
-        # self.E = UHeng_fromSI( get_prop('U') )
-        
-        # self.Cp = CPeng_fromSI( get_prop('C') )
-
-        # # Some INCOMP fluids have no viscosity data
-        # if self.Viscmin < float('inf'):
-        #     self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
-        # else:
-        #     self.Visc = self.Viscmin
-
-        # self.Cond = CondEng_fromSI( get_prop('L') )
-
-        # self.Psat = self.get_Psat( self.T )
-        # # # self.Tsat = self.get_Tsat( self.P )
 
     def constS_newP(self,P=1000.0):
         '''Calc properties at new P with same S'''
@@ -585,7 +546,7 @@ class EC_Incomp_Fluid(object):
             print("    Tnbp =%s"%SGL.Tnbp," degR,")
         print("    rho  =%s"%SGL.rho," lbm/cuin",   '                   Range(%.6f - %.6f) lbm/cuin'%(self.rho_min, self.rho_max))
         
-        if self.Psat is not None and self.Psat_max > 0:
+        if self.psat_is_supported:
             print("    Psat =%s"%SGL.Psat," psia", '                       Range(%g - %g) psia'%(self.Psat_min, self.Psat_max))
             # print("    Tsat =%s"%SGL.Tsat," degR", '                       Range(%g - %g) degR'%(self.Tsat_min, self.Tsat_max))
 
@@ -596,6 +557,10 @@ class EC_Incomp_Fluid(object):
 
         self.Psat_min = self.get_Psat( self.Tmin )
         self.Psat_max = self.get_Psat( self.Tmax )
+        if self.Psat_max > 0:
+            self.psat_is_supported = True
+        else:
+            self.psat_is_supported = False
 
         # self.Tsat_min = self.get_Tsat( self.Pmin )
         # self.Tsat_max = self.get_Tsat( self.Pmax )
@@ -649,7 +614,7 @@ class EC_Incomp_Fluid(object):
 
 
 
-if __name__ == '__main__':
+def dev_tests():
     """
     __incompressibles_pure__ = ['Acetone', 'Air', 'AS10', 'AS20', 'AS30', 'AS40', 'AS55', 'DEB', 
     'DowJ', 'DowJ2', 'DowQ', 'DowQ2', 'DSF', 'Ethanol', 'ExampleDigitalPure', 'ExamplePure',
@@ -742,3 +707,9 @@ if __name__ == '__main__':
     print()
     print( '='*22, "print full %s properties"%symbol, '='*22 )
     C.printProps()
+
+    print()
+    print( C.getStrTPDphase() )
+
+if __name__ == '__main__':
+    dev_tests()

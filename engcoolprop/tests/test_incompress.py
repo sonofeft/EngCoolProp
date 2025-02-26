@@ -54,7 +54,8 @@ for more assert options
 """
 
 import sys, os
-from engcoolprop.ec_incomp_fluid import EC_Incomp_Fluid
+import CoolProp.CoolProp as CP
+from engcoolprop.ec_incomp_fluid import EC_Incomp_Fluid, dev_tests
 
 here = os.path.abspath(os.path.dirname(__file__)) # Needed for py.test
 up_one = os.path.split( here )[0]  # Needed to find models development version
@@ -77,6 +78,78 @@ class MyTest(unittest.TestCase):
         
         # See if the self.EC_Incomp_Fluid object exists
         self.assertIsInstance(ec_inc, EC_Incomp_Fluid, msg=None)
+
+    def test_make_all_fluids(self):
+        """test make all fluids"""
+
+        incompressible_fluids = CP.get_global_param_string('incompressible_list_pure').split(',')
+        for symbol in incompressible_fluids:
+            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            self.assertIsInstance(ec_inc, EC_Incomp_Fluid, msg=None)
+
+    def test_setPropsDP_all_fluids(self):
+        """test setPropsDP for all fluids"""
+
+        incompressible_fluids = CP.get_global_param_string('incompressible_list_pure').split(',')
+        for symbol in incompressible_fluids:
+            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            T = ec_inc.T
+            ec_inc.setProps( D=ec_inc.D, P=ec_inc.P)
+
+            self.assertAlmostEqual(T, ec_inc.T, delta=0.1)
+
+    def test_setPropsHP_all_fluids(self):
+        """test setPropsHP for all fluids"""
+
+        incompressible_fluids = CP.get_global_param_string('incompressible_list_pure').split(',')
+        for symbol in incompressible_fluids:
+            if symbol == 'Air':
+                continue
+            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            T = ec_inc.T
+            ec_inc.setProps( H=ec_inc.H, P=ec_inc.P)
+
+            self.assertAlmostEqual(T, ec_inc.T, delta=0.1)
+            
+
+    def test_setPropsSP_all_fluids(self):
+        """test setPropsSP for all fluids"""
+
+        incompressible_fluids = CP.get_global_param_string('incompressible_list_pure').split(',')
+        for symbol in incompressible_fluids:
+            if symbol == 'Air':
+                continue
+            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            T = ec_inc.T
+            ec_inc.setProps( S=ec_inc.S, P=ec_inc.P)
+
+            self.assertAlmostEqual(T, ec_inc.T, delta=0.1)
+            
+
+    def test_setPropsTP_Tmin_Tmax_all_fluids(self):
+        """test setPropsDP for all fluids"""
+
+        incompressible_fluids = CP.get_global_param_string('incompressible_list_pure').split(',')
+        for symbol in incompressible_fluids:
+            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            
+            # check that safeguards for Tmin/Tmax are working
+            ec_inc.setProps( T=ec_inc.Tmin-1, P=ec_inc.P)
+            ec_inc.setProps( T=ec_inc.Tmax+1, P=ec_inc.P)
+
+            
+
+    def test__main__(self):
+        old_sys_argv = list(sys.argv)
+        sys.argv = list(sys.argv)
+        sys.argv.append('suppress_show')
+        
+        try:
+            dev_tests()
+        except:
+            raise Exception('ERROR... failed in __main__ routine')
+        finally:
+            sys.argv = old_sys_argv
         
 
 if __name__ == '__main__':
