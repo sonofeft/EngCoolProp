@@ -142,11 +142,7 @@ class EC_Incomp_Fluid(object):
         else:
             self.T = T
 
-        T_save = self.T
-        P_save = self.P
         self.calc_min_max_props()
-        self.T = T_save
-        self.P = P_save
 
         # set properties to input T and P
         # print( 'First call to setTP')
@@ -595,6 +591,8 @@ class EC_Incomp_Fluid(object):
 
     def calc_min_max_props(self, do_print=False):
         # print( '.......................Entered calc_min_max_props ..........................')
+        T_save = self.T
+        P_save = self.P
 
         self.Psat_min = self.get_Psat( self.Tmin )
         self.Psat_max = self.get_Psat( self.Tmax )
@@ -645,6 +643,10 @@ class EC_Incomp_Fluid(object):
                 min_name = name + 'min'
                 print( '%10s'%min_name, '%9g'%getattr(self, min_name) )
         # print( '.......................Finished calc_min_max_props ..........................')
+
+        # Restore state to T and P from calling method
+        self.setTP( T_save, P_save)        
+
 
 
 if __name__ == '__main__':
