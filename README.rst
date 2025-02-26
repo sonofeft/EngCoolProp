@@ -1,6 +1,6 @@
 
 
-.. image:: https://travis-ci.org/sonofeft/EngCoolProp.svg?branch=master
+
 
 .. image:: https://img.shields.io/pypi/v/EngCoolProp.svg
         
