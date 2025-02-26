@@ -497,22 +497,25 @@ class EC_Incomp_Fluid(object):
     def getStrTransport(self):
         '''create a string from the Transport properties'''
         return  "%s Cp=%6g Visc=%6g ThCond=%6g" %\
-        (self.symbol,self.Cp, self.Visc, self.Cond)
+        (self.fluid,self.Cp, self.Visc, self.Cond)
 
     def getStrTPD(self):
         '''create a string from the TPDEHS properties'''
         return  "%s T=%6.1f P=%6.1f D=%.4f E=%6.2f H=%6.2f S=%.3f" %\
-        (self.symbol,self.T, self.P, self.D, self.E, self.H, self.S)
+        (self.fluid,self.T, self.P, self.D, self.E, self.H, self.S)
 
-    def getStrTPDphase(self):
-        '''create a string from the TPDEHS properties'''
-        return  "%s T=%6.1f P=%6.1f D=%.4f E=%6.2f H=%6.2f S=%.3f" %\
-        (self.symbol,self.T, self.P, self.D, self.E, self.H, self.S)
+    # def getStrTPDphase(self):
+    #     '''create a string from the TPDEHS properties'''
+    #     return  "%s T=%6.1f P=%6.1f D=%.4f E=%6.2f H=%6.2f S=%.3f" %\
+    #     (self.fluid,self.T, self.P, self.D, self.E, self.H, self.S)
 
     def printTPD(self):
         '''print a string from the TPDEHS properties'''
         print(self.getStrTPD())
 
+    def printTransport(self):
+        '''print a string of Transport properties'''
+        print(self.getStrTransport())
 
     def printProps(self):
         '''print a multiline property summary with units'''
@@ -708,8 +711,6 @@ def dev_tests():
     print( '='*22, "print full %s properties"%symbol, '='*22 )
     C.printProps()
 
-    print()
-    print( C.getStrTPDphase() )
 
 if __name__ == '__main__':
     dev_tests()

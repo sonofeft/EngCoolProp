@@ -7,6 +7,10 @@ ec_inc = EC_Incomp_Fluid(symbol="Water")
 # Print state point
 ec_inc.printProps() # Print state point at given T,P
 
+print()
+ec_inc.printTPD()
+print()
+ec_inc.printTransport()
 
 from engcoolprop.ec_incomp_fluid import EC_Incomp_Fluid
 

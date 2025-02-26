@@ -47,7 +47,7 @@ Create a listing of properties at the default state point.
     ec_inc.printProps() # Print state point at given T,P
 
 Output::
-    
+
     State Point for fluid INCOMP::Water (Water)
     T =      671  degR,                              Range(  491.67 -   851.67) degR
     P =     1000  psia                               Range(       0 -    10000) psia
@@ -61,7 +61,19 @@ Output::
         Tnbp =  671.707  degR,
         rho  =0.0347471  lbm/cuin                    Range(0.031393 - 0.036246) lbm/cuin
         Psat =  14.4914  psia                        Range(0 - 226.073) psia
-        Tsat =   851.67  degR                        Range(500.901 - 851.67) degR    
+
+Can also print short forms of properties as::
+
+    ec_inc.printTPD()
+    
+    ec_inc.printTransport()
+
+
+Output::    
+
+    INCOMP::Water T= 671.0 P=1000.0 D=60.0430 E=142.12 H=145.20 S=0.238
+    INCOMP::Water Cp=1.00285 Visc=19.0492 ThCond=0.393587
+
 
 State Point
 -----------
@@ -80,7 +92,6 @@ It is usually best to keep Pmax above the max pressure being analyzed.::
 
 Output::
 
-
     State Point for fluid INCOMP::Water (Water)
     T =       500  degR,                              Range(  491.67 -   851.67) degR
     P =       500  psia                               Range(       0 -     5000) psia
@@ -94,7 +105,6 @@ Output::
         Tnbp =   671.707  degR,
         rho  = 0.0362273  lbm/cuin                    Range(0.031393 - 0.036246) lbm/cuin
         Psat =         0  psia                        Range(0 - 226.073) psia
-        Tsat =    851.67  degR                        Range(500.901 - 851.67) degR
 
 
 Acetone State Point
@@ -122,9 +132,10 @@ Output::
     P =     1000  psia                               Range(       0 -    10000) psia
     D =   48.427  lbm/cuft                           Range( 39.3847 -  55.7377) lbm/cuft
     E =  11.2384  BTU/lbm                            Range(-91.8912 -  123.564) BTU/lbm
-    H =  15.0596  BTU/lbm                            Range(-83.7831 -  120.773) BTU/lbm
+    H =  15.0596  BTU/lbm                            Range(-83.7831 -  123.564) BTU/lbm
     S =0.0209767  BTU/lbm degR                       Range(-0.214127 - 0.194387) BTU/lbm degR
     Cp= 0.516159  BTU/lbm degR                       Range(0.476931 - 0.623845) BTU/lbm degR
     V =  23.0543  viscosity [1.0E5 * lbm/ft-sec]     Range( 12.4036 -  113.822)
     C =        0  thermal conductivity [BTU/ft-hr-R] Range(       0 -        0)
         rho  =0.0280249  lbm/cuin                    Range(0.022792 - 0.032256) lbm/cuin
+
