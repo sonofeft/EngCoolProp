@@ -1,6 +1,6 @@
-future
 numpy
 coolprop
+scipy
 
 [dev]
 check-manifest

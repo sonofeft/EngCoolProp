@@ -1,6 +1,6 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.2
 Name: engcoolprop
-Version: 0.1.7
+Version: 0.1.8
 Summary: EngCoolProp is a python Engineering Units wrapper around the CoolProp project.
 Home-page: http://engcoolprop.readthedocs.org/en/latest/
 Download-URL: https://github.com/sonofeft/EngCoolProp
@@ -15,21 +15,35 @@ Classifier: Intended Audience :: Developers
 Classifier: Intended Audience :: End Users/Desktop
 Classifier: Topic :: Software Development :: Build Tools
 Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
-Classifier: Programming Language :: Python :: 2
-Classifier: Programming Language :: Python :: 2.7
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
 Description-Content-Type: text/x-rst
 License-File: LICENSE.txt
 License-File: AUTHORS.rst
-Requires-Dist: future
 Requires-Dist: numpy
 Requires-Dist: coolprop
+Requires-Dist: scipy
 Provides-Extra: dev
 Requires-Dist: check-manifest; extra == "dev"
 Provides-Extra: test
 Requires-Dist: coverage; extra == "test"
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: download-url
+Dynamic: home-page
+Dynamic: keywords
+Dynamic: license
+Dynamic: platform
+Dynamic: provides-extra
+Dynamic: requires-dist
+Dynamic: summary
 
 
 
@@ -37,6 +51,7 @@ Requires-Dist: coverage; extra == "test"
 
 .. image:: https://img.shields.io/pypi/v/EngCoolProp.svg
         
-.. image:: https://img.shields.io/badge/python-2.7|3.6|3.7-blue
+.. image:: https://img.shields.io/badge/python-3.7|3.8|3.9|3.10|3.11|3.12-blue
 
-.. image:: https://img.shields.io/pypi/l/EngCoolProp.svg
+.. image:: https://img.shields.io/pypi/l/EngCoolProp.svg
+

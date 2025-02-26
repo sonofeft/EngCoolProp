@@ -4,7 +4,7 @@ setlocal
 
 rem Change "do_the_upload=FALSE" to "do_the_upload=TRUE" to run the upload
 rem AFTER... satisfying upload check list
-set "do_the_upload=FALSE"
+set "do_the_upload=TRUE"
 
 if "%do_the_upload%" == "TRUE" (
     echo ...............................................................

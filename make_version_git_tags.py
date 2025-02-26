@@ -56,7 +56,7 @@ for id,v in version_tagD.items():
     
     print( tag_cmd )
     # Un-Comment os.system in order to create tag commands
-    # os.system( tag_cmd )
+    os.system( tag_cmd )
     
     
 print( "="*66 )

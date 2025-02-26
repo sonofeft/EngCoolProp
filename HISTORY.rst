@@ -7,6 +7,11 @@ History
 GitHub Log
 ----------
 
+* Feb 22, 2025
+    - (by: sonofeft) 
+        - First version including INCOMP fluids from CoolProp
+
+
 * Jan 21, 2025
     - (by: sonofeft) 
         - Fixed Viscosity conversion factor from Pa-s to lbm/ft-sec

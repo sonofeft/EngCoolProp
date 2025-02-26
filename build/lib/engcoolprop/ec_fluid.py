@@ -67,13 +67,12 @@ __email__ = "cet@appliedpython.com"
 __status__ = "4 - Beta" # "3 - Alpha", "4 - Beta", "5 - Production/Stable"
 
 #
-import string, os, sys
-from math import exp
+import os
 from CoolProp.CoolProp import PropsSI
 from CoolProp import AbstractState
 import CoolProp.CoolProp as CP
 
-# Q values to indicat all liquid or gas
+# Q values to indicate all liquid or gas
 Q_LIQUID = 0  # all liquid
 Q_GAS = 1     # all gas
 
@@ -124,7 +123,7 @@ def Veng_fromSI( V ):
     return V * 0.6719689751 # convert from Pa*s to lbm/ft/sec
     
 def VSI_fromEng( V ):
-    return V * 32.174 / 0.6719689751
+    return V / 0.6719689751
 
 def CondEng_fromSI( Cond ):
     return Cond * 0.578176
@@ -161,6 +160,20 @@ toSI_callD['E'] = UHSI_fromEng
 toSI_callD['T'] = TSI_fromEng
 toSI_callD['P'] = PSI_fromEng
 toSI_callD['Q'] = EchoInput
+
+# map SI to Eng conversion functions for each of the fluid properties
+toEng_callD = {} # index=si char, value=conversion func (e.g. Seng_fromSI)
+toEng_callD['H'] = UHeng_fromSI
+toEng_callD['D'] = Deng_fromSI
+toEng_callD['S'] = Seng_fromSI
+toEng_callD['U'] = UHeng_fromSI
+toEng_callD['T'] = Teng_fromSI
+toEng_callD['P'] = Peng_fromSI
+toEng_callD['Q'] = EchoInput
+toEng_callD['C'] = CPeng_fromSI
+toEng_callD['V'] = Veng_fromSI
+toEng_callD['L'] = CondEng_fromSI
+
 
 # create simple look-up that is order-independent for input pairs
 call_tuplesD = {} # index=(ec1, ec2), value=(XX_INPUTS, c1, c2)
@@ -335,6 +348,7 @@ class EC_Fluid(object):
             self.good_nbp = False
             self.Tnbp = 'N/A'
             
+        # set Tref value (used to get Href)
         if self.good_nbp:
             if self.Tnbp < 536.67:
                 self.Tref = self.Tnbp # if NBP is low, use NBP as ref
@@ -439,7 +453,7 @@ class EC_Fluid(object):
         except:
             #print('Failed in newDE for D=%g, E=%g'%(D, E))
             '''iterate on temperature until internal energy is correct
-            tRbegin--begining search temperature [R]'''
+            tRbegin--beginning search temperature [R]'''
             
             if self.Ttriple > self.T:
                 Tbegin = self.Ttriple
@@ -449,7 +463,7 @@ class EC_Fluid(object):
             tolr = 1.0E-8
             tR = Tbegin
             #print '---'
-            for i in range(48): # limit number of interations
+            for i in range(48): # limit number of iterations
                 self.setTD(T=tR, D=D)
                 dedt = self.Cv
                 eError = E-self.E
@@ -457,7 +471,7 @@ class EC_Fluid(object):
                 #print 'dedt=',dedt,'  eError=',eError,'  tR=',tR
                 
                 if self.Cv==0.0:
-                    print( '==> ERROR in wrap_dll.  CV=0 for tR=',tR,'  Dpcf=',Dpcf)
+                    print( '==> ERROR in wrap_dll.  CV=0 for tR=',tR )
                 
                 tR = tR + eError / dedt
                 
@@ -841,7 +855,7 @@ if __name__ == '__main__':
     
     C = EC_Fluid( symbol='CO2' )
     
-    C.setProps(T=C.Tref, Q=0.5)
+    # C.setProps(T=C.Tref, Q=0.5)
     #C.setProps(P=5., Q=0.5)
     #C.setProps(H=120., E=0.5) # illegal inputs
     
