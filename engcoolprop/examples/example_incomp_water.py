@@ -20,3 +20,5 @@ ec_inc = EC_Incomp_Fluid(symbol="Water", T=500, P=500, Pmax=5000)
 # Print state point
 ec_inc.printProps()
 
+ec_inc.setTP( 600, 600 )
+ec_inc.printProps()
