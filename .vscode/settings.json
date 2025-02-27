@@ -79,6 +79,7 @@
         "Smass",
         "Smax",
         "Smin",
+        "Soln",
         "Sref",
         "subcooled",
         "Supercrit",
@@ -105,6 +106,8 @@
         "Visc",
         "Viscmax",
         "Viscmin",
+        "Vmax",
+        "Vmin",
         "xtol"
     ],
     "python.testing.unittestEnabled": false,

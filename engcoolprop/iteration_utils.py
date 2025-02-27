@@ -1,3 +1,4 @@
+import traceback
 from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP
 from engcoolprop.ec_fluid import ( Peng_fromSI, PropsSI , TSI_fromEng, PSI_fromEng, UHeng_fromSI,
@@ -113,6 +114,48 @@ def find_T_at_P( ec_inc, P, dep_name='H', dep_val=0, tol=1.0E-6):
         return TdegR, 0 # all good
     else:
         return TdegR, 1 # error
+
+
+# ==================================================================================
+def calc_T_freeze( ec_inc  ):
+    """ 
+    Use brentq method to solve for T_freeze
+    (code taken from scipy)
+    see: https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.root_scalar.html
+    or: https://en.wikipedia.org/wiki/Brent%27s_method
+    for background info.
+    """
+
+    # find Tnbp where Psat = 1 atm (14.6959 psia)
+
+    Tmin_si =   PropsSI('Tmin','T',0,'P',0,'INCOMP::%s'%ec_inc.symbol) * 1.0000000000000002
+    Tmax_si =   PropsSI('Tmax','T',0,'P',0,'INCOMP::%s'%ec_inc.symbol) * 0.9999999999999999
+    Tmin = Teng_fromSI( Tmin_si )
+    Tmax = Teng_fromSI( Tmax_si )
+
+    T = int( Tmin + 1)
+    Psi = PSI_fromEng( 5000 )
+
+    target_str = 'below the freezing point of'
+
+    while T < Tmax:
+        try:
+            PropsSI('D', 'T',TSI_fromEng(T),'P',Psi, ec_inc.fluid)
+        except:
+            tb_str = traceback.format_exc()
+            if target_str in tb_str:
+                sL = tb_str.split( target_str )
+                sL = sL[1].split()
+                s = sL[0][:-1]
+                try:
+                    T_freeze = float( s.strip() )
+                    return T_freeze
+                except:
+                    pass
+        T += 1
+
+    return 0
+
 
 
 # ==================================================================================

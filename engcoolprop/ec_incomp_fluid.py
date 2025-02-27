@@ -61,7 +61,7 @@ class EC_Incomp_Fluid(object):
 
     def __init__(self,symbol="DowQ", T=None ,P=None, Pmax=10000.0,
                  show_warnings=2, child=1):
-        '''Init generic Fluid'''
+        '''Init generic Incompressible Fluid'''
 
         if symbol not in self.fluidNameL:
             raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(self.fluidNameL) ) )

@@ -6,7 +6,6 @@ MANIFEST.in
 README.rst
 _TODO.TXT
 nosetests_details.txt
-pyproject.toml
 requirements.txt
 setup.cfg
 setup.py
