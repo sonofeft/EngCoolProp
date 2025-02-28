@@ -18,6 +18,29 @@ prop_descD ['Cond'] = 'L'
 # NOTE: 'P' is always an independent variable
 LEGAL_PROP_CHR = set( ['T', 'D', 'U', 'H', 'S', 'C', 'V', 'L', 'P'] )
 
+def is_frac_max_check_inclusive( base_name ):
+    """ 
+    Some Solutions have problem with non-inclusive check of range.
+    Check to if this "base_name" solution has that problem. 
+    """
+
+    # get frac_max from CoolProp DB
+    frac_max = PropsSI('fraction_max','INCOMP::%s'%base_name) 
+    
+    # create max fraction input from base name of solution
+    symbol = base_name + '-' + '%g'%( frac_max*100 ) + '%'
+
+    # Use Tmax as temperature for density calc
+    T = PropsSI('Tmax','T',0,'P',0, 'INCOMP::%s'%symbol)
+    P = 34.473E+6 # Pa (5000 psia)
+
+    try:
+        PropsSI('D', 'T',T,'P',P, 'INCOMP::%s'%symbol)
+        all_good = True
+    except:
+        all_good = False
+    return all_good
+
 
 def get_si_prop( Psi_val, targ_prop='H', ind_name='T', ind_si_val=1000.0, symbol='Water'):
     """

@@ -57,14 +57,12 @@ incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_pure').spli
 
 class EC_Incomp_Fluid(object):
     
-    fluidNameL = incomp_pure_fluidL
-
     def __init__(self,symbol="DowQ", T=None ,P=None, Pmax=10000.0,
                  show_warnings=2, child=1):
         '''Init generic Incompressible Fluid'''
 
-        if symbol not in self.fluidNameL:
-            raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(self.fluidNameL) ) )
+        if symbol not in incomp_pure_fluidL:
+            raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(incomp_pure_fluidL) ) )
         
         self.symbol = symbol
         self.Pmax = Pmax # highest pressure considered in any iterative calcs (can still input P > Pmax)

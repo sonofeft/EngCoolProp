@@ -36,28 +36,27 @@ from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng
                                   Deng_fromSI ,   PSI_fromEng, Peng_fromSI,
                                   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )
-from engcoolprop.safe_get_property import safe_get_INCOMP_prop
-from engcoolprop.utils import Same_g_len
+
+from engcoolprop.safe_get_property import safe_get_INCOMP_prop, is_frac_max_check_inclusive
+from engcoolprop.utils import Same_g_len, parse_coolprop_mixture, incomp_pure_fluidL
 
 # make a list of all incompressible fluids in coolprop
-incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_solution').split(',')
+# incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_solution').split(',')
 # print( 'incomp_pure_fluidL =', incomp_pure_fluidL)
-
 
 
 class EC_Incomp_Soln(object):
     
-    fluidNameL = incomp_pure_fluidL
-
     def __init__(self,symbol="MEG-20%", T=None ,P=None, Pmax=10000.0,
                  show_warnings=2):
         '''Init generic Incompressible Solution'''
 
-        if '-' in symbol:
-            self.basename, self.percentage = symbol.split('-')
-        else:
-            self.basename, self.percentage = symbol, '100%'
-        # print( "basename=%s, percentage=%s"%(self.basename, self.percentage) )
+        try:
+            self.basename, self.percentage = parse_coolprop_mixture(symbol)
+        except:
+            raise ValueError( 'Input symbol "" not recognized.'%symbol )
+        
+        print( "basename=%s, percentage=%s"%(self.basename, self.percentage) )
 
         frac_min = PropsSI('fraction_min','INCOMP::%s'%self.basename)
         frac_max = PropsSI('fraction_max','INCOMP::%s'%self.basename)
@@ -67,18 +66,20 @@ class EC_Incomp_Soln(object):
         self.pcent_min_str = '%g'%( frac_min*100 ) + '%'
         self.pcent_max_str = '%g'%( frac_max*100 ) + '%'
 
-        self.fraction = float( self.percentage.replace('%','') ) / 100.0
+        self.fraction = self.percentage / 100.0
         # print( "self.fraction=%g"%self.fraction )
 
         # Make sure that solution base name is in CoolProp DB
-        if self.basename not in self.fluidNameL:
+        if self.basename not in incomp_pure_fluidL:
             if show_warnings:
-                raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(self.fluidNameL) ) )
+                raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(incomp_pure_fluidL) ) )
 
 
         # ==========  Account for errors in CoolProp DB ======================
-        frac_max_bad_solnL = ['ExampleSolution', 'IceEA', 'IceNA', 'IcePG', 'MKA2', 'MMG2', 'MPG2', 'ZLC', 'ZMC', 'MAM2', 'VMG' ]
-        if self.basename in frac_max_bad_solnL:
+        # Feb 2025 non-inclusive checks ['ExampleSolution', 'IceEA', 'IceNA', 'IcePG', 'MAM2', 'MKA2', 
+        #                                'MMG2', 'MPG2', 'VMG', 'ZLC', 'ZMC' ]
+        frac_max_is_inclusive = is_frac_max_check_inclusive( self.basename )
+        if not frac_max_is_inclusive:
             frac_max_offset = 0.00001
             if show_warnings and self.fraction >= frac_max:
                 print( "CoolProp DB frac_min=%s, frac_max=%s"%(frac_min, frac_max) )
@@ -95,9 +96,10 @@ class EC_Incomp_Soln(object):
             self.percentage = new_pcent
             self.fraction = frac_min
             symbol = self.basename + '-' + new_pcent
-        elif self.fraction > frac_max:
 
-            if self.basename in frac_max_bad_solnL:
+        elif self.fraction > frac_max:
+            # Need to reduce self.fraction below frac_max with non-inclusive range check.
+            if not frac_max_is_inclusive:
                 new_pcent = '%.3f'%( frac_max*100 ) + '%'
             else:
                 new_pcent = '%g'%( frac_max*100 ) + '%'

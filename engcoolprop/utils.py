@@ -1,4 +1,48 @@
 
+import re
+import CoolProp.CoolProp as CP
+
+incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_solution').split(',')
+
+def parse_coolprop_mixture(mixture_name):
+    """
+    Parses the name of a CoolProp mixture and returns the base name and mass percentage.
+
+    Args:
+    - mixture_name (str): The name of the CoolProp mixture (e.g., "LiBr[0.23]", "LiBr-23%", or "MAM2-23.6%").
+
+    Returns:
+    - tuple: A tuple containing the base name (str) and the mass percentage (float).
+    """
+    if mixture_name in incomp_pure_fluidL:
+        return mixture_name, 100 # for name w/o fraction_mass, assume 100%
+
+    # Regular expression patterns to match the different formats
+    pattern_brackets = re.compile(r"(?P<base_name>[A-Za-z0-9]+)\[(?P<mass_fraction>\d*\.\d+|\d+)\]")
+    pattern_percentage = re.compile(r"(?P<base_name>[A-Za-z0-9]+)-(?P<mass_fraction>\d*\.\d+|\d+)%")
+
+    match_brackets = pattern_brackets.match(mixture_name)
+    match_percentage = pattern_percentage.match(mixture_name)
+
+    if match_brackets:
+        base_name = match_brackets.group("base_name")
+        mass_fraction = float(match_brackets.group("mass_fraction"))
+        percent_mass = mass_fraction * 100
+    elif match_percentage:
+        base_name = match_percentage.group("base_name")
+        percent_mass = float(match_percentage.group("mass_fraction"))
+    else:
+        raise ValueError("Invalid mixture name format")
+
+    return base_name, percent_mass
+
+
+    # # Example usage
+    # mixture_name_1 = "LiBr[0.23]"
+    # mixture_name_2 = "LiBr-23%"
+
+    # base_name, percent_mass = parse_coolprop_mixture(mixture_name_1)
+    # base_name, percent_mass = parse_coolprop_mixture(mixture_name_2)
 
 def format_float(float_val, output_len=9, sig_digits=4):
     """
