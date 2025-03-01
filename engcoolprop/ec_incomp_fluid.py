@@ -22,7 +22,7 @@ EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and
     #:c     C = Thermal Conductivity = BTU/ft-hr-R
 
 """
-import os
+import traceback
 from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  
                                   Deng_fromSI ,   PSI_fromEng, Peng_fromSI,
                                   PropsSI ,   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
@@ -35,7 +35,8 @@ from engcoolprop.find_exception_threshold import find_exception_limit
 from engcoolprop.InterpProp_scipy import get_density_interpolator
 from engcoolprop.iteration_utils import find_T_from_Dterp, find_T_at_P
 from engcoolprop.iteration_utils import calc_Tnbp
-from engcoolprop.utils import Same_g_len
+from engcoolprop.utils import Same_g_len, print_avoid_valerr, incomp_pure_fluidL
+from engcoolprop.banner import banner
 
 
 # create simple look-up that is order-independent for input pairs
@@ -51,15 +52,25 @@ call_tuplesD[('S', 'P')] = {'L', 'T', 'U', 'H', 'V', 'C', 'D'}
 call_tuplesD[('T', 'P')] = {'L', 'S', 'U', 'H', 'V', 'C', 'D'}          
 
 
-# make a list of all incompressible fluids in coolprop
-incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_pure').split(',')
-# print( 'incomp_pure_fluidL =', incomp_pure_fluidL)
+# how to make a list of all incompressible fluids in coolprop
+# incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_pure').split(',')
 
 class EC_Incomp_Fluid(object):
     
     def __init__(self,symbol="DowQ", T=None ,P=None, Pmax=10000.0,
-                 show_warnings=2, child=1):
-        '''Init generic Incompressible Fluid'''
+                 show_warnings=2, auto_fix_value_errors=False):
+        """        Init generic Incompressible Fluid
+
+        Args:
+            symbol (str): Name and percent mass. (e.g. "Water", "DowQ")
+            T (None or float): Temperature degR (None sets T to (Tmin+Tmax)/2)
+            P (None or float): Pressure psia. (None set P to Pmax/10)
+            Pmax (float): Max expected pressure psia. Defaults to 10000.0.
+            show_warnings (int): Sets warning level(0=None, 1=Only serious, 2=all). Defaults to 2.
+            auto_fix_value_errors (bool): Action when ValueError occurs. 
+                                        True=correct problem with a warning, 
+                                        False throws Exception Defaults to False.
+        """
 
         if symbol not in incomp_pure_fluidL:
             raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(incomp_pure_fluidL) ) )
@@ -71,9 +82,14 @@ class EC_Incomp_Fluid(object):
             P = int( Pmax / 10 )
 
         self.show_warnings = show_warnings # some calcs will issue warning statements if show_warnings >0 severe>1
+        self.auto_fix_value_errors = auto_fix_value_errors
+
+        if show_warnings>1 and auto_fix_value_errors:
+            banner( 'NOTICE: any input violations on limits of T, D, H or S\nwill be automatically corrected (set to min or max).'+\
+                   '\nTo change this behavior set "auto_fix_value_errors" to False'+\
+                    '\nTo suppress this banner set "show_warnings" to 0 or 1')
 
         self.fluid = 'INCOMP::%s'%symbol
-        self.child = child
 
         # get temperature limits (Note attempt to avoid CoolProp round-off problems)
         self.Tmin_si =   PropsSI('Tmin','T',0,'P',0,'INCOMP::%s'%symbol) * 1.0000000000000002
@@ -129,15 +145,22 @@ class EC_Incomp_Fluid(object):
 
         # if input T is in range, use it... otherwise
         if T<self.Tmin:
-            # Each fluid has a different T range, so just set T to a mid point
-            self.T = self.Tmin + 0.001
-            print( 'NOTICE: input T too low. Changed from: %g to: %g degR'%(T, self.T) )
-            print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
+            if self.auto_fix_value_errors:
+                self.T = self.Tmin + 0.001
+                print( 'NOTICE: input T too low. Changed from: %g to: %g degR'%(T, self.T) )
+                print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input T too low. T=%g,  Tmin=%g"%(T, self.Tmin))
+
         elif T>self.Tmax:
-            # Each fluid has a different T range, so just set T to a mid point
-            self.T = self.Tmax - 0.001
-            print( 'NOTICE: input T too high. Changed from: %g to: %g degR'%(T, self.T) )
-            print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
+            if self.auto_fix_value_errors:                            
+                self.T = self.Tmax - 0.001
+                print( 'NOTICE: input T too high. Changed from: %g to: %g degR'%(T, self.T) )
+                print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input T too high. T=%g,  Tmax=%g"%(T, self.Tmax))
         else:
             self.T = T
 
@@ -148,9 +171,6 @@ class EC_Incomp_Fluid(object):
         self.setTP(self.T, self.P)
         # print( 'Back from: First call to setTP')
             
-        if child==1: 
-            self.dup = EC_Incomp_Fluid(symbol=self.symbol, T=self.T, P=self.P, child=0, Pmax=self.Pmax, 
-                                       show_warnings=0)
             
     def check_visc_support(self):
         try:
@@ -262,23 +282,41 @@ class EC_Incomp_Fluid(object):
 
 
         if T < self.Tmin:
-            if self.show_warnings and self.Tmin - T > 0.01:
-                print( 'T too low in setTP. Changed T=%g to T=%g'%( T, self.Tmin ))
-            T = self.Tmin
+            if self.auto_fix_value_errors:
+                if self.show_warnings and self.Tmin - T > 0.01:
+                    print( 'T too low in setTP. Changed T=%g to Tmin=%g'%( T, self.Tmin ))
+                T = self.Tmin
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input T too low in setTP. T=%g,  Tmin=%g"%(T, self.Tmin))
         if T > self.Tmax:
-            # if self.show_warnings and T - self.Tmax  > 0.01:
-            if self.show_warnings and T > self.Tmax + 0.1 :
-                print( 'T too high in setTP. Changed T=%g to T=%g'%( T, self.Tmax ))
-            T = self.Tmax
+            if self.auto_fix_value_errors:
+                # if self.show_warnings and T - self.Tmax  > 0.01:
+                if self.show_warnings and T > self.Tmax + 0.1 :
+                    print( 'T too high in setTP. Changed T=%g to Tmax=%g'%( T, self.Tmax ))
+                T = self.Tmax
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input T too high in setTP. T=%g,  Tmin=%g"%(T, self.Tmax))
 
         self.Pinput = P # save input P in case Psat changes it.
 
         # === Don't allow Vapor phase... increase P to phase line ===
-        P = max( P,  self.get_Psat( T ))
+        # P = max( P,  self.get_Psat( T ))
 
-        if P > self.Pinput:
-            if self.show_warnings:
-                print( 'P too low in setTP. Changed P=%g to Psat=%g'%( self.Pinput, P ))
+        self.Psat = self.get_Psat( self.T )
+
+        # if P > self.Pinput:
+        if self.Psat > P:
+            # print( 'Psat - P =', self.Psat - P)
+            if self.auto_fix_value_errors:
+                P = self.Psat
+                if self.show_warnings:
+                    print( 'P too low in setTP. Changed P=%g to Psat=%g'%( self.Pinput, self.Psat ))
+            else:
+                print_avoid_valerr()
+                raise ValueError( 'P too low in setTP. P=%g should be >= Psat=%g'%( self.Pinput, self.Psat ))
+
 
         
         Tsi = TSI_fromEng( T )
@@ -314,8 +352,6 @@ class EC_Incomp_Fluid(object):
         self.Cond = CondEng_fromSI( get_prop('L') )
 
 
-        self.Psat = self.get_Psat( self.T )
-
         # self.Tsat = self.get_Tsat( self.P )
 
         # ============== Debug prints ================
@@ -341,13 +377,21 @@ class EC_Incomp_Fluid(object):
             raise Exception( 'PH data for Air will not work properly in setPH.' )
   
         if H < self.Hmin:
-            if self.show_warnings:
-                print( 'H too low in setPH. Changed H=%g to H=%g'%( H, self.Hmin ))
-            H = self.Hmin
+            if self.auto_fix_value_errors:
+                if self.show_warnings:
+                    print( 'H too low in setPH. Changed H=%g to H=%g'%( H, self.Hmin ))
+                H = self.Hmin
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input H too low in setPH. H=%g,  Hmin=%g"%(H, self.Hmin))
         if H > self.Hmax:
-            if self.show_warnings:
-                print( 'H too high in setPH. Changed H=%g to H=%g'%( H, self.Hmax ))
-            H = self.Hmax
+            if self.auto_fix_value_errors:
+                if self.show_warnings:
+                    print( 'H too high in setPH. Changed H=%g to Hmax=%g'%( H, self.Hmax ))
+                H = self.Hmax
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input H too high in setPH. H=%g,  Hmax=%g"%(H, self.Hmax))
 
 
         self.Pinput = P # save input P in case Psat changes it.
@@ -388,13 +432,22 @@ class EC_Incomp_Fluid(object):
             raise Exception( 'PS data for Air will not work properly in setPS.' )
 
         if S < self.Smin:
-            if self.show_warnings:
-                print( 'S too low in setPS. Changed S=%g to S=%g'%( S, self.Smin ))
-            S = self.Smin
+            if self.auto_fix_value_errors:
+                if self.show_warnings:
+                    print( 'S too low in setPS. Changed S=%g to S=%g'%( S, self.Smin ))
+                S = self.Smin
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input D too low in setPS. S=%g,  Smin=%g"%(S, self.Smin))
+            
         if S > self.Smax:
-            if self.show_warnings:
-                print( 'S too high in setPS. Changed S=%g to S=%g'%( S, self.Smax ))
-            S = self.Smax
+            if self.auto_fix_value_errors:
+                if self.show_warnings:
+                    print( 'S too high in setPS. Changed S=%g to Smax=%g'%( S, self.Smax ))
+                S = self.Smax
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input D too low in setPS. S=%g,  Smin=%g"%(S, self.Smin))
 
         self.Pinput = P # save input P in case Psat changes it.
         # P = self.adjust_P_for_Psat( P, ind_param="S", ind_val=S )
@@ -420,14 +473,22 @@ class EC_Incomp_Fluid(object):
         '''
 
         if D < self.Dmin:
-            if self.show_warnings:
-                print( 'D too low in setDP. Changed D=%g to D=%g'%( D, self.Dmin ))
-            D = self.Dmin
-        if D > self.Dmax:
-            if self.show_warnings:
-                print( 'D too high in setDP. Changed D=%g to D=%g'%( D, self.Dmax ))
-            D = self.Dmax
+            if self.auto_fix_value_errors:
+                if self.show_warnings:
+                    print( 'D too low in setDP. Changed D=%g to D=%g'%( D, self.Dmin ))
+                D = self.Dmin
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input D too low in setPD. D=%g,  Dmin=%g"%(D, self.Dmin))
 
+        if D > self.Dmax:
+            if self.auto_fix_value_errors:
+                if self.show_warnings:
+                    print( 'D too high in setDP. Changed D=%g to Dmax=%g'%( D, self.Dmax ))
+                D = self.Dmax
+            else:
+                print_avoid_valerr()
+                raise ValueError("Input D too high in setPD. D=%g,  Dmax=%g"%(D, self.Dmax))
 
         self.Pinput = P # save input P in case Psat changes it.
         # P = self.adjust_P_for_Psat( P, ind_param="D", ind_val=D )
@@ -446,52 +507,6 @@ class EC_Incomp_Fluid(object):
         self.setTP( self.T, self.P )
         
         
-
-    def restoreFromDup(self):
-        '''restore properties from duplicate n_fluid'''
-        self.T = self.dup.T
-        self.P = self.dup.P
-        self.D = self.dup.D
-        self.rho = self.D / 1728.0
-        self.E = self.dup.E
-        self.H = self.dup.H
-        self.S = self.dup.S
-        self.Cp = self.dup.Cp
-        self.Visc = self.dup.Visc
-        self.Cond = self.dup.Cond
-        self.Psat = self.dup.Psat
-
-    def saveToDup(self):
-        '''save properties to duplicate n_fluid'''
-        self.dup.T = self.T
-        self.dup.P = self.P
-        self.dup.D = self.D
-        self.dup.E = self.E
-        self.dup.H = self.H
-        self.dup.S = self.S
-        self.dup.Cp = self.Cp
-        self.dup.Visc = self.Visc
-        self.dup.Cond = self.Cond
-        self.dup.Psat = self.Psat
-
-    def initFromObj(self, obj):
-        '''initialize properties from another n_fluid object'''
-        if  self.symbol == obj.symbol:
-            
-            self.T = obj.T
-            self.P = obj.P
-            self.D = obj.D
-            self.rho = self.D / 1728.0
-            self.E = obj.E
-            self.H = obj.H
-            self.S = obj.S
-            self.Cp = obj.Cp
-            self.Visc = obj.Visc
-            self.Cond = obj.Cond
-            self.Psat = obj.Psat
-        else:
-            raise Exception('Wrong fluid for initializing')
-
     def getStrTransport(self):
         '''create a string from the Transport properties'''
         return  "%s Cp=%6g Visc=%6g ThCond=%6g" %\
@@ -555,6 +570,8 @@ class EC_Incomp_Fluid(object):
         # print( '.......................Entered calc_min_max_props ..........................')
         T_save = self.T
         P_save = self.P
+
+        self.setTP(self.T, self.P)
 
         self.Psat_min = self.get_Psat( self.Tmin )
         self.Psat_max = self.get_Psat( self.Tmax )
@@ -630,7 +647,7 @@ def dev_tests():
     symbol = 'Water'
     
     print( '='*22, "%s at Pressure = 0"%symbol, '='*22 )
-    C = EC_Incomp_Fluid( symbol=symbol, T=None, P=0 )
+    C = EC_Incomp_Fluid( symbol=symbol, T=None, P=0, auto_fix_value_errors=True )
     
     # C.setTP(T= (C.Tmin+C.Tmax)/2.0, P=100) # this temperature throws an exception ???
     
@@ -708,6 +725,17 @@ def dev_tests():
     print()
     print( '='*22, "print full %s properties"%symbol, '='*22 )
     C.printProps()
+    print()
+
+    banner( 'This should fail due to "auto_fix_value_errors = False"' )
+    print( '='*22, "print full %s properties"%symbol, '='*22 )
+    try:
+        C_bad = EC_Incomp_Fluid( symbol='Water', T=None, P=0 )
+    except:
+        tb_str = traceback.format_exc()
+        print( tb_str.split('raise ValueError')[-1])
+        # print( tb_str )
+    
 
 
 if __name__ == '__main__':

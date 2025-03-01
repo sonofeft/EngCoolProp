@@ -26,7 +26,7 @@ EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and
     #:c     C = Thermal Conductivity = BTU/ft-hr-R
 
 """
-import os
+import traceback
 from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP
 
@@ -38,18 +38,18 @@ from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )
 
 from engcoolprop.safe_get_property import safe_get_INCOMP_prop, is_frac_max_check_inclusive
-from engcoolprop.utils import Same_g_len, parse_coolprop_mixture, incomp_pure_fluidL
+from engcoolprop.utils import Same_g_len, parse_coolprop_mixture, incomp_pure_solnL, print_avoid_valerr
 from engcoolprop.iteration_utils import find_T_from_Dterp
+from engcoolprop.banner import banner
 
-# make a list of all incompressible fluids in coolprop
-# incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_solution').split(',')
-# print( 'incomp_pure_fluidL =', incomp_pure_fluidL)
+# how to make a list of all incompressible solutions in coolprop
+# incomp_pure_solnL = CP.get_global_param_string('incompressible_list_solution').split(',')
 
 
 class EC_Incomp_Soln(object):
     
     def __init__(self,symbol="MEG-20%", T=None ,P=None, Pmax=10000.0,
-                 show_warnings=2, correct_value_errors=False):
+                 show_warnings=2, auto_fix_value_errors=False):
         """        Init generic Incompressible Solution
 
         Args:
@@ -58,17 +58,17 @@ class EC_Incomp_Soln(object):
             P (None or float): Pressure psia. (None set P to Pmax/10)
             Pmax (float): Max expected pressure psia. Defaults to 10000.0.
             show_warnings (int): Sets warning level(0=None, 1=Only serious, 2=all). Defaults to 2.
-            correct_value_errors (bool): Action when ValueError occurs. 
+            auto_fix_value_errors (bool): Action when ValueError occurs. 
                                         True=correct problem with a warning, 
                                         False throws Exception Defaults to False.
         """
-        self.correct_value_errors = correct_value_errors
+        self.auto_fix_value_errors = auto_fix_value_errors
 
         self.basename, self.percentage = parse_coolprop_mixture(symbol)
         if self.basename is None:
             raise ValueError( 'Input symbol "" not recognized.'%symbol )
         
-        print( "basename=%s, percentage=%s"%(self.basename, self.percentage) )
+        # print( "basename=%s, percentage=%s"%(self.basename, self.percentage) )
 
         frac_min = PropsSI('fraction_min','INCOMP::%s'%self.basename)
         frac_max = PropsSI('fraction_max','INCOMP::%s'%self.basename)
@@ -84,8 +84,13 @@ class EC_Incomp_Soln(object):
         # print( "self.fraction=%g"%self.fraction )
 
         # Make sure that solution base name is in CoolProp DB
-        if self.basename not in incomp_pure_fluidL:
-            raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(incomp_pure_fluidL) ) )
+        if self.basename not in incomp_pure_solnL:
+            raise ValueError( '"%s" is NOT in coolprop incompressible list\n%s'%(symbol, repr(incomp_pure_solnL) ) )
+
+        if show_warnings>1 and auto_fix_value_errors:
+            banner( 'NOTICE: any input violations on limits of T, D or mass fraction\nwill be automatically corrected (set to min or max).'+\
+                   '\nTo change this behavior set "auto_fix_value_errors" to False'+\
+                    '\nTo suppress this banner set "show_warnings" to 0 or 1')
 
 
         # ==========  Account for errors in CoolProp DB ======================
@@ -98,15 +103,16 @@ class EC_Incomp_Soln(object):
         if not frac_max_is_inclusive:
             
             frac_max_adjusted = frac_max - 0.00001
+
             if show_warnings and self.fraction >= frac_max:
-                print( "CoolProp DB frac_min=%s, frac_max=%s"%(frac_min, frac_max) )
-                print( 'CoolProp has a round-off problem with frac_max=%g for %s'%(frac_max, self.basename) )
+                print( 'WARNING: CoolProp has a round-off problem with frac_max=%g for %s'%(frac_max, self.basename) )
+                print( "   CoolProp DB frac_min=%s, frac_max=%s"%(frac_min, frac_max) )
                 print( '   Changing frac_max from %g to %g'%(frac_max, frac_max_adjusted))
 
 
         # make sure that fraction is in range
         if self.fraction < frac_min:
-            if self.correct_value_errors:
+            if self.auto_fix_value_errors:
                 new_pcent = '%g'%( frac_min*100 ) + '%'
                 if show_warnings:
                     print( 'WARNING: input percentage(%s) is too low. Reset to %s'%( self.percentage, new_pcent ))
@@ -114,7 +120,7 @@ class EC_Incomp_Soln(object):
                 self.fraction = frac_min
                 symbol = self.basename + '-' + new_pcent
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError('Input percentage(%s) is too low. min percent = %g'%( self.percentage, frac_min*100 ))
 
         elif self.fraction >= frac_max_adjusted and self.fraction <= frac_max_hi: 
@@ -130,7 +136,7 @@ class EC_Incomp_Soln(object):
                 symbol = self.basename + '-' + new_pcent
 
         elif self.fraction > frac_max:
-            if self.correct_value_errors:
+            if self.auto_fix_value_errors:
                 # Need to reduce self.fraction below frac_max with non-inclusive range check.
                 if not frac_max_is_inclusive:
                     new_pcent = '%.3f'%( frac_max_adjusted*100 ) + '%'
@@ -143,7 +149,7 @@ class EC_Incomp_Soln(object):
                 self.fraction = frac_max
                 symbol = self.basename + '-' + new_pcent
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError( 'Input percentage(%s) is too high. max percent = %g'%( self.percentage, frac_max*100 ) )
 
 
@@ -213,25 +219,25 @@ class EC_Incomp_Soln(object):
 
         # if input T is in range, use it... otherwise
         if T<self.Tmin:
-            if self.correct_value_errors:
-                # Each fluid has a different T range, so just set T to a mid point
+            if self.auto_fix_value_errors:                
                 self.T = self.Tmin + 0.001
                 if show_warnings:
                     print( 'NOTICE: input T too low. Changed from: %g to: %g degR'%(T, self.T) )
                     print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError("Input T too low. T=%g,  Tmin=%g"%(T, self.Tmin))
+                
         elif T>self.Tmax:
-            if self.correct_value_errors:
-                # Each fluid has a different T range, so just set T to a mid point
+            if self.auto_fix_value_errors:                
                 self.T = self.Tmax - 0.001
                 if show_warnings:
                     print( 'NOTICE: input T too high. Changed from: %g to: %g degR'%(T, self.T) )
                     print( "        INCOMP: Tmin=%g, Tmax=%g"%(self.Tmin, self.Tmax) )
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError("Input T too high. T=%g,  Tmax=%g"%(T, self.Tmax))
+                
         else:
             self.T = T
 
@@ -317,21 +323,21 @@ class EC_Incomp_Soln(object):
 
 
         if T < self.Tmin:
-            if self.correct_value_errors:
+            if self.auto_fix_value_errors:
                 if self.show_warnings and self.Tmin - T > 0.01:
-                    print( 'T too low in setTP. Changed T=%g to T=%g'%( T, self.Tmin ))
+                    print( 'T too low in setTP. Changed T=%g to Tmin=%g'%( T, self.Tmin ))
                 T = self.Tmin
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError("Input T too low in setTP. T=%g,  Tmin=%g"%(T, self.Tmin))
         if T > self.Tmax:
-            if self.correct_value_errors:
+            if self.auto_fix_value_errors:
                 # if self.show_warnings and T - self.Tmax  > 0.01:
                 if self.show_warnings and T > self.Tmax + 0.1 :
-                    print( 'T too high in setTP. Changed T=%g to T=%g'%( T, self.Tmax ))
+                    print( 'T too high in setTP. Changed T=%g to Tmax=%g'%( T, self.Tmax ))
                 T = self.Tmax
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError("Input T too high in setTP. T=%g,  Tmin=%g"%(T, self.Tmax))
 
         self.Pinput = P # save input P in case Psat changes it.
@@ -380,21 +386,21 @@ class EC_Incomp_Soln(object):
         '''
 
         if D < self.Dmin:
-            if self.correct_value_errors:
+            if self.auto_fix_value_errors:
                 if self.show_warnings:
-                    print( 'D too low in setDP. Changed D=%g to D=%g'%( D, self.Dmin ))
+                    print( 'D too low in setDP. Changed D=%g to Dmin=%g'%( D, self.Dmin ))
                 D = self.Dmin
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError("Input D too low in setPD. D=%g,  Dmin=%g"%(D, self.Dmin))
 
         if D > self.Dmax:
-            if self.correct_value_errors:
+            if self.auto_fix_value_errors:
                 if self.show_warnings:
-                    print( 'D too high in setDP. Changed D=%g to D=%g'%( D, self.Dmax ))
+                    print( 'D too high in setDP. Changed D=%g to Dmax=%g'%( D, self.Dmax ))
                 D = self.Dmax
             else:
-                print( '.'*22, 'To avoid ValueError set "correct_value_errors" to True', '.'*22 )
+                print_avoid_valerr()
                 raise ValueError("Input D too high in setPD. D=%g,  Dmax=%g"%(D, self.Dmax))
 
 
@@ -522,12 +528,14 @@ def dev_tests():
 
     symbol = 'MEG-99%'    
     print( '='*22, "%s with %% too high"%symbol, '='*22 )
-    C = EC_Incomp_Soln( symbol=symbol, T=None, P=None, correct_value_errors=True )
+    C = EC_Incomp_Soln( symbol=symbol, T=None, P=None, 
+                        auto_fix_value_errors=True, show_warnings=1 )
     print()
 
     symbol = 'IceNA-1%'
     print( '='*22, "%s with %% too low"%symbol, '='*22 )
-    C = EC_Incomp_Soln( symbol=symbol, T=None, P=None, correct_value_errors=True )
+    C = EC_Incomp_Soln( symbol=symbol, T=None, P=None, 
+                        auto_fix_value_errors=True, show_warnings=1 )
     print()
 
     
@@ -558,6 +566,27 @@ def dev_tests():
     C.setPD( C.P, C.D )
     C.printProps()
 
+
+    banner( 'This should fail due to "auto_fix_value_errors = False"\nand max mass fraction = "MEG-60%"' )
+    print( '='*22, "print full %s properties"%symbol, '='*22 )
+    try:
+        C_bad = EC_Incomp_Soln( symbol='MEG-99%', T=None, P=0 )
+    except:
+        tb_str = traceback.format_exc()
+        print( tb_str.split('raise ValueError')[-1])
+        # print( tb_str )
+    
+
+    banner( 'This should fail due to "auto_fix_value_errors = False"\nand T=100 below Tmin=428.68' )
+    print( '='*22, "print full %s properties"%symbol, '='*22 )
+    try:
+        C_bad = EC_Incomp_Soln( symbol='MEG-50%', T=100, P=0 )
+        C_bad.printTPD()
+    except:
+        tb_str = traceback.format_exc()
+        print( tb_str.split('raise ValueError')[-1])
+        # print( tb_str )
+    
     
 
 if __name__ == '__main__':

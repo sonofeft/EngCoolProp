@@ -2,7 +2,10 @@
 import re
 import CoolProp.CoolProp as CP
 
-incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_solution').split(',')
+incomp_pure_solnL = CP.get_global_param_string('incompressible_list_solution').split(',')
+
+incomp_pure_fluidL = CP.get_global_param_string('incompressible_list_pure').split(',')
+
 
 def parse_coolprop_mixture(mixture_name):
     """
@@ -19,7 +22,7 @@ def parse_coolprop_mixture(mixture_name):
         return None, None
     
     # Pattern for just the base name, mass fraction is 100%
-    if mixture_name in incomp_pure_fluidL:
+    if mixture_name in incomp_pure_solnL:
         return mixture_name, 100.0 # for name w/o fraction_mass, assume 100%
 
     # Pattern for [fraction] notation
@@ -45,6 +48,8 @@ def parse_coolprop_mixture(mixture_name):
     # print(parse_coolprop_mixture("NaCl[0.1]"))
     # print(parse_coolprop_mixture("SomeInvalidString"))
 
+def print_avoid_valerr():
+    print( '.'*22, 'To avoid ValueError set "auto_fix_value_errors" to True', '.'*22 )
 
 def format_float(float_val, output_len=9, sig_digits=4):
     """

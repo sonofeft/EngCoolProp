@@ -54,9 +54,9 @@ for more assert options
 """
 
 import sys, os
-
-from engcoolprop.ec_incomp_fluid import EC_Incomp_Fluid, dev_tests
-from engcoolprop.utils import incomp_pure_fluidL
+from CoolProp.CoolProp import PropsSI
+from engcoolprop.ec_incomp_soln import EC_Incomp_Soln, dev_tests
+from engcoolprop.utils import incomp_pure_solnL
 
 here = os.path.abspath(os.path.dirname(__file__)) # Needed for py.test
 up_one = os.path.split( here )[0]  # Needed to find models development version
@@ -75,50 +75,35 @@ class MyTest(unittest.TestCase):
     def test_myclass_existence(self):
         """Check that myclass exists"""
 
-        ec_inc = EC_Incomp_Fluid( symbol='DowJ' )
+        ec_inc = EC_Incomp_Soln( symbol='ZFC-60%' )
         
-        # See if the self.EC_Incomp_Fluid object exists
-        self.assertIsInstance(ec_inc, EC_Incomp_Fluid, msg=None)
+        # See if the self.EC_Incomp_Soln object exists
+        self.assertIsInstance(ec_inc, EC_Incomp_Soln, msg=None)
 
     def test_make_all_fluids(self):
         """test make all fluids"""
 
-        for symbol in incomp_pure_fluidL:
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
-            self.assertIsInstance(ec_inc, EC_Incomp_Fluid, msg=None)
+        for base_symbol in incomp_pure_solnL:
+            frac_max = PropsSI('fraction_max','INCOMP::%s'%base_symbol )
+            frac_min = PropsSI('fraction_min','INCOMP::%s'%base_symbol )
+            pcent = int( 100 * (frac_max + frac_min)/ 2 )
+            symbol = base_symbol + '-%i'%pcent + '%'
+
+            ec_inc = EC_Incomp_Soln( symbol=symbol, auto_fix_value_errors=False )
+            self.assertIsInstance(ec_inc, EC_Incomp_Soln, msg=None)
 
     def test_setPropsDP_all_fluids(self):
         """test setPropsDP for all fluids"""
 
-        for symbol in incomp_pure_fluidL:
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+        for base_symbol in incomp_pure_solnL:
+            frac_max = PropsSI('fraction_max','INCOMP::%s'%base_symbol )
+            frac_min = PropsSI('fraction_min','INCOMP::%s'%base_symbol )
+            pcent = int( 100 * (frac_max + frac_min)/ 2 )
+            symbol = base_symbol + '-%i'%pcent + '%'
+
+            ec_inc = EC_Incomp_Soln( symbol=symbol, auto_fix_value_errors=False )
             T = ec_inc.T
-            ec_inc.setProps( D=ec_inc.D, P=ec_inc.P)
-
-            self.assertAlmostEqual(T, ec_inc.T, delta=0.1)
-
-    def test_setPropsHP_all_fluids(self):
-        """test setPropsHP for all fluids"""
-
-        for symbol in incomp_pure_fluidL:
-            if symbol == 'Air':
-                continue
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
-            T = ec_inc.T
-            ec_inc.setProps( H=ec_inc.H, P=ec_inc.P)
-
-            self.assertAlmostEqual(T, ec_inc.T, delta=0.1)
-            
-
-    def test_setPropsSP_all_fluids(self):
-        """test setPropsSP for all fluids"""
-
-        for symbol in incomp_pure_fluidL:
-            if symbol == 'Air':
-                continue
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
-            T = ec_inc.T
-            ec_inc.setProps( S=ec_inc.S, P=ec_inc.P)
+            ec_inc.setPD( ec_inc.P, ec_inc.D)
 
             self.assertAlmostEqual(T, ec_inc.T, delta=0.1)
             
@@ -126,12 +111,17 @@ class MyTest(unittest.TestCase):
     def test_setPropsTP_Tmin_Tmax_all_fluids(self):
         """test setPropsDP for all fluids"""
 
-        for symbol in incomp_pure_fluidL:
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+        for base_symbol in incomp_pure_solnL:
+            frac_max = PropsSI('fraction_max','INCOMP::%s'%base_symbol )
+            frac_min = PropsSI('fraction_min','INCOMP::%s'%base_symbol )
+            pcent = int( 100 * (frac_max + frac_min)/ 2 )
+            symbol = base_symbol + '-%i'%pcent + '%'
+
+            ec_inc = EC_Incomp_Soln( symbol=symbol )
             
             # check that safeguards for Tmin/Tmax are working
-            ec_inc.setProps( T=ec_inc.Tmin-1, P=ec_inc.P)
-            ec_inc.setProps( T=ec_inc.Tmax+1, P=ec_inc.P)
+            ec_inc.setTP( ec_inc.Tmin-1, ec_inc.P)
+            ec_inc.setTP( ec_inc.Tmax+1, ec_inc.P)
 
             
 
