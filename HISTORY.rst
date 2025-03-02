@@ -7,10 +7,13 @@ History
 GitHub Log
 ----------
 
+* March 2, 2025
+    - (by: sonofeft) 
+        - First version including INCOMP solutions from CoolProp
+
 * Feb 22, 2025
     - (by: sonofeft) 
         - First version including INCOMP fluids from CoolProp
-
 
 * Jan 21, 2025
     - (by: sonofeft) 

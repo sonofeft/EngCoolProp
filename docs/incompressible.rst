@@ -12,6 +12,20 @@ but also  `Incompressible Fluids <http://www.coolprop.org/fluid_properties/Incom
 wrapped by the EngCoolProp **EC_Incomp_Fluid** object
 :ref:`link_ec_incomp_fluid_functions`.
 
+To see a list of all incompressible fluids execute the following script::
+
+    from CoolProp import __incompressibles_pure__
+    print( __incompressibles_pure__ ) 
+
+Results in the list: **['Acetone', 'Air', 'AS10', 'AS20', 'AS30', 'AS40', 'AS55', 'DEB', 'DowJ', 
+'DowJ2', 'DowQ', 'DowQ2', 'DSF', 'Ethanol', 'ExampleDigitalPure', 'ExamplePure', 'FoodAsh', 
+'FoodCarbohydrate', 'FoodFat', 'FoodFiber', 'FoodIce', 'FoodProtein', 'FoodWater', 'HC10', 
+'HC20', 'HC30', 'HC40', 'HC50', 'HCB', 'HCM', 'Hexane', 'HFE', 'HFE2', 'HY20', 'HY30', 'HY40', 
+'HY45', 'HY50', 'LiqNa', 'NaK', 'NBS', 'PBB', 'PCL', 'PCR', 'PGLT', 'PHE', 'PHR', 'PLR', 'PMR',
+'PMS1', 'PMS2', 'PNF', 'PNF2', 'S800', 'SAB', 'T66', 'T72', 'TCO', 'TD12', 'TVP1', 'TVP1869', 
+'TX22', 'TY10', 'TY15', 'TY20', 'TY24', 'Water', 'XLT', 'XLT2', 'ZS10', 'ZS25', 'ZS40', 'ZS45', 'ZS55']**
+
+
 For incompressible fluids, EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and hour).::
 
     The following are the default units for each property.

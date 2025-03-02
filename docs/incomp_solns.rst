@@ -13,6 +13,18 @@ but also  `Incompressible Solutions <http://www.coolprop.org/fluid_properties/In
 (e.g. Brines and Solutions) wrapped by the EngCoolProp **EC_Incomp_Soln** object
 :ref:`link_ec_incomp_soln_functions`.
 
+To see a list of all incompressible fluids execute the following script::
+
+    from CoolProp import __incompressibles_solution__
+    print( __incompressibles_solution__ ) 
+
+Results in the list: **['AEG', 'AKF', 'AL', 'AN', 'APG', 'ExampleDigital', 'ExampleMelinder', 
+'ExampleSecCool', 'ExampleSolution', 'FRE', 'GKN', 'IceEA', 'IceNA', 'IcePG', 'LiBr', 'MAM', 
+'MAM2', 'MCA', 'MCA2', 'MEA', 'MEA2', 'MEG', 'MEG2', 'MGL', 'MGL2', 'MITSW', 'MKA', 'MKA2', 
+'MKC', 'MKC2', 'MKF', 'MLI', 'MMA', 'MMA2', 'MMG', 'MMG2', 'MNA', 'MNA2', 'MPG', 'MPG2', 'PK2', 
+'PKL', 'VCA', 'VKC', 'VMA', 'VMG', 'VNA', 'ZAC', 'ZFC', 'ZLC', 'ZM', 'ZMC']**
+
+
 For incompressible solutions, EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and hour).::
 
     The following are the default units for each property.
