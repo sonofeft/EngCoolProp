@@ -3,7 +3,7 @@
 
 
 r"""
-CoolProps has a set of incompressible fluids
+CoolProp has a set of incompressible fluids
 EC_Incomp_Fluid is a wrapper of those fluids using Engineering Units.
 
 EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and hour).::
@@ -469,7 +469,7 @@ class EC_Incomp_Fluid(object):
     def setPD(self,P=1000.0,D=0.01):
         '''
         Calc props from P and D
-        NOTE: The pressure has NO EFFECT on incompressible density calc.
+        NOTE: The pressure has NO EFFECT on calculated temperature for incompressible density.
         '''
 
         if D < self.Dmin:

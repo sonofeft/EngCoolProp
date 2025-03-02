@@ -5,10 +5,10 @@ Incompressible Fluids
 =====================
 
 The `CoolProp <http://www.coolprop.org/dev/index.html>`_ project not only supports 
-`pure fluids <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
+`Pure Fluids <http://www.coolprop.org/fluid_properties/PurePseudoPure.html#list-of-fluids>`_
 wrapped by the EngCoolProp **EC_Fluid** object
 :ref:`link_ec_fluid_functions`, 
-but also  `incompressible fluids <http://www.coolprop.org/fluid_properties/Incompressibles.html#>`_
+but also  `Incompressible Fluids <http://www.coolprop.org/fluid_properties/Incompressibles.html#pure>`_
 wrapped by the EngCoolProp **EC_Incomp_Fluid** object
 :ref:`link_ec_incomp_fluid_functions`.
 
@@ -86,6 +86,9 @@ It is usually best to keep Pmax above the max pressure being analyzed.::
 
     # Create incompressible object at T=500 degR, P=500 psia and max pressure = 5000 psia
     ec_inc = EC_Incomp_Fluid(symbol="Water", T=500, P=500, Pmax=5000) # T=degR, P=psia
+
+    # OR... After ec_inc has been crated
+    ec_inc.setTP( 500, 500)
 
     # Print state point
     ec_inc.printProps()

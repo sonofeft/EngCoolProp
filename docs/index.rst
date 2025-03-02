@@ -60,7 +60,10 @@ Contents:
    quickstart
    examples
    incompressible
+   incomp_solns
    functions
+   incomp_fluid_funcs
+   incomp_soln_funcs
    copyright
    authors
    history

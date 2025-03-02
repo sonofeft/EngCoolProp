@@ -21,9 +21,16 @@ def parse_coolprop_mixture(mixture_name):
     if mixture_name is None or not isinstance(mixture_name, str):
         return None, None
     
-    # Pattern for just the base name, mass fraction is 100%
+    # Pattern for just the base name, mass fraction is average of range
     if mixture_name in incomp_pure_solnL:
-        return mixture_name, 100.0 # for name w/o fraction_mass, assume 100%
+
+        frac_min = CP.PropsSI('fraction_min','INCOMP::%s'%mixture_name) 
+        frac_max = CP.PropsSI('fraction_max','INCOMP::%s'%mixture_name) 
+
+        pcent = int(100*(frac_min + frac_max)/2)
+        print( 'Calculated Average Mass Fraction =', pcent )
+
+        return mixture_name, pcent # for name w/o fraction_mass, assume average of range
 
     # Pattern for [fraction] notation
     match_bracket = re.match(r"([a-zA-Z0-9]+)\[([0-9.]+)\]", mixture_name)

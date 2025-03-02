@@ -3,7 +3,7 @@
 
 
 r"""
-CoolProps has a set of incompressible solutions (e.g. Brines and solutions)
+CoolProp has a set of incompressible solutions (e.g. Brines and Solutions)
 EC_Incomp_Soln is a wrapper of those solutions using Engineering Units.
 
 To get a list of these solutions use::
@@ -67,6 +67,10 @@ class EC_Incomp_Soln(object):
         self.basename, self.percentage = parse_coolprop_mixture(symbol)
         if self.basename is None:
             raise ValueError( 'Input symbol "" not recognized.'%symbol )
+        
+        # If only basename was given, create a proper symbol with mass fraction
+        if symbol == self.basename:
+            symbol = symbol + '-' + '%g'%( self.percentage ) + '%'
         
         # print( "basename=%s, percentage=%s"%(self.basename, self.percentage) )
 
@@ -181,9 +185,9 @@ class EC_Incomp_Soln(object):
             
             if self.T_freeze_si > self.Tmin_si:
                 if self.show_warnings:
-                    print( 'NOTICE: Tmin=%.1f degR has been increased to T_freeze=%.1f degR'%\
-                          ( Teng_fromSI(self.Tmin_si), Teng_fromSI(self.T_freeze_si)) )
-                self.Tmin_si = self.T_freeze_si + 1
+                    print( 'NOTICE: Tmin=%.1f degR has been increased to T_freeze + 1 = %.1f degR'%\
+                          ( Teng_fromSI(self.Tmin_si), Teng_fromSI(self.T_freeze_si + 5.0/9.0)) )
+                self.Tmin_si = self.T_freeze_si + 5.0/9.0
         except:
             # If no freezing point found, set it to 0
             self.T_freeze_si = 0
@@ -194,9 +198,9 @@ class EC_Incomp_Soln(object):
             self.T_freeze_si = calc_T_freeze(self)
             if self.T_freeze_si > self.Tmin_si:
                 if self.show_warnings:
-                    print( 'NOTICE: Tmin=%.1f degR has been increased to T_freeze=%.1f degR'%\
-                          ( Teng_fromSI(self.Tmin_si), Teng_fromSI(self.T_freeze_si)) )
-                self.Tmin_si = self.T_freeze_si + 1
+                    print( 'NOTICE: Tmin=%.1f degR has been increased to T_freeze + 1 = %.1f degR'%\
+                          ( Teng_fromSI(self.Tmin_si), Teng_fromSI(self.T_freeze_si + 5.0/9.0)) )
+                self.Tmin_si = self.T_freeze_si  + 5.0/9.0
 
         self.T_freeze = Teng_fromSI(self.T_freeze_si)
         # print( "self.T_freeze=%.1f"%self.T_freeze )
@@ -382,7 +386,7 @@ class EC_Incomp_Soln(object):
     def setPD(self,P=1000.0,D=0.01):
         '''
         Calc props from P and D
-        NOTE: The pressure has NO EFFECT on incompressible density calc.
+        NOTE: The pressure has NO EFFECT on calculated temperature for incompressible density.
         '''
 
         if D < self.Dmin:
@@ -586,7 +590,12 @@ def dev_tests():
         tb_str = traceback.format_exc()
         print( tb_str.split('raise ValueError')[-1])
         # print( tb_str )
-    
+
+
+    print( '='*22, "%s Check omission of mass fraction", '='*22 )
+    C = EC_Incomp_Soln( symbol='MEG', T=None, P=None )
+    C.printProps()
+
     
 
 if __name__ == '__main__':
