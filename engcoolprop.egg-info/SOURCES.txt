@@ -14,9 +14,12 @@ engcoolprop/.coverage
 engcoolprop/InterpProp_scipy.py
 engcoolprop/__init__.py
 engcoolprop/_version.py
+engcoolprop/banner.py
 engcoolprop/coverage.xml
 engcoolprop/ec_fluid.py
+engcoolprop/ec_humid_air.py
 engcoolprop/ec_incomp_fluid.py
+engcoolprop/ec_incomp_soln.py
 engcoolprop/find_exception_threshold.py
 engcoolprop/iteration_utils.py
 engcoolprop/min_max_results.txt
@@ -39,6 +42,8 @@ engcoolprop/examples/example_1.py
 engcoolprop/examples/example_2.py
 engcoolprop/examples/example_h2.py
 engcoolprop/examples/example_he.py
+engcoolprop/examples/example_inc_soln_meg30.py
+engcoolprop/examples/example_inc_soln_meg30_wTP.py
 engcoolprop/examples/example_incomp.py
 engcoolprop/examples/example_incomp_Acetone.py
 engcoolprop/examples/example_incomp_DowQ.py
@@ -47,8 +52,10 @@ engcoolprop/examples/image_change_on_RST_page.txt
 engcoolprop/examples/incomp_propery_options.py
 engcoolprop/examples/list_all_heos.py
 engcoolprop/examples/list_all_incomp.py
+engcoolprop/examples/print_incomp_fluids_solns.py
 engcoolprop/examples/run_experiments.py
 engcoolprop/examples/sample_plot.py
 engcoolprop/tests/__init__.py
 engcoolprop/tests/test_ec_fluid.py
+engcoolprop/tests/test_incomp_solns.py
 engcoolprop/tests/test_incompress.py
