@@ -55,19 +55,25 @@ Create a listing of properties at the default state point.
     from engcoolprop.ec_incomp_fluid import EC_Incomp_Fluid
 
     # Create incompressible object. (without specifying state point)
-    ec_inc = EC_Incomp_Fluid(symbol="Water")
+    ec_inc = EC_Incomp_Fluid(symbol="Water", auto_fix_value_errors=True, show_warnings=2 )
 
     # Print state point
     ec_inc.printProps() # Print state point at given T,P
 
 Output::
 
+    +----------------------------------------------------------------+
+    |     NOTICE: any input violations on limits of T, D, H or S     |
+    |      will be automatically corrected (set to min or max).      |
+    |  To change this behavior set "auto_fix_value_errors" to False  |
+    |     To suppress this banner set "show_warnings" to 0 or 1      |
+    +----------------------------------------------------------------+
     State Point for fluid INCOMP::Water (Water)
     T =      671  degR,                              Range(  491.67 -   851.67) degR
     P =     1000  psia                               Range(       0 -    10000) psia
     D =   60.043  lbm/cuft                           Range( 54.2479 -  62.6328) lbm/cuft
     E =  142.121  BTU/lbm                            Range(-36.7331 -  328.172) BTU/lbm
-    H =  145.203  BTU/lbm                            Range(-35.9729 -  342.116) BTU/lbm
+    H =  145.203  BTU/lbm                            Range(-35.9312 -  342.116) BTU/lbm
     S = 0.238477  BTU/lbm degR                       Range(-0.072072 - 0.483928) BTU/lbm degR
     Cp=  1.00285  BTU/lbm degR                       Range(0.999244 -  1.06583) BTU/lbm degR
     V =  19.0492  viscosity [1.0E5 * lbm/ft-sec]     Range( 9.17101 -  118.181)
