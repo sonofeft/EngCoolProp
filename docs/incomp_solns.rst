@@ -18,7 +18,7 @@ To see a list of all incompressible fluids execute the following script::
     from CoolProp import __incompressibles_solution__
     print( __incompressibles_solution__ ) 
 
-Results in the list: **['AEG', 'AKF', 'AL', 'AN', 'APG', 'ExampleDigital', 'ExampleMelinder', 
+In March 2025, results in the list: **['AEG', 'AKF', 'AL', 'AN', 'APG', 'ExampleDigital', 'ExampleMelinder', 
 'ExampleSecCool', 'ExampleSolution', 'FRE', 'GKN', 'IceEA', 'IceNA', 'IcePG', 'LiBr', 'MAM', 
 'MAM2', 'MCA', 'MCA2', 'MEA', 'MEA2', 'MEG', 'MEG2', 'MGL', 'MGL2', 'MITSW', 'MKA', 'MKA2', 
 'MKC', 'MKC2', 'MKF', 'MLI', 'MMA', 'MMA2', 'MMG', 'MMG2', 'MNA', 'MNA2', 'MPG', 'MPG2', 'PK2', 

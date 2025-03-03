@@ -75,7 +75,7 @@ class MyTest(unittest.TestCase):
     def test_myclass_existence(self):
         """Check that myclass exists"""
 
-        ec_inc = EC_Incomp_Fluid( symbol='DowJ' )
+        ec_inc = EC_Incomp_Fluid( symbol='DowJ', auto_fix_value_errors=True )
         
         # See if the self.EC_Incomp_Fluid object exists
         self.assertIsInstance(ec_inc, EC_Incomp_Fluid, msg=None)
@@ -84,14 +84,14 @@ class MyTest(unittest.TestCase):
         """test make all fluids"""
 
         for symbol in incomp_pure_fluidL:
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            ec_inc = EC_Incomp_Fluid( symbol=symbol, auto_fix_value_errors=True )
             self.assertIsInstance(ec_inc, EC_Incomp_Fluid, msg=None)
 
     def test_setPropsDP_all_fluids(self):
         """test setPropsDP for all fluids"""
 
         for symbol in incomp_pure_fluidL:
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            ec_inc = EC_Incomp_Fluid( symbol=symbol, auto_fix_value_errors=True )
             T = ec_inc.T
             ec_inc.setProps( D=ec_inc.D, P=ec_inc.P)
 
@@ -103,7 +103,7 @@ class MyTest(unittest.TestCase):
         for symbol in incomp_pure_fluidL:
             if symbol == 'Air':
                 continue
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            ec_inc = EC_Incomp_Fluid( symbol=symbol, auto_fix_value_errors=True )
             T = ec_inc.T
             ec_inc.setProps( H=ec_inc.H, P=ec_inc.P)
 
@@ -116,7 +116,7 @@ class MyTest(unittest.TestCase):
         for symbol in incomp_pure_fluidL:
             if symbol == 'Air':
                 continue
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            ec_inc = EC_Incomp_Fluid( symbol=symbol, auto_fix_value_errors=True )
             T = ec_inc.T
             ec_inc.setProps( S=ec_inc.S, P=ec_inc.P)
 
@@ -127,7 +127,7 @@ class MyTest(unittest.TestCase):
         """test setPropsDP for all fluids"""
 
         for symbol in incomp_pure_fluidL:
-            ec_inc = EC_Incomp_Fluid( symbol=symbol )
+            ec_inc = EC_Incomp_Fluid( symbol=symbol, auto_fix_value_errors=True )
             
             # check that safeguards for Tmin/Tmax are working
             ec_inc.setProps( T=ec_inc.Tmin-1, P=ec_inc.P)

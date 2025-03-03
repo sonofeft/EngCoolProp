@@ -75,7 +75,7 @@ class MyTest(unittest.TestCase):
     def test_myclass_existence(self):
         """Check that myclass exists"""
 
-        ec_inc = EC_Incomp_Soln( symbol='ZFC-60%' )
+        ec_inc = EC_Incomp_Soln( symbol='ZFC-60%', auto_fix_value_errors=True )
         
         # See if the self.EC_Incomp_Soln object exists
         self.assertIsInstance(ec_inc, EC_Incomp_Soln, msg=None)
@@ -117,7 +117,7 @@ class MyTest(unittest.TestCase):
             pcent = int( 100 * (frac_max + frac_min)/ 2 )
             symbol = base_symbol + '-%i'%pcent + '%'
 
-            ec_inc = EC_Incomp_Soln( symbol=symbol )
+            ec_inc = EC_Incomp_Soln( symbol=symbol, auto_fix_value_errors=True )
             
             # check that safeguards for Tmin/Tmax are working
             ec_inc.setTP( ec_inc.Tmin-1, ec_inc.P)

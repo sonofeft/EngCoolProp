@@ -17,7 +17,7 @@ To see a list of all incompressible fluids execute the following script::
     from CoolProp import __incompressibles_pure__
     print( __incompressibles_pure__ ) 
 
-Results in the list: **['Acetone', 'Air', 'AS10', 'AS20', 'AS30', 'AS40', 'AS55', 'DEB', 'DowJ', 
+In March 2025, results in the list: **['Acetone', 'Air', 'AS10', 'AS20', 'AS30', 'AS40', 'AS55', 'DEB', 'DowJ', 
 'DowJ2', 'DowQ', 'DowQ2', 'DSF', 'Ethanol', 'ExampleDigitalPure', 'ExamplePure', 'FoodAsh', 
 'FoodCarbohydrate', 'FoodFat', 'FoodFiber', 'FoodIce', 'FoodProtein', 'FoodWater', 'HC10', 
 'HC20', 'HC30', 'HC40', 'HC50', 'HCB', 'HCM', 'Hexane', 'HFE', 'HFE2', 'HY20', 'HY30', 'HY40', 

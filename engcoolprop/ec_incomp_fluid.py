@@ -99,19 +99,19 @@ class EC_Incomp_Fluid(object):
         if self.symbol == 'PMR':
             self.Tmax_si = 500.0 # degK # has minimum in D=f(T) curve.
             if show_warnings > 0:
-                print( 'WARNING: PMR Tmax reduced to 500K due to error in CoolProp equation for Density' )
+                print( 'WARNING: PMR Tmax reduced to 500 degK (900 degR) due to error in CoolProp equation for Density' )
         elif self.symbol == 'NBS':
             self.Tmin_si = 275.0 # degK # has maximum in D=f(T) curve.
             if show_warnings > 0:
-                print( 'WARNING: NBS Tmin increased to 275K due to error in CoolProp equation for Density' )
+                print( 'WARNING: NBS Tmin increased to 275 degK (495 degR) due to error in CoolProp equation for Density' )
         elif self.symbol == 'FoodWater':
             self.Tmin_si =  280.0 # degK # has maximum in D=f(T) curve.
             if show_warnings > 0:
-                print( 'WARNING: FoodWater Tmin increased to 280K due to error in CoolProp equation for Density' )
+                print( 'WARNING: FoodWater Tmin increased to 280 degK (504 degR) due to error in CoolProp equation for Density' )
         elif self.symbol == 'LiqNa':
             self.Tmax_si = 2455.0 # degK # has maximum in H=f(T,P) curve.
             if show_warnings > 0:
-                print( 'WARNING: LiqNa Tmax reduced to 2455 due to error in CoolProp equation for Enthalpy' )
+                print( 'WARNING: LiqNa Tmax reduced to 2455 degK (4419 degR) due to error in CoolProp equation for Enthalpy' )
 
 
 

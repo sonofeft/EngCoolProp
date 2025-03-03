@@ -4,7 +4,7 @@ requires = ["setuptools", "wheel"]
 
 [project]
 name = "engcoolprop"
-version = "0.1.8"
+version = "0.1.9"
 
 description = "EngCoolProp is a python Engineering Units wrapper around the CoolProp project."
 license = "GPL-3"
