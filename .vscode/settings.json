@@ -33,6 +33,7 @@
         "funcalls",
         "funcs",
         "fval",
+        "gmole",
         "HEOS",
         "Hexafluoride",
         "Hgas",
@@ -115,6 +116,7 @@
         "Viscmin",
         "Vmax",
         "Vmin",
+        "Voleng",
         "xtol"
     ],
     "python.testing.unittestEnabled": false,
