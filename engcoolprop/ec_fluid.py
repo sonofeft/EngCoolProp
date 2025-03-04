@@ -421,7 +421,7 @@ class EC_Fluid(object):
         self.sonicV = Aeng_fromSI( AS.speed_sound() )
         
         try:
-            self.Visc = Veng_fromSI( AS.viscosity() ) * 1.0E5
+            self.Visc = Veng_fromSI( AS.viscosity() ) # multiply only for display * 1.0E5
         except:
             self.Visc = 0.0
         try:
@@ -697,8 +697,9 @@ class EC_Fluid(object):
 
     def getStrTransport(self):
         '''create a string from the Transport properties'''
+        Visc = self.Visc * 1.0E5
         return  "%s Cp=%6g Cv=%6g gamma=%.4f Visc=%6g ThCond=%6g" %\
-        (self.symbol,self.Cp, self.Cv, self.gamma(), self.Visc, self.Cond)
+        (self.symbol,self.Cp, self.Cv, self.gamma(), Visc, self.Cond)
 
     def getStrTPD(self):
         '''create a string from the TPDEHS properties'''
@@ -828,6 +829,8 @@ class EC_Fluid(object):
             print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=%8g"%self.Tnbp, "Ttriple=%8g"%self.Ttriple,")", sep=' ')
         else:
             print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=N/A", "Ttriple=%8g"%self.Ttriple,")", sep=' ')
+
+        Visc = self.Visc * 1.0E5
             
         print("P =%8g"%self.P," psia (Pc=%8g"%self.Pc,")", sep=' ')
         print("D =%8g"%self.D," lbm/cu ft (Dc=%8g"%self.Dc,")", sep=' ')
@@ -838,7 +841,7 @@ class EC_Fluid(object):
         print("Cp=%8g"%self.Cp," BTU/lbm degR", sep=' ')
         print("g =%8g"%self.gamma()," Cp/Cv (-)", sep=' ')
         print("A =%8g"%self.sonicV," ft/sec", sep=' ')
-        print("V =%8g"%self.Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
+        print("V =%8g"%Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
         print("C =%8g"%self.Cond," thermal conductivity [BTU/ft-hr-R]", sep=' ')
         print("MW=%8g"%self.WtMol," lbm/lbmmole", sep=' ')
         print("Q =%8g"%self.Q," Vapor Quality (mass fraction gas)", sep=' ')

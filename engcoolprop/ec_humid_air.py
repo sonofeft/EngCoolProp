@@ -79,6 +79,19 @@ toEng_callD['WetBulb'] = Teng_fromSI
 toEng_callD['Y'] = EchoInput
 toEng_callD['Z'] = EchoInput
 
+# may need to show viscosity in lbf-s/ft^2 ???
+def convert_viscosity_to_lbf_s_per_ft2(lbm_per_s_per_ft):
+    # Conversion factor
+    conversion_factor = 0.03108095
+    # Convert to lbf-s/ft^2
+    lbf_s_per_ft2 = lbm_per_s_per_ft * conversion_factor
+    return lbf_s_per_ft2
+
+    # Example usage
+    # viscosity_lbm_per_s_per_ft = 1.23324e-5
+    # viscosity_lbf_s_per_ft2 = convert_viscosity_to_lbf_s_per_ft2(viscosity_lbm_per_s_per_ft)
+    # print(f"Dynamic Viscosity: {viscosity_lbf_s_per_ft2} lbf-s/ft²")
+
 
 class EC_Humid_Air(object):
     
@@ -141,7 +154,9 @@ class EC_Humid_Air(object):
         self.si_propD['Cond'] = self.si_propD['Conductivity']
         self.eng_propD['Cond'] = self.eng_propD['Conductivity']
 
-        self.eng_propD['Visc'] *= 1.0E5
+        # assign Engineering properties to self
+        for name, value in self.eng_propD.items():
+            setattr(self, name, value)
 
         # if 'Y' in self.eng_propD and self.eng_propD['Y'] < 1.0:
         #     # Constants
@@ -157,13 +172,13 @@ class EC_Humid_Air(object):
         """Make a g format sized for largest number of property in propL"""
         # sL = ['%g'%self.eng_propD[name] for name in propL]
         max_len = max([len('%g'%self.eng_propD[name]) for name in preferred_list])
-        return '%' + '%ig'%max_len
+        return '%' + '%ig'%max_len, max_len
 
     def get_si_fmt_size(self):
         """Make a g format sized for largest number of property in propL"""
         # sL = ['%g'%self.eng_propD[name] for name in propL]
         max_len = max([len('%g'%self.si_propD[name]) for name in preferred_list])
-        return '%' + '%ig'%max_len
+        return '%' + '%ig'%max_len, max_len
 
     def printProps(self, eng_units=True):
         '''print a multiline property summary with units'''
@@ -175,17 +190,18 @@ class EC_Humid_Air(object):
 
         print_orderL = ["Tdb","DewPoint","WetBulb","P","P_w","",
         "Vda","Vha","","cp","cp_ha","CV","CVha","","Hda","Hha","Sda","Sha",
-        "",     "Visc","Cond","","RelHum","HumRat","Y","Z"]
+        "",     "Cond","Visc","","RelHum","HumRat","Y","Z"]
 
         if eng_units:
             s = dict_to_string( self.eng_inputD )
-            fmt = self.get_eng_fmt_size( )
-            propD = self.eng_propD
+            fmt, max_len = self.get_eng_fmt_size( )
+            propD = self.eng_propD.copy()
             unitsD = param_eng_unitsD
+            propD['Visc'] *= 1.0E5
         else:
             s = dict_to_string( self.si_inputD )
-            fmt = self.get_si_fmt_size( )
-            propD = self.si_propD
+            fmt, max_len = self.get_si_fmt_size( )
+            propD = self.si_propD.copy()
             unitsD = param_si_unitsD
         print("============ State Point for Humid Air (%s) ============"%s)
 
@@ -193,6 +209,10 @@ class EC_Humid_Air(object):
             if name:
                 print("%10s ="%name, fmt%propD[name], unitsD[name],
                       " :: %s"%param_descD[name])
+                # if eng_units and name=='Visc':
+                #     print( '           =', 
+                #           fmt%convert_viscosity_to_lbf_s_per_ft2(self.eng_propD['Visc']),
+                #            'lbf-s/ft^2', " :: %s"%param_descD[name] )
             else:
                 print()
 
@@ -208,5 +228,7 @@ if __name__ == "__main__":
     print()
 
     ha.printProps()
-    print('.'*66)
-    ha.printProps(eng_units=False)
+    # print('.'*66)
+    # ha.printProps(eng_units=False)
+    print( 'ha.Cond =', ha.Cond)
+    print( 'ha.Visc =', ha.Visc)

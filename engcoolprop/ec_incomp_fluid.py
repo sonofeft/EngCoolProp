@@ -345,7 +345,7 @@ class EC_Incomp_Fluid(object):
 
         # Some INCOMP fluids have no viscosity data
         if self.visc_is_supported:
-            self.Visc = Veng_fromSI( get_prop('V') ) * 1.0E5
+            self.Visc = Veng_fromSI( get_prop('V') ) # multiply only for display * 1.0E5
         else:
             self.Visc = float('inf')
 
@@ -509,8 +509,9 @@ class EC_Incomp_Fluid(object):
         
     def getStrTransport(self):
         '''create a string from the Transport properties'''
+        Visc = self.Visc * 1.0E5
         return  "%s Cp=%6g Visc=%6g ThCond=%6g" %\
-        (self.fluid,self.Cp, self.Visc, self.Cond)
+        (self.fluid,self.Cp, Visc, self.Cond)
 
     def getStrTPD(self):
         '''create a string from the TPDEHS properties'''
@@ -552,7 +553,8 @@ class EC_Incomp_Fluid(object):
         print("Cp=%s"%SGL.Cp," BTU/lbm degR",   '                      Range(%8g - %8g) BTU/lbm degR'%(self.Cpmin, self.Cpmax))
 
         if self.Visc < float('inf'):
-            print("V =%s"%SGL.Visc," viscosity [1.0E5 * lbm/ft-sec]", '    Range(%8g - %8g)'%(self.Viscmin, self.Viscmax) )
+            print("V =%s"%SGL.Visc * 1.0E5," viscosity [1.0E5 * lbm/ft-sec]", 
+                  '    Range(%8g - %8g)'%(self.Viscmin * 1.0E5, self.Viscmax * 1.0E5) )
         else:
             print("V =UNDEFINED","viscosity [1.0E5 * lbm/ft-sec]" )
 
