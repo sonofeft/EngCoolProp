@@ -117,7 +117,10 @@
         "Vmax",
         "Vmin",
         "Voleng",
-        "xtol"
+        "wetbulb",
+        "xlabel",
+        "xtol",
+        "ylabel"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true

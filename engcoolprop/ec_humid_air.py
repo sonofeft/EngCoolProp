@@ -5,20 +5,28 @@ http://www.coolprop.org/fluid_properties/HumidAir.html#table-of-inputs-outputs-t
 """
 import CoolProp.CoolProp as CP
 from engcoolprop.humid_air_params import (preferred_list, param_synonymD, param_eng_unitsD, 
-                                          param_descD, param_si_unitsD)
+                                          param_descD, param_si_unitsD, preferred_nameD, 
+                                          input_set, param_synonymD)
 
 from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  CPSI_fromEng,
                                   Deng_fromSI ,   PSI_fromEng, Peng_fromSI, EchoInput,
                                   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI,
                                   CondSI_fromEng, VSI_fromEng  )
-
+from engcoolprop.banner import banner
 
 def Voleng_fromSI( Vol ): # 1 lbm/ft^3 = 16.01843417 kg/m^3
     return Vol * 16.01843417
 
 def VolSI_fromEng( Vol ): # 1 lbm/ft^3 = 16.01843417 kg/m^3
     return Vol / 16.01843417
+
+PSIA_PER_ATM = 14.6959 # used to convert between psia and atm
+
+
+print_orderL = ["Tdb","WetBulb","DewPoint","P","P_w","",
+"Vda","Vha","","cp","cp_ha","CV","CVha","","Hda","Hha","Sda","Sha",
+"",     "Cond","Visc","","RelHum","HumRat","Y","Z"]
 
 
 # map Eng to SI conversion functions for each of the fluid properties
@@ -45,7 +53,9 @@ toSI_callD['WetBulb'] = TSI_fromEng
 toSI_callD['Y'] = EchoInput
 toSI_callD['Z'] = EchoInput
 
-# need to add to toEng_callD with all synonyms for preferred names
+toSI_callD['Cond'] = CondSI_fromEng
+
+# need to add to toSI_callD with all synonyms for preferred names
 for pref_name in preferred_list:
     syn_set = param_synonymD[pref_name]
     for syn in syn_set:
@@ -78,6 +88,8 @@ toEng_callD['Visc'] = Veng_fromSI
 toEng_callD['WetBulb'] = Teng_fromSI
 toEng_callD['Y'] = EchoInput
 toEng_callD['Z'] = EchoInput
+
+toEng_callD['Cond'] = CondEng_fromSI
 
 # may need to show viscosity in lbf-s/ft^2 ???
 def convert_viscosity_to_lbf_s_per_ft2(lbm_per_s_per_ft):
@@ -114,9 +126,9 @@ class EC_Humid_Air(object):
         """
         # Allow user to call setProps with none or partial parameters
         if len(kwargs) == 0:
-            kwargs = {'T':536.4 ,'P':14.6959, 'RelHum':0.5}
+            kwargs = {'T':536.4 ,'P':PSIA_PER_ATM, 'RelHum':0.5}
         elif len(kwargs) == 2 and 'P' not in kwargs:
-            kwargs['P'] = 14.6959
+            kwargs['P'] = PSIA_PER_ATM
 
         # Ensure the kwargs dictionary has exactly three items
         if len(kwargs) != 3:
@@ -144,6 +156,9 @@ class EC_Humid_Air(object):
             except:
                 print( 'Failed to calc:', prop)
                 self.si_propD[prop] = float('inf')
+
+        # include shorter, non-CoolProp name for Conductivity
+        self.si_propD['Cond'] = self.si_propD['Conductivity']
                 
 
         # convert properties from SI to Engineering
@@ -151,7 +166,6 @@ class EC_Humid_Air(object):
             self.eng_propD[k] = toEng_callD[k](v)
 
         # include shorter, non-CoolProp name for Conductivity
-        self.si_propD['Cond'] = self.si_propD['Conductivity']
         self.eng_propD['Cond'] = self.eng_propD['Conductivity']
 
         # assign Engineering properties to self
@@ -187,11 +201,6 @@ class EC_Humid_Air(object):
         def dict_to_string(D):
             return ', '.join([f"{key}={value:g}" for key, value in D.items()])
 
-
-        print_orderL = ["Tdb","DewPoint","WetBulb","P","P_w","",
-        "Vda","Vha","","cp","cp_ha","CV","CVha","","Hda","Hha","Sda","Sha",
-        "",     "Cond","Visc","","RelHum","HumRat","Y","Z"]
-
         if eng_units:
             s = dict_to_string( self.eng_inputD )
             fmt, max_len = self.get_eng_fmt_size( )
@@ -203,12 +212,22 @@ class EC_Humid_Air(object):
             fmt, max_len = self.get_si_fmt_size( )
             propD = self.si_propD.copy()
             unitsD = param_si_unitsD
-        print("============ State Point for Humid Air (%s) ============"%s)
+        
+        banner(  '-'*4 + ' State Point for Humid Air (%s) '%s +'-'*4, leftMargin=3 )
 
         for name in print_orderL:
             if name:
+                if unitsD[name] == 'degR':
+                    alt_units = '%.1f'%(propD[name] - 459.67,)
+                    alt_units = '(' + alt_units.strip() + ' degF)'
+                elif unitsD[name] == 'psia':
+                    alt_units = fmt%(propD[name]/PSIA_PER_ATM,)
+                    alt_units = '(' + alt_units.strip() + ' atm)'
+                else:
+                    alt_units = ''
                 print("%10s ="%name, fmt%propD[name], unitsD[name],
-                      " :: %s"%param_descD[name])
+                      " :: %s"%param_descD[name], alt_units)
+                
                 # if eng_units and name=='Visc':
                 #     print( '           =', 
                 #           fmt%convert_viscosity_to_lbf_s_per_ft2(self.eng_propD['Visc']),
@@ -217,13 +236,51 @@ class EC_Humid_Air(object):
                 print()
 
 
+    def print_inputs(self):
+        """Print all the legal inputs for Humid Air"""
+        banner(  '-'*22 + ' Humid Air Input Parameters ' +'-'*22, leftMargin=3 )
+        for name in print_orderL:
+            if name:
+                if name == 'Cond':
+                    desc = preferred_nameD['Conductivity']
+                else:
+                    desc = preferred_nameD[name]
+
+                # for name, desc in preferred_nameD.items():
+                if name in input_set:
+                    syn_set = eval(param_synonymD[name])-{name}
+                    if syn_set:
+                        print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc, '::AKA', syn_set)
+                    else:
+                        print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc)
+
+    def print_outputs(self):
+        """Print all the legal outputs for Humid Air"""
+        banner(  '-'*22 + ' Humid Air Output Parameters ' +'-'*22, leftMargin=3 )
+        for name in print_orderL:
+            if name:
+                if name == 'Cond':
+                    desc = preferred_nameD['Conductivity']
+                else:
+                    desc = preferred_nameD[name]
+            
+                syn_set = eval(param_synonymD[name])-{name}
+                if name=='Conductivity': 
+                    name='Cond'
+                if syn_set:
+                    print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc, '::AKA', syn_set)
+                else:
+                    print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc)
+
+
+
 if __name__ == "__main__":
 
     ha = EC_Humid_Air( T=536.4 , RelHum=0.5 )
 
-    kL = sorted( ha.eng_propD.keys(), key=str.lower)
-    for k in kL:
-        print( '%10s = %12g'%(k,ha.eng_propD[k]), '= %12G'%ha.si_propD[k])
+    # kL = sorted( ha.eng_propD.keys(), key=str.lower)
+    # for k in kL:
+    #     print( '%10s = %12g'%(k,ha.eng_propD[k]), '= %12G'%ha.si_propD[k])
 
     print()
 
@@ -232,3 +289,6 @@ if __name__ == "__main__":
     # ha.printProps(eng_units=False)
     print( 'ha.Cond =', ha.Cond)
     print( 'ha.Visc =', ha.Visc)
+
+    ha.print_inputs()
+    ha.print_outputs()

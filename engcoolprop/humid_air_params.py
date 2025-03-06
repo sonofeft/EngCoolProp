@@ -232,6 +232,8 @@ param_synonymD["Omega"] = "{'W', 'Omega', 'HumRat'}"
 param_synonymD["HumRat"] = "{'W', 'Omega', 'HumRat'}"
 param_synonymD["Z"] = "{'Z'}"
 
+param_synonymD["Cond"] = "{'Conductivity', 'k', 'K'}"
+
 # ============= preferred_nameD ===================
 preferred_nameD["WetBulb"] = "Wet-Bulb Temperature"
 preferred_nameD["cp"]    = "Mixture Cp per unit dry air"
