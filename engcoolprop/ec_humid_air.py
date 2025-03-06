@@ -23,6 +23,8 @@ def VolSI_fromEng( Vol ): # 1 lbm/ft^3 = 16.01843417 kg/m^3
 
 PSIA_PER_ATM = 14.6959 # used to convert between psia and atm
 
+DEG_F_R_OFFSET = 459.67
+
 
 print_orderL = ["Tdb","WetBulb","DewPoint","P","P_w","",
 "Vda","Vha","","cp","cp_ha","CV","CVha","","Hda","Hha","Sda","Sha",
@@ -127,20 +129,27 @@ class EC_Humid_Air(object):
         # Allow user to call setProps with none or partial parameters
         if len(kwargs) == 0:
             kwargs = {'T':536.4 ,'P':PSIA_PER_ATM, 'RelHum':0.5}
-        elif len(kwargs) == 2 and 'P' not in kwargs:
-            kwargs['P'] = PSIA_PER_ATM
+        
+        # self.eng_inputD = kwargs.copy()
+        self.eng_inputD = {} # key:CoolProp input name: value=value in Engineering units
+        for k,v in kwargs.items():
+            if k.endswith('degF'):
+                self.eng_inputD[ k[:-4] ] = v + DEG_F_R_OFFSET
+            else:
+                self.eng_inputD[k] = v
+
+        if len(self.eng_inputD) == 2 and 'P' not in kwargs:
+            self.eng_inputD['P'] = PSIA_PER_ATM
 
         # Ensure the kwargs dictionary has exactly three items
-        if len(kwargs) != 3:
+        if len(self.eng_inputD) != 3:
             raise ValueError("Exactly three input properties must be provided")
         
-        if 'P' not in kwargs:
+        if 'P' not in self.eng_inputD:
             raise ValueError('"P" must be specified')
-        
-        self.eng_inputD = kwargs.copy()
 
         self.si_inputD = {}
-        for k,v in kwargs.items():
+        for k,v in self.eng_inputD.items():
             self.si_inputD[k] = toSI_callD[k](v)
 
 
@@ -218,7 +227,7 @@ class EC_Humid_Air(object):
         for name in print_orderL:
             if name:
                 if unitsD[name] == 'degR':
-                    alt_units = '%.1f'%(propD[name] - 459.67,)
+                    alt_units = '%.1f'%(propD[name] - DEG_F_R_OFFSET,)
                     alt_units = '(' + alt_units.strip() + ' degF)'
                 elif unitsD[name] == 'psia':
                     alt_units = fmt%(propD[name]/PSIA_PER_ATM,)
@@ -236,7 +245,7 @@ class EC_Humid_Air(object):
                 print()
 
 
-    def print_inputs(self):
+    def print_input_params(self):
         """Print all the legal inputs for Humid Air"""
         banner(  '-'*22 + ' Humid Air Input Parameters ' +'-'*22, leftMargin=3 )
         for name in print_orderL:
@@ -254,7 +263,7 @@ class EC_Humid_Air(object):
                     else:
                         print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc)
 
-    def print_outputs(self):
+    def print_output_params(self):
         """Print all the legal outputs for Humid Air"""
         banner(  '-'*22 + ' Humid Air Output Parameters ' +'-'*22, leftMargin=3 )
         for name in print_orderL:
@@ -290,5 +299,9 @@ if __name__ == "__main__":
     print( 'ha.Cond =', ha.Cond)
     print( 'ha.Visc =', ha.Visc)
 
-    ha.print_inputs()
-    ha.print_outputs()
+    ha.print_input_params()
+    ha.print_output_params()
+
+    print( '-'*66 )
+    HA = ha = EC_Humid_Air( TdegF=70, RelHum=0.5 )
+    HA.printProps()
