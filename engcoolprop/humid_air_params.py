@@ -234,6 +234,10 @@ param_synonymD["Z"] = "{'Z'}"
 
 param_synonymD["Cond"] = "{'Conductivity', 'k', 'K'}"
 
+# convert param_synonymD values from strings to sets
+for k,v in param_synonymD.items():
+    param_synonymD[k] = eval(v)
+
 # ============= preferred_nameD ===================
 preferred_nameD["WetBulb"] = "Wet-Bulb Temperature"
 preferred_nameD["cp"]    = "Mixture Cp per unit dry air"

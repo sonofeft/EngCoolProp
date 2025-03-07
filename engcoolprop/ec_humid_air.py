@@ -3,10 +3,11 @@ Humid Air Properties
 http://www.coolprop.org/fluid_properties/HumidAir.html#table-of-inputs-outputs-to-hapropssi
 
 """
+import traceback
 import CoolProp.CoolProp as CP
 from engcoolprop.humid_air_params import (preferred_list, param_synonymD, param_eng_unitsD, 
                                           param_descD, param_si_unitsD, preferred_nameD, 
-                                          input_set, param_synonymD)
+                                          input_set)
 
 from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  CPSI_fromEng,
                                   Deng_fromSI ,   PSI_fromEng, Peng_fromSI, EchoInput,
@@ -57,14 +58,14 @@ toSI_callD['Z'] = EchoInput
 
 toSI_callD['Cond'] = CondSI_fromEng
 
-# need to add to toSI_callD with all synonyms for preferred names
+# need to add to toSI_callD with all synonyms of preferred names
 for pref_name in preferred_list:
     syn_set = param_synonymD[pref_name]
     for syn in syn_set:
         if syn not in toSI_callD:
             toSI_callD[syn] = toSI_callD[pref_name]
 
-
+# print( 'toSI_callD.keys =', sorted(toSI_callD.keys(), key=str.lower))
 # ==========================================================
 # map SI to Eng conversion functions for each of the fluid properties
 toEng_callD = {} # index=si char, value=conversion func (e.g. Seng_fromSI)
@@ -130,7 +131,7 @@ class EC_Humid_Air(object):
         if len(kwargs) == 0:
             kwargs = {'T':536.4 ,'P':PSIA_PER_ATM, 'RelHum':0.5}
         
-        # self.eng_inputD = kwargs.copy()
+        # Allow any temperature to be input in degF
         self.eng_inputD = {} # key:CoolProp input name: value=value in Engineering units
         for k,v in kwargs.items():
             if k.endswith('degF'):
@@ -152,6 +153,9 @@ class EC_Humid_Air(object):
         for k,v in self.eng_inputD.items():
             self.si_inputD[k] = toSI_callD[k](v)
 
+        # print( 'eng_inputD =', self.eng_inputD)
+        # print( 'si_inputD =', self.si_inputD)
+
 
         # Extract keys and values from the self.si_inputD dictionary
         input_keys = list(self.si_inputD.keys())
@@ -165,6 +169,12 @@ class EC_Humid_Air(object):
             except:
                 print( 'Failed to calc:', prop)
                 self.si_propD[prop] = float('inf')
+
+                tb_str = traceback.format_exc()
+                if 'ValueError' in tb_str:
+                    print( tb_str.split('ValueError')[-1])
+                else:
+                    print( tb_str )
 
         # include shorter, non-CoolProp name for Conductivity
         self.si_propD['Cond'] = self.si_propD['Conductivity']
@@ -180,6 +190,10 @@ class EC_Humid_Air(object):
         # assign Engineering properties to self
         for name, value in self.eng_propD.items():
             setattr(self, name, value)
+            for syn in param_synonymD[name]:
+                if syn != name:
+                    setattr(self, syn, value)
+
 
         # if 'Y' in self.eng_propD and self.eng_propD['Y'] < 1.0:
         #     # Constants
@@ -257,7 +271,7 @@ class EC_Humid_Air(object):
 
                 # for name, desc in preferred_nameD.items():
                 if name in input_set:
-                    syn_set = eval(param_synonymD[name])-{name}
+                    syn_set = param_synonymD[name]-{name}
                     if syn_set:
                         print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc, '::AKA', syn_set)
                     else:
@@ -273,7 +287,7 @@ class EC_Humid_Air(object):
                 else:
                     desc = preferred_nameD[name]
             
-                syn_set = eval(param_synonymD[name])-{name}
+                syn_set = param_synonymD[name]-{name}
                 if name=='Conductivity': 
                     name='Cond'
                 if syn_set:
