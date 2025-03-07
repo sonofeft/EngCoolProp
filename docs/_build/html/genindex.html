@@ -104,6 +104,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid">EC_Fluid (class in engcoolprop.ec_fluid)</a>
 </li>
+      <li><a href="humid_air_funcs.html#engcoolprop.ec_humid_air.EC_Humid_Air">EC_Humid_Air (class in engcoolprop.ec_humid_air)</a>
+</li>
       <li><a href="incomp_fluid_funcs.html#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid">EC_Incomp_Fluid (class in engcoolprop.ec_incomp_fluid)</a>
 </li>
       <li><a href="incomp_soln_funcs.html#engcoolprop.ec_incomp_soln.EC_Incomp_Soln">EC_Incomp_Soln (class in engcoolprop.ec_incomp_soln)</a>
@@ -117,6 +119,13 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    engcoolprop.ec_humid_air
+
+      <ul>
+        <li><a href="humid_air_funcs.html#module-engcoolprop.ec_humid_air">module</a>
+</li>
+      </ul></li>
       <li>
     engcoolprop.ec_incomp_fluid
 
@@ -139,7 +148,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.gamma">gamma() (engcoolprop.ec_fluid.EC_Fluid method)</a>
 </li>
+      <li><a href="humid_air_funcs.html#engcoolprop.ec_humid_air.EC_Humid_Air.get_eng_fmt_size">get_eng_fmt_size() (engcoolprop.ec_humid_air.EC_Humid_Air method)</a>
+</li>
       <li><a href="incomp_fluid_funcs.html#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Psat">get_Psat() (engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid method)</a>
+</li>
+      <li><a href="humid_air_funcs.html#engcoolprop.ec_humid_air.EC_Humid_Air.get_si_fmt_size">get_si_fmt_size() (engcoolprop.ec_humid_air.EC_Humid_Air method)</a>
 </li>
       <li><a href="incomp_fluid_funcs.html#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.get_Tsat">get_Tsat() (engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid method)</a>
 </li>
@@ -149,10 +162,10 @@
 </li>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.getSatT">getSatT() (engcoolprop.ec_fluid.EC_Fluid method)</a>
 </li>
-      <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.getSatTandDens">getSatTandDens() (engcoolprop.ec_fluid.EC_Fluid method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.getSatTandDens">getSatTandDens() (engcoolprop.ec_fluid.EC_Fluid method)</a>
+</li>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.getStrTPD">getStrTPD() (engcoolprop.ec_fluid.EC_Fluid method)</a>
 
       <ul>
@@ -199,6 +212,8 @@
       <ul>
         <li><a href="functions.html#module-engcoolprop.ec_fluid">engcoolprop.ec_fluid</a>
 </li>
+        <li><a href="humid_air_funcs.html#module-engcoolprop.ec_humid_air">engcoolprop.ec_humid_air</a>
+</li>
         <li><a href="incomp_fluid_funcs.html#module-engcoolprop.ec_incomp_fluid">engcoolprop.ec_incomp_fluid</a>
 </li>
         <li><a href="incomp_soln_funcs.html#module-engcoolprop.ec_incomp_soln">engcoolprop.ec_incomp_soln</a>
@@ -224,11 +239,17 @@
         <li><a href="incomp_soln_funcs.html#engcoolprop.ec_incomp_soln.EC_Incomp_Soln.pause_warnings">(engcoolprop.ec_incomp_soln.EC_Incomp_Soln method)</a>
 </li>
       </ul></li>
+      <li><a href="humid_air_funcs.html#engcoolprop.ec_humid_air.EC_Humid_Air.print_input_params">print_input_params() (engcoolprop.ec_humid_air.EC_Humid_Air method)</a>
+</li>
+      <li><a href="humid_air_funcs.html#engcoolprop.ec_humid_air.EC_Humid_Air.print_output_params">print_output_params() (engcoolprop.ec_humid_air.EC_Humid_Air method)</a>
+</li>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.printCriticalProps">printCriticalProps() (engcoolprop.ec_fluid.EC_Fluid method)</a>
 </li>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.printProps">printProps() (engcoolprop.ec_fluid.EC_Fluid method)</a>
 
       <ul>
+        <li><a href="humid_air_funcs.html#engcoolprop.ec_humid_air.EC_Humid_Air.printProps">(engcoolprop.ec_humid_air.EC_Humid_Air method)</a>
+</li>
         <li><a href="incomp_fluid_funcs.html#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.printProps">(engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid method)</a>
 </li>
         <li><a href="incomp_soln_funcs.html#engcoolprop.ec_incomp_soln.EC_Incomp_Soln.printProps">(engcoolprop.ec_incomp_soln.EC_Incomp_Soln method)</a>
@@ -302,14 +323,16 @@
         <li><a href="incomp_fluid_funcs.html#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPH">(engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.setProps">setProps() (engcoolprop.ec_fluid.EC_Fluid method)</a>
 
       <ul>
+        <li><a href="humid_air_funcs.html#engcoolprop.ec_humid_air.EC_Humid_Air.setProps">(engcoolprop.ec_humid_air.EC_Humid_Air method)</a>
+</li>
         <li><a href="incomp_fluid_funcs.html#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setProps">(engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="functions.html#engcoolprop.ec_fluid.EC_Fluid.setPropsFromAS">setPropsFromAS() (engcoolprop.ec_fluid.EC_Fluid method)</a>
 </li>
       <li><a href="incomp_fluid_funcs.html#engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid.setPS">setPS() (engcoolprop.ec_incomp_fluid.EC_Incomp_Fluid method)</a>
@@ -347,9 +370,11 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="incompressible.html">Incompressible Fluids</a></li>
 <li class="toctree-l1"><a class="reference internal" href="incomp_solns.html">Incompressible Solutions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="humid_air.html">Humid Air</a></li>
 <li class="toctree-l1"><a class="reference internal" href="functions.html">EC_Fluid Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="incomp_fluid_funcs.html">EC_Incomp_Fluid Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="incomp_soln_funcs.html">EC_Incomp_Soln Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="humid_air_funcs.html">EC_Humid_Air Functions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="copyright.html">Copyright</a></li>
 <li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
 <li class="toctree-l1"><a class="reference internal" href="history.html">History</a></li>

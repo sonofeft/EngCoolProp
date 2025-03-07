@@ -1,7 +1,7 @@
 from engcoolprop.ec_incomp_soln import EC_Incomp_Soln
 
 # Create incompressible solution object. (without specifying state point)
-ec_soln = EC_Incomp_Soln(symbol="MEG-30%", auto_fix_value_errors=False, show_warnings=2)
+ec_soln = EC_Incomp_Soln(symbol="MEG-30%", auto_fix_value_errors=True, show_warnings=2)
 
 # Print state point
 ec_soln.printProps() # Print state point

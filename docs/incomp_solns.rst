@@ -129,3 +129,47 @@ Output::
         mass%    =         30 base mass percent       Range(0% - 60%)
 
 
+Making Plots
+------------
+
+An easy way to make plots is to use the `matplotlib <https://matplotlib.org/>`_ package.
+
+To install `matplotlib <https://matplotlib.org/>`_ give the commands::
+    
+    pip install matplotlib    
+       ... OR to upgrade...
+    pip install --upgrade matplotlib
+
+The example below will plot the density (D) of MEG for a number of solution concentrations.::
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from engcoolprop.ec_incomp_soln import EC_Incomp_Soln
+
+    P = 1000
+    for pcent in [60, 40, 20, 0]:
+
+        # Create incompressible solution object. (without specifying state point)
+        ec_soln = EC_Incomp_Soln(symbol="MEG-%i%%"%pcent, auto_fix_value_errors=True, show_warnings=0)
+
+        tArr = np.linspace(ec_soln.Tmin, ec_soln.Tmax, 50)
+
+        densL = []
+        for T in tArr:
+            ec_soln.setTP( T, P)
+            densL.append( ec_soln.D )
+
+        plt.plot( tArr, densL, label="MEG-%i%%"%pcent)
+
+    plt.grid( True )
+    plt.title( 'MEG Solution Densities')
+    plt.xlabel( 'Temperature (degR)')
+    plt.ylabel( 'Density (lbm/cuft)')
+    plt.legend( loc='best' )
+
+    plt.savefig( 'MEG_pcent_D.png', dpi=200)
+    plt.show()
+
+.. image:: _static/MEG_pcent_D.png
+    :width: 80%
+

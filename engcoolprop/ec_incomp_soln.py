@@ -49,7 +49,7 @@ from engcoolprop.banner import banner
 class EC_Incomp_Soln(object):
     
     def __init__(self,symbol="MEG-20%", T=None ,P=None, Pmax=10000.0,
-                 show_warnings=2, auto_fix_value_errors=False):
+                 show_warnings=2, auto_fix_value_errors=True):
         """        Init generic Incompressible Solution
 
         Args:
@@ -449,7 +449,9 @@ class EC_Incomp_Soln(object):
         print("Cp=%s"%SGL.Cp," BTU/lbm degR",   '                      Range(%8g - %8g) BTU/lbm degR'%(self.Cpmin, self.Cpmax))
 
         if self.Visc < float('inf'):
-            print("V =%s"%SGL.Visc * 1.0E5," viscosity [1.0E5 * lbm/ft-sec]", '    Range(%8g - %8g)'%(self.Viscmin * 1.0E5, self.Viscmax * 1.0E5) )
+            print( "SGL.Visc=%s, self.Viscmin=%s, self.Viscmax=%s"%(SGL.Visc, self.Viscmin, self.Viscmax) )
+            print("V =%s"%SGL.Visc," viscosity [1.0E5 * lbm/ft-sec]", 
+                  '    Range(%8g - %8g)'%(self.Viscmin * 1.0E5, self.Viscmax * 1.0E5) )
         else:
             print("V =UNDEFINED","viscosity [1.0E5 * lbm/ft-sec]" )
 

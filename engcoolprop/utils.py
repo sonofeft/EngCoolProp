@@ -95,6 +95,8 @@ class Same_g_len:
         for prop in properties:
             if hasattr(obj, prop):
                 value = getattr(obj, prop)
+                if prop=='Visc':
+                    value *= 1.0E5
                 try:
                     formatted_value = f"{value:g}"
                 except:

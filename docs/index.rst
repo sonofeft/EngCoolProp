@@ -61,9 +61,11 @@ Contents:
    examples
    incompressible
    incomp_solns
+   humid_air
    functions
    incomp_fluid_funcs
    incomp_soln_funcs
+   humid_air_funcs
    copyright
    authors
    history

@@ -122,10 +122,10 @@ class EC_Humid_Air(object):
 
         Args:
         - kwargs (dict): Dictionary with three keys corresponding to the input properties and their values.
-                         The values in kwargs are in Engineering units
 
-        Returns:
-        - dict: A dictionary with property names as keys and their calculated values as values.
+        Note the values in kwargs are in Engineering units.
+
+        Results in object properties corresponding to state properties in engineering units.
         """
         # Allow user to call setProps with none or partial parameters
         if len(kwargs) == 0:
@@ -155,7 +155,6 @@ class EC_Humid_Air(object):
 
         # print( 'eng_inputD =', self.eng_inputD)
         # print( 'si_inputD =', self.si_inputD)
-
 
         # Extract keys and values from the self.si_inputD dictionary
         input_keys = list(self.si_inputD.keys())
@@ -218,7 +217,11 @@ class EC_Humid_Air(object):
         return '%' + '%ig'%max_len, max_len
 
     def printProps(self, eng_units=True):
-        '''print a multiline property summary with units'''
+        '''
+        Print a multiline property summary with Engineering units.
+        
+        If eng_units=False, SI units will be printed.
+        '''
 
         
         def dict_to_string(D):
