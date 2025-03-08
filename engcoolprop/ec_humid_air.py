@@ -161,19 +161,33 @@ class EC_Humid_Air(object):
         input_vals = list(self.si_inputD.values())
 
         # Iterate through the list of properties and calculate each one
+        self.success = True
         for prop in preferred_list:
-            try:
-                # Place SI results into self.si_propD
-                self.si_propD[prop] = CP.HAPropsSI(prop, input_keys[0], input_vals[0], input_keys[1], input_vals[1], input_keys[2], input_vals[2])
-            except:
-                print( 'Failed to calc:', prop)
+            if not self.success:
+                self.si_propD[prop] = float('inf')
+            else:
+                try:
+                    # Place SI results into self.si_propD
+                    self.si_propD[prop] = CP.HAPropsSI(prop, input_keys[0], input_vals[0], input_keys[1], input_vals[1], input_keys[2], input_vals[2])
+                except:
+                    self.success = False
+
+                    print( 'Failed to calc:', prop)
+                    self.si_propD[prop] = float('inf')
+
+                    tb_str = traceback.format_exc()
+                    if 'ValueError' in tb_str:
+                        print( tb_str.split('ValueError')[-1])
+                    else:
+                        print( tb_str )
+
+                    break # all props will be set to float('inf')
+                
+        # if not success, set everything to infinity
+        if not self.success:
+            for prop in preferred_list:
                 self.si_propD[prop] = float('inf')
 
-                tb_str = traceback.format_exc()
-                if 'ValueError' in tb_str:
-                    print( tb_str.split('ValueError')[-1])
-                else:
-                    print( tb_str )
 
         # include shorter, non-CoolProp name for Conductivity
         self.si_propD['Cond'] = self.si_propD['Conductivity']

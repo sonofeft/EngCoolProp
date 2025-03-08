@@ -9,3 +9,6 @@ ha.print_output_params()
 print()
 ha.printProps()
 
+
+print()
+ha.printProps( eng_units=False )

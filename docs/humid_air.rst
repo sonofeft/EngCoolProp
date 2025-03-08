@@ -34,8 +34,8 @@ three inputs to the CoolProp HAPropsSI interface.
     *) Can use all synonyms for inputs (e.g. T_db, Tdb, T)
     EC_Humid_Air(P=14.7, RH=.3, Tdb=530) # P=14.7, RH=0.3, Tdb=530
 
-Input/Output
-------------
+Input Parameters
+----------------
 
 To see the legal input parameters for EC_Humid_Air, run the following script::
 
@@ -64,7 +64,56 @@ with results::
     HumRat   lbm water/lbm dry air Humidity Ratio                     ::AKA {'W', 'Omega'}
          Y mol water/mol humid air Water mole fraction                ::AKA {'psi_w'}
 
-Similarly for output parameters, run the following script::
+Note that Pressure(P) must ALWAYS be input and that for the remaining 2 inputs,
+not all input pairs are compatible. 
+Dry bulb temperature(Tdb) will work with ALL other input parameters, however,
+the rest of the input parameters are more limited.
+The following shows what pairs are known to work and fail::
+
+
+       Tdb WORKS: DewPoint, Hda, Hha, HumRat, P_w, RelHum, Sda, Sha, Vda, Vha, WetBulb, Y
+           FAILS:
+
+    RelHum WORKS: Hda, Hha, P_w, Sda, Sha, Tdb, Vda, Vha, WetBulb, Y
+           FAILS: DewPoint, HumRat
+
+  DewPoint WORKS: Hda, Hha, Sda, Sha, Tdb, Vda, Vha, WetBulb
+           FAILS: HumRat, P_w, RelHum, Y
+
+    HumRat WORKS: Hda, Hha, Sda, Sha, Tdb, Vda, Vha, WetBulb
+           FAILS: DewPoint, P_w, RelHum, Y
+
+       Hda WORKS: DewPoint, HumRat, RelHum, Tdb
+           FAILS: Hha, P_w, Sda, Sha, Vda, Vha, WetBulb, Y
+
+       Hha WORKS: DewPoint, HumRat, RelHum, Tdb
+           FAILS: Hda, P_w, Sda, Sha, Vda, Vha, WetBulb, Y
+
+       Sda WORKS: DewPoint, HumRat, RelHum, Tdb
+           FAILS: Hda, Hha, P_w, Sha, Vda, Vha, WetBulb, Y
+
+       Sha WORKS: DewPoint, HumRat, RelHum, Tdb
+           FAILS: Hda, Hha, P_w, Sda, Vda, Vha, WetBulb, Y
+
+       Vda WORKS: DewPoint, HumRat, RelHum, Tdb
+           FAILS: Hda, Hha, P_w, Sda, Sha, Vha, WetBulb, Y
+
+       Vha WORKS: DewPoint, HumRat, RelHum, Tdb
+           FAILS: Hda, Hha, P_w, Sda, Sha, Vda, WetBulb, Y
+
+   WetBulb WORKS: DewPoint, HumRat, RelHum, Tdb
+           FAILS: Hda, Hha, P_w, Sda, Sha, Vda, Vha, Y
+
+       P_w WORKS: RelHum, Tdb
+           FAILS: DewPoint, Hda, Hha, HumRat, Sda, Sha, Vda, Vha, WetBulb, Y
+
+         Y WORKS: RelHum, Tdb
+           FAILS: DewPoint, Hda, Hha, HumRat, P_w, Sda, Sha, Vda, Vha, WetBulb
+
+Output Parameters
+-----------------
+
+To see all output parameters, run the following script::
 
     from engcoolprop.ec_humid_air import EC_Humid_Air
     ha = EC_Humid_Air()
@@ -97,6 +146,7 @@ with results::
     HumRat   lbm water/lbm dry air Humidity Ratio                     ::AKA {'W', 'Omega'}
          Y mol water/mol humid air Water mole fraction                ::AKA {'psi_w'}
          Z                         Compressibility factor (Z=pv/(RT))
+
 
 State Point
 -----------
@@ -139,6 +189,42 @@ Resulting In::
     HumRat =  0.00983592 lbm water/lbm dry air  :: Humidity Ratio
          Y =   0.0155686 mol water/mol humid air  :: Water mole fraction
          Z =    0.999629   :: Compressibility factor (Z=pv/(RT))
+
+Note that:: 
+    
+    ha.printProps( eng_units=False )
+
+will output SI units.::
+
+   +---------------------------------------------------------------------+
+   |  ---- State Point for Humid Air (T=298, P=101325, RelHum=0.5) ----  |
+   +---------------------------------------------------------------------+
+       Tdb =         298 K  :: Dry-Bulb Temperature
+   WetBulb =      290.91 K  :: Wet-Bulb Temperature
+  DewPoint =     286.879 K  :: Dew-Point Temperature
+         P =      101325 Pa  :: Pressure
+       P_w =     1577.48 Pa  :: Partial pressure of water vapor
+
+       Vda =    0.857236 m^3 /kg dry air  :: Mixture volume per unit dry air
+       Vha =    0.848887 m^3 /kg humid air  :: Mixture volume per unit humid air
+
+        cp =     1024.83 J/kg dry air/K  :: Mixture Cp per unit dry air
+     cp_ha =     1014.84 J/kg humid air/K  :: Mixture Cp per unit humid air
+        CV =     731.789 J/kg dry air/K  :: Mixture Cv per unit dry air
+      CVha =     724.661 J/kg humid air/K  :: Mixture Cv per unit humid air
+
+       Hda =     50041.1 J/kg dry air  :: Mixture enthalpy per dry air
+       Hha =     49553.7 J/kg humid air  :: Mixture enthalpy per humid air
+       Sda =     179.445 J/kg dry air/K  :: Mixture entropy per unit dry air
+       Sha =     177.697 J/kg humid air/K  :: Mixture entropy per unit humid air
+
+      Cond =   0.0262197 W/m/K  :: Mixture thermal conductivity
+      Visc = 1.83527e-05 Pa-s  :: Mixture viscosity
+
+    RelHum =         0.5   :: Relative humidity in range [0, 1]
+    HumRat =  0.00983592 kg water/kg dry air  :: Humidity Ratio
+         Y =   0.0155686 mol water/mol humid air  :: Water mole fraction
+         Z =    0.999629   :: Compressibility factor (Z=pv/(RT))    
 
 
 Making Plots
