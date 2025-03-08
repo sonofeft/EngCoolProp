@@ -163,25 +163,22 @@ class EC_Humid_Air(object):
         # Iterate through the list of properties and calculate each one
         self.success = True
         for prop in preferred_list:
-            if not self.success:
+            try:
+                # Place SI results into self.si_propD
+                self.si_propD[prop] = CP.HAPropsSI(prop, input_keys[0], input_vals[0], input_keys[1], input_vals[1], input_keys[2], input_vals[2])
+            except:
+                self.success = False
+
+                print( 'Failed to calc:', prop)
                 self.si_propD[prop] = float('inf')
-            else:
-                try:
-                    # Place SI results into self.si_propD
-                    self.si_propD[prop] = CP.HAPropsSI(prop, input_keys[0], input_vals[0], input_keys[1], input_vals[1], input_keys[2], input_vals[2])
-                except:
-                    self.success = False
 
-                    print( 'Failed to calc:', prop)
-                    self.si_propD[prop] = float('inf')
+                tb_str = traceback.format_exc()
+                if 'ValueError' in tb_str:
+                    print( 'ValueError::', tb_str.split('ValueError')[-1])
+                else:
+                    print( tb_str )
 
-                    tb_str = traceback.format_exc()
-                    if 'ValueError' in tb_str:
-                        print( tb_str.split('ValueError')[-1])
-                    else:
-                        print( tb_str )
-
-                    break # all props will be set to float('inf')
+                break # all props will be set to float('inf')
                 
         # if not success, set everything to infinity
         if not self.success:
@@ -305,17 +302,14 @@ class EC_Humid_Air(object):
                     desc = preferred_nameD[name]
             
                 syn_set = param_synonymD[name]-{name}
-                if name=='Conductivity': 
-                    name='Cond'
+                # if name=='Conductivity': 
+                #     name='Cond'
                 if syn_set:
                     print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc, '::AKA', syn_set)
                 else:
                     print( '%10s'%name, '%23s'%param_eng_unitsD[name], '%-34s'%desc)
 
-
-
-if __name__ == "__main__":
-
+def dev_tests():
     ha = EC_Humid_Air( T=536.4 , RelHum=0.5 )
 
     # kL = sorted( ha.eng_propD.keys(), key=str.lower)
@@ -336,3 +330,7 @@ if __name__ == "__main__":
     print( '-'*66 )
     HA = ha = EC_Humid_Air( TdegF=70, RelHum=0.5 )
     HA.printProps()
+
+if __name__ == "__main__":
+
+    dev_tests()

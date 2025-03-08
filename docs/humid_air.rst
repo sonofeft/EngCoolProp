@@ -68,7 +68,7 @@ Note that Pressure(P) must ALWAYS be input and that for the remaining 2 inputs,
 not all input pairs are compatible. 
 Dry bulb temperature(Tdb) will work with ALL other input parameters, however,
 the rest of the input parameters are more limited.
-The following shows what pairs are known to work and fail::
+The following shows what pairs are known to work and fail in order of least to most limited::
 
 
        Tdb WORKS: DewPoint, Hda, Hha, HumRat, P_w, RelHum, Sda, Sha, Vda, Vha, WetBulb, Y

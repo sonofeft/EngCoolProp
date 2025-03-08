@@ -7,6 +7,10 @@ History
 GitHub Log
 ----------
 
+* March 8, 2025
+    - (by: sonofeft) 
+        - First version including Humid Air from CoolProp
+
 * March 2, 2025
     - (by: sonofeft) 
         - First version including INCOMP solutions from CoolProp
