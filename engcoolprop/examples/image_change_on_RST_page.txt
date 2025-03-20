@@ -2,7 +2,8 @@
 # In a ReadtheDocs document page created by a *.rst file, can a link on a page
 # cause an image on the page to change.
 
-# In other words, instead of jumping to a new page, simply change an image being displayed
+# In other words, instead of jumping to a new page, 
+#  simply change an image being displayed
 
 # RST File script: Include the JavaScript in your reST file:
 .. raw:: html

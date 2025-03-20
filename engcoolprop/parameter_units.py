@@ -48,6 +48,7 @@ eng_unitsD["Zc"] = ""
 
 
 # coolprop units from: http://www.coolprop.org/coolprop/HighLevelAPI.html#fluid-information
+#  http://www.coolprop.org/coolprop/HighLevelAPI.html#table-of-string-inputs-to-propssi-function
 si_unitsD = {} # key:coolprop param name, value: SI units
 si_unitsD["A"] = "m/s"
 si_unitsD["ACENTRIC"] = ""
