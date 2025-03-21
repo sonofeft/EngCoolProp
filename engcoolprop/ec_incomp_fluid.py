@@ -23,9 +23,9 @@ EngCoolProp uses units of primarily inch, lbm, lbf, sec, BTU (some use of ft and
 
 """
 import traceback
-from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  
+from engcoolprop.conv_funcs import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  
                                   Deng_fromSI ,   PSI_fromEng, Peng_fromSI,
-                                  PropsSI ,   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
+                                  SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )
 from CoolProp.CoolProp import PropsSI
 import CoolProp.CoolProp as CP

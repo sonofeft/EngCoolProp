@@ -2,7 +2,7 @@ import traceback
 from CoolProp.CoolProp import PropsSI
 from engcoolprop.find_exception_threshold import find_exception_limit
 # from engcoolprop.parameter_units import si_unitsD
-from engcoolprop.ec_fluid import  Peng_fromSI, PSI_fromEng
+from engcoolprop.conv_funcs import  Peng_fromSI, PSI_fromEng
 
 prop_descD = {} # key:eng prop desc, value:coolprop prop desc
 prop_descD ['T'] = 'T'
@@ -137,7 +137,7 @@ def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=10
     return prop_val, good_Psi_val
 
 if __name__ == "__main__":
-    from engcoolprop.ec_fluid import (toEng_callD,  DSI_fromEng ,  
+    from engcoolprop.conv_funcs import (toEng_callD,  DSI_fromEng ,  
                                       PropsSI ,   SSI_fromEng , TSI_fromEng ,  
                                       UHSI_fromEng )
     from engcoolprop.parameter_units import si_unitsD

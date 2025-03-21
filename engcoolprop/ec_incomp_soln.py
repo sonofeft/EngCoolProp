@@ -32,7 +32,7 @@ import CoolProp.CoolProp as CP
 
 from engcoolprop.iteration_utils import calc_T_freeze
 from engcoolprop.InterpProp_scipy import get_density_interpolator
-from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  
+from engcoolprop.conv_funcs import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  
                                   Deng_fromSI ,   PSI_fromEng, Peng_fromSI,
                                   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI )

@@ -9,7 +9,7 @@ from engcoolprop.humid_air_params import (preferred_list, param_synonymD, param_
                                           param_descD, param_si_unitsD, preferred_nameD, 
                                           input_set)
 
-from engcoolprop.ec_fluid import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  CPSI_fromEng,
+from engcoolprop.conv_funcs import (CPeng_fromSI ,  CondEng_fromSI ,   DSI_fromEng ,  CPSI_fromEng,
                                   Deng_fromSI ,   PSI_fromEng, Peng_fromSI, EchoInput,
                                   SSI_fromEng ,  Seng_fromSI ,  TSI_fromEng ,  
                                   Teng_fromSI ,  UHSI_fromEng ,  UHeng_fromSI ,   Veng_fromSI,

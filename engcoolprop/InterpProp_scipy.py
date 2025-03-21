@@ -5,7 +5,7 @@
 from scipy import interpolate
 from numpy import float64, array
 from CoolProp.CoolProp import PropsSI
-from engcoolprop.ec_fluid import TSI_fromEng, Deng_fromSI, PSI_fromEng
+from engcoolprop.conv_funcs import TSI_fromEng, Deng_fromSI, PSI_fromEng
 
 def get_density_interpolator( ec_inc ):
     """

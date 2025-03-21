@@ -1,5 +1,5 @@
 from CoolProp.CoolProp import PropsSI
-from engcoolprop.ec_fluid import ( Peng_fromSI, PropsSI , TSI_fromEng, PSI_fromEng, UHeng_fromSI,
+from engcoolprop.conv_funcs import ( Peng_fromSI, TSI_fromEng, PSI_fromEng, UHeng_fromSI,
                                    Teng_fromSI, Deng_fromSI,  )
 from engcoolprop.find_exception_threshold import find_exception_limit
 
