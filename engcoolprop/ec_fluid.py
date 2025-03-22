@@ -78,6 +78,7 @@ from engcoolprop.conv_funcs import (ASI_fromEng, CondSI_fromEng, CPSI_fromEng,
                                     DSI_fromEng, PSI_fromEng, SSI_fromEng, 
                                     TSI_fromEng, UHSI_fromEng, VSI_fromEng)
 from engcoolprop.conv_funcs import  EchoInput
+from engcoolprop.si_object import SI_obj
 
 # Q values to indicate all liquid or gas
 Q_LIQUID = 0  # all liquid
@@ -796,6 +797,37 @@ class EC_Fluid(object):
         print("Q =%8g"%self.Q," Vapor Quality (mass fraction gas)", sep=' ')
         print("Z =%8g"%self.Z," (-)", sep=' ')
 
+    def printSIProps(self):
+        '''print a multiline property summary with SI units'''
+
+        ec_fluidL = ['Cond', 'Cp', 'Cv', 'D', 'Dc', 'E', 'gamma', 'good_nbp', 'H', 'name', 
+            'P', 'Pc', 'Q', 'S', 'sonicV', 'symbol', 'T', 'Tc', 'Tnbp', 'Ttriple', 
+            'Visc', 'WtMol', 'Z']
+
+        si_obj = SI_obj( self, ec_fluidL)
+
+
+        print("State Point for fluid",self.name,"("+self.symbol+")")
+        if self.good_nbp:
+            print("T =%s"%si_obj.T," degK (Tc=%s"%si_obj.Tc.strip(),", Tnbp=%s"%si_obj.Tnbp.strip(), "Ttriple=%s"%si_obj.Ttriple.strip(),")")
+        else:
+            print("T =%s"%si_obj.T," degK (Tc=%s"%si_obj.Tc.strip(),", Tnbp=N/A", "Ttriple=%s"%si_obj.Ttriple.strip(),")")
+            
+        print("P =%s"%si_obj.P," Pa (Pc=%s"%si_obj.Pc.strip(),")")
+        print("D =%s"%si_obj.D," kg/m^3 (Dc=%s"%si_obj.Dc.strip(),")")
+        print("E =%s"%si_obj.E," J/kg")
+        print("H =%s"%si_obj.H," J/kg")
+        print("S =%s"%si_obj.S," J/kg/K")
+        print("Cv=%s"%si_obj.Cv," J/kg/K")
+        print("Cp=%s"%si_obj.Cp," J/kg/K")
+        print("g =%s"%si_obj.gamma," Cp/Cv (-)")
+        print("A =%s"%si_obj.sonicV," m/s")
+        print("V =%s"%si_obj.Visc," viscosity Pa-s")
+        print("C =%s"%si_obj.Cond," thermal conductivity W/m/K")
+        print("MW=%s"%si_obj.WtMol," g/mol")
+        print("Q =%s"%si_obj.Q," Vapor Quality (mass fraction gas)")
+        print("Z =%s"%si_obj.Z," (-)")
+
     def compressibility(self):
         '''returns Z'''
         return self.Z
@@ -885,4 +917,7 @@ if __name__ == '__main__':
         print('dHvap=%g at P=%g'%(dH,P) )
     
     
-    
+    print('_'*55)
+    C = EC_Fluid( symbol='H2O' )
+    C.setTP( 534.67, 14.6959 )
+    C.printSIProps()

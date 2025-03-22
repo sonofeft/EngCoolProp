@@ -227,6 +227,9 @@ class EC_Humid_Air(object):
         max_len = max([len('%g'%self.si_propD[name]) for name in preferred_list])
         return '%' + '%ig'%max_len, max_len
 
+    def printSIProps(self):
+        self.printProps( eng_units=False )
+
     def printProps(self, eng_units=True):
         '''
         Print a multiline property summary with Engineering units.
@@ -330,6 +333,9 @@ def dev_tests():
     print( '-'*66 )
     HA = ha = EC_Humid_Air( TdegF=70, RelHum=0.5 )
     HA.printProps()
+
+    print( '-'*66 )
+    HA.printSIProps()
 
 if __name__ == "__main__":
 

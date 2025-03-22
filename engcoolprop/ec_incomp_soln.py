@@ -41,6 +41,7 @@ from engcoolprop.safe_get_property import safe_get_INCOMP_prop, is_frac_max_chec
 from engcoolprop.utils import Same_g_len, parse_coolprop_mixture, incomp_pure_solnL, print_avoid_valerr
 from engcoolprop.iteration_utils import find_T_from_Dterp
 from engcoolprop.banner import banner
+from engcoolprop.si_object import SI_obj
 
 # how to make a list of all incompressible solutions in coolprop
 # incomp_pure_solnL = CP.get_global_param_string('incompressible_list_solution').split(',')
@@ -449,7 +450,7 @@ class EC_Incomp_Soln(object):
         print("Cp=%s"%SGL.Cp," BTU/lbm degR",   '                      Range(%8g - %8g) BTU/lbm degR'%(self.Cpmin, self.Cpmax))
 
         if self.Visc < float('inf'):
-            print( "SGL.Visc=%s, self.Viscmin=%s, self.Viscmax=%s"%(SGL.Visc, self.Viscmin, self.Viscmax) )
+            # print( "Visc=%s, Viscmin=%s, Viscmax=%s"%(SGL.Visc, self.Viscmin, self.Viscmax) )
             print("V =%s"%SGL.Visc," viscosity [1.0E5 * lbm/ft-sec]", 
                   '    Range(%8g - %8g)'%(self.Viscmin * 1.0E5, self.Viscmax * 1.0E5) )
         else:
@@ -462,6 +463,46 @@ class EC_Incomp_Soln(object):
 
         print("    rho      = %s"%SGL.rho," lbm/cuin",   '              Range(%.6f - %.6f) lbm/cuin'%(self.rho_min, self.rho_max))
         print("    mass%%    = %s"%SGL.percentage,"base mass percent", '      Range(%s - %s)'%(self.pcent_min_str, self.pcent_max_str))
+        
+
+    def printSIProps(self):
+        '''print a multiline property summary with SI units'''
+
+        ec_incomp_solnL = ['Cond','Condmax', 'Condmin', 'Cp', 'Cpmax', 'Cpmin', 'D', 'Dmax', 'Dmin', 'E', 'Emax', 'Emin', 
+                           'fluid', 'H', 'Hmax', 'Hmin', 'P', 'percentage', 'pcent_max_str', 'pcent_min_str', 'Pinput', 
+                           'Pmax', 'Pmin', 'rho', 'rho_max', 'rho_min', 'S', 'Smax', 'Smin', 'symbol', 'T', 'T_freeze', 
+                           'Tmax', 'Tmin', 'Visc', 'Viscmax', 'Viscmin']
+        si_obj = SI_obj( self, ec_incomp_solnL)
+
+
+        print("State Point for fluid",self.fluid,"("+ self.symbol +")")
+        print("T =%s"%si_obj.T," degK,",    '                       Range(%s - %s) degK'%(si_obj.Tmin.strip(), si_obj.Tmax.strip()))
+
+        print("P =%s"%si_obj.P," Pa",    '                          Range(%s - %s) Pa'%(si_obj.Pmin.strip(), si_obj.Pmax.strip()))
+        if self.Pinput != self.P:
+            print("    Pinput =%s"%si_obj.Pinput, '(Adjusted due to Psat)')
+
+        print("D =%s"%si_obj.D," kg/m^3",    '                      Range(%s - %s) lbm/cuft'%(si_obj.Dmin.strip(), si_obj.Dmax.strip()))
+
+        print("E =%s"%si_obj.E," J/kg",    '                        Range(%s - %s) J/kg'%(si_obj.Emin.strip(), si_obj.Emax.strip()))
+        print("H =%s"%si_obj.H," J/kg",    '                        Range(%s - %s) J/kg'%(si_obj.Hmin.strip(), si_obj.Hmax.strip()))
+        print("S =%s"%si_obj.S," J/kg/K",    '                      Range(%s - %s) J/kg/K'%(si_obj.Smin.strip(), si_obj.Smax.strip()))
+        print("Cp=%s"%si_obj.Cp," J/kg/K",   '                      Range(%s - %s) J/kg/K'%(si_obj.Cpmin.strip(), si_obj.Cpmax.strip()))
+
+        if self.Visc < float('inf'):
+            # print( "Visc=%s, Viscmin=%s, Viscmax=%s"%(si_obj.Visc, si_obj.Viscmin.strip(), si_obj.Viscmax.strip()) )
+            print("V =%s"%si_obj.Visc," viscosity Pa s", 
+                  '              Range(%s - %s) Pa s'%(si_obj.Viscmin.strip(), si_obj.Viscmax.strip()) )
+        else:
+            print("V =UNDEFINED","viscosity Pa s" )
+
+        print("C =%s"%si_obj.Cond," thermal conductivity W/m/K", '  Range(%s - %s) W/m/K'%(si_obj.Condmin.strip(), si_obj.Condmax.strip()) )
+
+        if self.T_freeze > 0:
+            print( "    T_freeze = %s degK"%si_obj.T_freeze)
+
+        print("    rho      = %s"%si_obj.rho," g/cm^3",   '          Range(%s - %s) g/cm^3'%(si_obj.rho_min.strip(), si_obj.rho_max.strip()))
+        print("    mass%%    = %s"%si_obj.percentage,"base mass percent", 'Range(%s - %s)'%(si_obj.pcent_min_str.strip(), si_obj.pcent_max_str.strip()))
         
         
         
@@ -595,10 +636,12 @@ def dev_tests():
         # print( tb_str )
 
 
-    print( '='*22, "%s Check omission of mass fraction", '='*22 )
+    print( '='*22, "Check omission of mass fraction", '='*22 )
     C = EC_Incomp_Soln( symbol='MEG', T=None, P=None )
     C.printProps()
 
+    print( '='*22, "Check printSIProps", '='*22 )
+    C.printSIProps()
     
 
 if __name__ == '__main__':

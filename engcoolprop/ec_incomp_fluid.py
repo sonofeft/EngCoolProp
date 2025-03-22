@@ -37,7 +37,7 @@ from engcoolprop.iteration_utils import find_T_from_Dterp, find_T_at_P
 from engcoolprop.iteration_utils import calc_Tnbp
 from engcoolprop.utils import Same_g_len, print_avoid_valerr, incomp_pure_fluidL
 from engcoolprop.banner import banner
-
+from engcoolprop.si_object import SI_obj
 
 # create simple look-up that is order-independent for input pairs
 
@@ -568,6 +568,55 @@ class EC_Incomp_Fluid(object):
             print("    Psat =%s"%SGL.Psat," psia", '                       Range(%g - %g) psia'%(self.Psat_min, self.Psat_max))
             # print("    Tsat =%s"%SGL.Tsat," degR", '                       Range(%g - %g) degR'%(self.Tsat_min, self.Tsat_max))
 
+    def printSIProps(self):
+        '''print a multiline property summary with SI units'''
+
+        # get formatted floats that are same length to help the look of table
+        # SGL = Same_g_len(self, ['Cond', "Cp", 'D', 'E', 'H', 'P', 'S', 'T', 'Visc', 'rho', 'Tnbp', 'Psat'] ) # , 'Tsat'
+
+        # ec_incomp_solnL = ['Cond','Condmax', 'Condmin', 'Cp', 'Cpmax', 'Cpmin', 'D', 'Dmax', 'Dmin', 'E', 'Emax', 'Emin', 
+        #                    'fluid', 'H', 'Hmax', 'Hmin', 'P', 'percentage', 'pcent_max_str', 'pcent_min_str', 'Pinput', 
+        #                    'Pmax', 'Pmin', 'rho', 'rho_max', 'rho_min', 'S', 'Smax', 'Smin', 'symbol', 'T', 'T_freeze', 
+        #                    'Tmax', 'Tmin', 'Visc', 'Viscmax', 'Viscmin']
+        
+        ec_incomp_fluidL = ['Cond','Condmax', 'Condmin', 'Cp', 'Cpmax', 'Cpmin', 'D', 'Dmax', 'Dmin', 'E', 'Emax', 'Emin', 
+                'fluid', 'H', 'Hmax', 'Hmin', 'P', 'Pinput', 'Pmax', 'Pmin', 'psat_is_supported', 
+                'Psat','Psat_max', 'Psat_min', 'rho', 'rho_max', 'rho_min', 'S', 'Smax', 'Smin', 'symbol', 
+                'T','Tmax', 'Tmin', 'Tnbp', 'Visc', 'Viscmax', 'Viscmin']
+        
+        si_obj = SI_obj( self, ec_incomp_fluidL)
+
+
+        print("State Point for fluid",self.fluid,"("+ self.symbol +")")
+        print("T =%s"%si_obj.T," degK,",    '                           Range(%s - %s) degK'%(si_obj.Tmin, si_obj.Tmax))
+
+        print("P =%s"%si_obj.P," Pa",    '                              Range(%s - %s) Pa'%(si_obj.Pmin, si_obj.Pmax))
+        if self.Pinput != self.P:
+            print("    Pinput =%s"%si_obj.Pinput, '(Adjusted due to Psat)')
+
+        print("D =%s"%si_obj.D," kg/m^3",    '                          Range(%s - %s) kg/m^3'%(si_obj.Dmin, si_obj.Dmax))
+
+        print("E =%s"%si_obj.E," J/kg",    '                            Range(%s - %s) J/kg'%(si_obj.Emin, si_obj.Emax))
+        print("H =%s"%si_obj.H," J/kg",    '                            Range(%s - %s) J/kg'%(si_obj.Hmin, si_obj.Hmax))
+        print("S =%s"%si_obj.S," J/kg/K",    '                          Range(%s - %s) J/kg/K'%(si_obj.Smin, si_obj.Smax))
+        print("Cp=%s"%si_obj.Cp," J/kg/K",   '                          Range(%s - %s) J/kg/K'%(si_obj.Cpmin, si_obj.Cpmax))
+
+        if self.Visc < float('inf'):
+            print("V =%s"%si_obj.Visc," viscosity Pa s", 
+                  '                  Range(%s - %s) Pa s'%(si_obj.Viscmin , si_obj.Viscmax ) )
+        else:
+            print("V =UNDEFINED","viscosity Pa s" )
+
+        print("C =%s"%si_obj.Cond," thermal conductivity W/m/K", '      Range(%s - %s) W/m/K'%(si_obj.Condmin, si_obj.Condmax) )
+
+        if self.Tnbp is not None:
+            print("    Tnbp =%s"%si_obj.Tnbp," degK,")
+        print("    rho  =%s"%si_obj.rho," g/cm^3",   '                   Range(%s - %s) g/cm^3'%(si_obj.rho_min, si_obj.rho_max))
+        
+        if self.psat_is_supported:
+            print("    Psat =%s"%si_obj.Psat," Pa", '                       Range(%s - %s) Pa'%(si_obj.Psat_min, si_obj.Psat_max))
+            # print("    Tsat =%s"%SGL.Tsat," degR", '                       Range(%g - %g) degR'%(self.Tsat_min, self.Tsat_max))
+
     def calc_min_max_props(self, do_print=False):
         # print( '.......................Entered calc_min_max_props ..........................')
         T_save = self.T
@@ -727,6 +776,10 @@ def dev_tests():
     print()
     print( '='*22, "print full %s properties"%symbol, '='*22 )
     C.printProps()
+    print()
+    print( '='*22, "print full SI %s properties"%symbol, '='*22 )
+    C.setTP( 534.67, 14.6959 )
+    C.printSIProps()
     print()
 
     banner( 'This should fail due to "auto_fix_value_errors = False"' )

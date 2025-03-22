@@ -137,8 +137,9 @@ def safe_get_INCOMP_prop( prop_desc, Psi_val=100000, ind_name='T', ind_si_val=10
     return prop_val, good_Psi_val
 
 if __name__ == "__main__":
-    from engcoolprop.conv_funcs import (toEng_callD,  DSI_fromEng ,  
-                                      PropsSI ,   SSI_fromEng , TSI_fromEng ,  
+    from engcoolprop.ec_fluid import toEng_callD
+    from engcoolprop.conv_funcs import (  DSI_fromEng ,  
+                                      SSI_fromEng , TSI_fromEng ,  
                                       UHSI_fromEng )
     from engcoolprop.parameter_units import si_unitsD
 
