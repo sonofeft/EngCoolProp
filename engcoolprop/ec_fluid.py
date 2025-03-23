@@ -835,7 +835,7 @@ class EC_Fluid(object):
     def dH_FromHZero(self):
         return self.H - self.Href
 
-if __name__ == '__main__':
+def dev_tests():
     
     C = EC_Fluid( symbol='CO2' )
     
@@ -921,3 +921,6 @@ if __name__ == '__main__':
     C = EC_Fluid( symbol='H2O' )
     C.setTP( 534.67, 14.6959 )
     C.printSIProps()
+
+if __name__ == '__main__':
+    dev_tests()

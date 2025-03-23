@@ -32,7 +32,7 @@ if here not in sys.path[:2]:
 if up_one not in sys.path[:2]:
     sys.path.insert(0, up_one)
 
-from engcoolprop.ec_fluid import EC_Fluid
+from engcoolprop.ec_fluid import EC_Fluid, dev_tests
 
 class MyTest(unittest.TestCase):
 
@@ -704,6 +704,26 @@ class MyTest(unittest.TestCase):
 
         del( ec )
 
+    def test_printSIProps_O2(self):
+        '''Check call to printSIProps with fluid O2'''
+        ec = EC_Fluid( symbol="O2" )
+        ec.printSIProps()
+
+        del( ec )
+
+
+    def test__main__(self):
+        old_sys_argv = list(sys.argv)
+        sys.argv = list(sys.argv)
+        sys.argv.append('suppress_show')
+        
+        try:
+            dev_tests()
+        except:
+            raise Exception('ERROR... failed in __main__ routine')
+        finally:
+            sys.argv = old_sys_argv
+        
 
 if __name__ == '__main__':
     # Can test just this file from command prompt
