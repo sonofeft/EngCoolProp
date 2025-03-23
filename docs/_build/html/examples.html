@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Examples &#8212; EngCoolProp 0.1.10 documentation</title>
+    <title>Pure Fluids &#8212; EngCoolProp 0.1.11 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
@@ -40,8 +40,8 @@
         <li class="right" >
           <a href="quickstart.html" title="QuickStart"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.10 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Examples</a></li> 
+        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Pure Fluids</a></li> 
       </ul>
     </div>  
 
@@ -50,8 +50,8 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="examples">
-<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this heading">¶</a></h1>
+  <section id="pure-fluids">
+<h1>Pure Fluids<a class="headerlink" href="#pure-fluids" title="Permalink to this heading">¶</a></h1>
 <section id="state-point">
 <h2>State Point<a class="headerlink" href="#state-point" title="Permalink to this heading">¶</a></h2>
 <p>Create a listing of properties at a given T and D:</p>
@@ -82,6 +82,38 @@
 <span class="n">MW</span><span class="o">=</span> <span class="mf">28.0135</span>  <span class="n">lbm</span><span class="o">/</span><span class="n">lbmmole</span>
 <span class="n">Q</span> <span class="o">=</span>      <span class="o">-</span><span class="mi">1</span>  <span class="n">Vapor</span> <span class="n">Quality</span> <span class="p">(</span><span class="n">mass</span> <span class="n">fraction</span> <span class="n">gas</span><span class="p">)</span>
 <span class="n">Z</span> <span class="o">=</span><span class="mf">0.999722</span>  <span class="p">(</span><span class="o">-</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="printsiunits">
+<h2>printSIUnits<a class="headerlink" href="#printsiunits" title="Permalink to this heading">¶</a></h2>
+<p>Although EngCoolProp was created to promote English units when using <a class="reference external" href="http://www.coolprop.org/dev/index.html">CoolProp</a> ,
+it is often helpful to see properties in SI units.</p>
+<p>For that reason, all the EngCoolProp models have a method called <strong>printSIUnits</strong> that will output the State Point with SI units.
+The script below shows the result of calling <strong>printSIUnits</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">engcoolprop.ec_fluid</span> <span class="kn">import</span> <span class="n">EC_Fluid</span>
+<span class="n">ec</span> <span class="o">=</span> <span class="n">EC_Fluid</span><span class="p">(</span><span class="n">symbol</span><span class="o">=</span><span class="s2">&quot;H2O&quot;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">530.0</span><span class="p">,</span><span class="n">P</span><span class="o">=</span><span class="mf">100.0</span> <span class="p">)</span> <span class="c1"># T=degR, P=psia</span>
+
+<span class="n">ec</span><span class="o">.</span><span class="n">printSIProps</span><span class="p">()</span> <span class="c1"># Print state point at given T,P with SI units</span>
+</pre></div>
+</div>
+<p>Output:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">State</span> <span class="n">Point</span> <span class="k">for</span> <span class="n">fluid</span> <span class="n">Water</span> <span class="p">(</span><span class="n">H2O</span><span class="p">)</span>
+<span class="n">T</span> <span class="o">=</span>    <span class="mf">294.444</span>  <span class="n">degK</span> <span class="p">(</span><span class="n">Tc</span><span class="o">=</span><span class="mf">647.096</span> <span class="p">,</span> <span class="n">Tnbp</span><span class="o">=</span><span class="mf">373.124</span> <span class="n">Ttriple</span><span class="o">=</span><span class="mf">273.16</span> <span class="p">)</span>
+<span class="n">P</span> <span class="o">=</span>     <span class="mi">689476</span>  <span class="n">Pa</span> <span class="p">(</span><span class="n">Pc</span><span class="o">=</span><span class="mf">2.2064e+07</span> <span class="p">)</span>
+<span class="n">D</span> <span class="o">=</span>    <span class="mf">998.199</span>  <span class="n">kg</span><span class="o">/</span><span class="n">m</span><span class="o">^</span><span class="mi">3</span> <span class="p">(</span><span class="n">Dc</span><span class="o">=</span><span class="mi">322</span> <span class="p">)</span>
+<span class="n">E</span> <span class="o">=</span>      <span class="mi">89283</span>  <span class="n">J</span><span class="o">/</span><span class="n">kg</span>
+<span class="n">H</span> <span class="o">=</span>    <span class="mf">89973.7</span>  <span class="n">J</span><span class="o">/</span><span class="n">kg</span>
+<span class="n">S</span> <span class="o">=</span>    <span class="mf">314.765</span>  <span class="n">J</span><span class="o">/</span><span class="n">kg</span><span class="o">/</span><span class="n">K</span>
+<span class="n">Cv</span><span class="o">=</span>    <span class="mf">4149.79</span>  <span class="n">J</span><span class="o">/</span><span class="n">kg</span><span class="o">/</span><span class="n">K</span>
+<span class="n">Cp</span><span class="o">=</span>    <span class="mf">4181.41</span>  <span class="n">J</span><span class="o">/</span><span class="n">kg</span><span class="o">/</span><span class="n">K</span>
+<span class="n">g</span> <span class="o">=</span>    <span class="mf">1.00762</span>  <span class="n">Cp</span><span class="o">/</span><span class="n">Cv</span> <span class="p">(</span><span class="o">-</span><span class="p">)</span>
+<span class="n">A</span> <span class="o">=</span>    <span class="mf">1487.23</span>  <span class="n">m</span><span class="o">/</span><span class="n">s</span>
+<span class="n">V</span> <span class="o">=</span><span class="mf">0.000970479</span>  <span class="n">viscosity</span> <span class="n">Pa</span><span class="o">-</span><span class="n">s</span>
+<span class="n">C</span> <span class="o">=</span>   <span class="mf">0.600621</span>  <span class="n">thermal</span> <span class="n">conductivity</span> <span class="n">W</span><span class="o">/</span><span class="n">m</span><span class="o">/</span><span class="n">K</span>
+<span class="n">MW</span><span class="o">=</span>    <span class="mf">18.0153</span>  <span class="n">g</span><span class="o">/</span><span class="n">mol</span>
+<span class="n">Q</span> <span class="o">=</span>         <span class="o">-</span><span class="mi">1</span>  <span class="n">Vapor</span> <span class="n">Quality</span> <span class="p">(</span><span class="n">mass</span> <span class="n">fraction</span> <span class="n">gas</span><span class="p">)</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="mf">0.00508403</span>  <span class="p">(</span><span class="o">-</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -207,8 +239,9 @@
     <h3><a href="index.html">Table of Contents</a></h3>
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">QuickStart</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pure Fluids</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#state-point">State Point</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#printsiunits">printSIUnits</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#critical-properties">Critical Properties</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#table-of-values">Table of Values</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#td-plot">TD Plot</a></li>
@@ -273,8 +306,8 @@
         <li class="right" >
           <a href="quickstart.html" title="QuickStart"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.10 documentation</a> &#187;</li>
-        <li class="nav-item nav-item-this"><a href="">Examples</a></li> 
+        <li class="nav-item nav-item-0"><a href="index.html">EngCoolProp 0.1.11 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Pure Fluids</a></li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

@@ -24,3 +24,15 @@ else:
 
     #ec_inc.setTP( 600, 600 )
     #ec_inc.printProps()
+
+print( '='*66 )
+
+# printSIUnits
+from engcoolprop.ec_incomp_fluid import EC_Incomp_Fluid
+
+# Create incompressible object. (without specifying state point)
+ec_inc = EC_Incomp_Fluid(symbol="Water", T=500, P=500, Pmax=5000,
+                         auto_fix_value_errors=True, show_warnings=0 )
+
+# Print state point with SI units
+ec_inc.printSIProps() # Print state point at given T,P

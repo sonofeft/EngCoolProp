@@ -130,6 +130,42 @@ Output::
         Psat =         0  psia                        Range(0 - 226.073) psia
 
 
+printSIUnits
+------------
+
+Although EngCoolProp was created to promote English units when using `CoolProp <http://www.coolprop.org/dev/index.html>`_ ,    
+it is often helpful to see properties in SI units.
+
+For that reason, all the EngCoolProp models have a method called **printSIUnits** that will output the State Point with SI units.
+The script below shows the result of calling **printSIUnits**::
+
+    from engcoolprop.ec_incomp_fluid import EC_Incomp_Fluid
+
+    # Create incompressible object. (without specifying state point)
+    ec_inc = EC_Incomp_Fluid(symbol="Water", T=500, P=500, Pmax=5000,
+                            auto_fix_value_errors=True, show_warnings=0 )
+
+    # Print state point with SI units
+    ec_inc.printSIProps() # Print state point at given T,P
+
+Output::
+
+    State Point for fluid INCOMP::Water (Water)
+    T =    277.778  degK,                            Range(     273.15 -      473.15) degK
+    P =3.44738e+06  Pa                               Range(          0 - 3.44738e+07) Pa
+    D =    1002.77  kg/m^3                           Range(    868.966 -     1003.28) kg/m^3
+    E =     -64439  J/kg                             Range(   -84557.2 -      763327) J/kg
+    H =   -61001.1  J/kg                             Range(     -83673 -      780087) J/kg
+    S =   -225.448  J/kg/K                           Range(   -298.514 -     2026.11) J/kg/K
+    Cp=    4181.27  J/kg/K                           Range(    4183.63 -     4462.41) J/kg/K
+    V = 0.00152325  viscosity Pa s                   Range( 0.00013648 -  0.00175873) Pa s
+    C =   0.571088  thermal conductivity W/m/K       Range(   0.561449 -    0.665022) W/m/K
+        Tnbp =    373.171  degK,
+        rho  =    1.00277  g/cm^3                    Range(   0.868967 -     1.00328) g/cm^3
+        Psat =          0  Pa                        Range(          0 - 1.55872e+06) Pa
+
+
+
 Acetone State Point
 -------------------
 

@@ -1,8 +1,8 @@
 
 .. examples
 
-Examples
-========
+Pure Fluids
+===========
 
 State Point
 -----------
@@ -36,7 +36,40 @@ Output::
     MW= 28.0135  lbm/lbmmole
     Q =      -1  Vapor Quality (mass fraction gas)
     Z =0.999722  (-)    
-    
+
+printSIUnits
+------------
+
+Although EngCoolProp was created to promote English units when using `CoolProp <http://www.coolprop.org/dev/index.html>`_ ,    
+it is often helpful to see properties in SI units.
+
+For that reason, all the EngCoolProp models have a method called **printSIUnits** that will output the State Point with SI units.
+The script below shows the result of calling **printSIUnits**::
+
+    from engcoolprop.ec_fluid import EC_Fluid
+    ec = EC_Fluid(symbol="H2O", T=530.0,P=100.0 ) # T=degR, P=psia
+
+    ec.printSIProps() # Print state point at given T,P with SI units
+
+Output::
+
+    State Point for fluid Water (H2O)
+    T =    294.444  degK (Tc=647.096 , Tnbp=373.124 Ttriple=273.16 )
+    P =     689476  Pa (Pc=2.2064e+07 )
+    D =    998.199  kg/m^3 (Dc=322 )
+    E =      89283  J/kg
+    H =    89973.7  J/kg
+    S =    314.765  J/kg/K
+    Cv=    4149.79  J/kg/K
+    Cp=    4181.41  J/kg/K
+    g =    1.00762  Cp/Cv (-)
+    A =    1487.23  m/s
+    V =0.000970479  viscosity Pa-s
+    C =   0.600621  thermal conductivity W/m/K
+    MW=    18.0153  g/mol
+    Q =         -1  Vapor Quality (mass fraction gas)
+    Z = 0.00508403  (-)    
+
 
 Critical Properties
 -------------------

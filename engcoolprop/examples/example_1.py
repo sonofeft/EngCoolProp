@@ -17,3 +17,11 @@ print( ')' )
 print()
 
 print( engcoolprop.ec_fluid.call_tuplesD )
+
+# printSIUnits 
+from engcoolprop.ec_fluid import EC_Fluid
+
+# Print state point
+ec = EC_Fluid(symbol="H2O", T=530.0,P=100.0 ) # T=degR, P=psia
+
+ec.printSIProps() # Print state point at given T,P with SI units

@@ -129,6 +129,42 @@ Output::
         mass%    =         30 base mass percent       Range(0% - 60%)
 
 
+printSIUnits
+------------
+
+Although EngCoolProp was created to promote English units when using `CoolProp <http://www.coolprop.org/dev/index.html>`_ ,    
+it is often helpful to see properties in SI units.
+
+For that reason, all the EngCoolProp models have a method called **printSIUnits** that will output the State Point with SI units.
+The script below shows the result of calling **printSIUnits**::
+
+    from engcoolprop.ec_incomp_soln import EC_Incomp_Soln
+
+    # Create incompressible solution object. (without specifying state point)
+    ec_soln = EC_Incomp_Soln(symbol="MEG-30%", auto_fix_value_errors=True, show_warnings=0)
+
+    # Print state point
+    ec_soln.printSIProps() # Print state point with SI units
+
+
+Output::
+
+    State Point for fluid INCOMP::MEG-30% (MEG-30%)
+    T =    316.111  degK,                        Range(259.13 - 373.15) degK
+    P =6.89476e+06  Pa                           Range(0 - 6.89476e+07) Pa
+    D =    1027.25  kg/m^3                       Range(989.413 - 1048.32) lbm/cuft
+    E =    84948.2  J/kg                         Range(-127968 - 305976) J/kg
+    H =      91660  J/kg                         Range(-124837 - 355176) J/kg
+    S =    279.412  J/kg/K                       Range(-464.25 - 922.192) J/kg/K
+    Cp=    3783.51  J/kg/K                       Range(3614.45 - 3921.54) J/kg/K
+    V = 0.00120391  viscosity Pa s               Range(0.000497664 - 0.00780573) Pa s
+    C =   0.485632  thermal conductivity W/m/K   Range(0.432187 - 0.531059) W/m/K
+        T_freeze =     258.574 degK
+        rho      =     1.02725  g/cm^3           Range(0.989415 - 1.04833) g/cm^3
+        mass%    =          30 base mass percent Range(0% - 60%)
+
+
+
 Making Plots
 ------------
 

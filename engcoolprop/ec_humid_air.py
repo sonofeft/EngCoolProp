@@ -228,6 +228,7 @@ class EC_Humid_Air(object):
         return '%' + '%ig'%max_len, max_len
 
     def printSIProps(self):
+        """Print a multiline property summary with SI units."""
         self.printProps( eng_units=False )
 
     def printProps(self, eng_units=True):

@@ -7,6 +7,10 @@ History
 GitHub Log
 ----------
 
+* March 23, 2025
+    - (by: sonofeft) 
+        - Added printSIUnits to all models
+
 * March 8, 2025
     - (by: sonofeft) 
         - First version including Humid Air from CoolProp

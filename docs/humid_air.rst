@@ -190,11 +190,22 @@ Resulting In::
          Y =   0.0155686 mol water/mol humid air  :: Water mole fraction
          Z =    0.999629   :: Compressibility factor (Z=pv/(RT))
 
-Note that:: 
-    
-    ha.printProps( eng_units=False )
 
-will output SI units.::
+printSIUnits
+------------
+
+Although EngCoolProp was created to promote English units when using `CoolProp <http://www.coolprop.org/dev/index.html>`_ ,    
+it is often helpful to see properties in SI units.
+
+For that reason, all the EngCoolProp models have a method called **printSIUnits** that will output the State Point with SI units.
+The script below shows the result of calling **printSIUnits**::
+
+    from engcoolprop.ec_humid_air import EC_Humid_Air
+    ha = EC_Humid_Air()
+    ha.printSIProps()
+
+
+Output::
 
    +---------------------------------------------------------------------+
    |  ---- State Point for Humid Air (T=298, P=101325, RelHum=0.5) ----  |
