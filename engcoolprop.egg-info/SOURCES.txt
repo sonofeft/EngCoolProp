@@ -15,6 +15,7 @@ engcoolprop/InterpProp_scipy.py
 engcoolprop/__init__.py
 engcoolprop/_version.py
 engcoolprop/banner.py
+engcoolprop/conv_funcs.py
 engcoolprop/coverage.xml
 engcoolprop/ec_fluid.py
 engcoolprop/ec_humid_air.py
@@ -27,6 +28,7 @@ engcoolprop/min_max_results.txt
 engcoolprop/parameter_units.py
 engcoolprop/root_solver.py
 engcoolprop/safe_get_property.py
+engcoolprop/si_object.py
 engcoolprop/utils.py
 engcoolprop.egg-info/PKG-INFO
 engcoolprop.egg-info/SOURCES.txt

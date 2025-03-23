@@ -71,68 +71,18 @@ import os
 from CoolProp.CoolProp import PropsSI
 from CoolProp import AbstractState
 import CoolProp.CoolProp as CP
+from engcoolprop.conv_funcs import (Aeng_fromSI, CondEng_fromSI, CPeng_fromSI, 
+                                    Deng_fromSI, Peng_fromSI, rhoEng_fromRhoSI, Seng_fromSI, 
+                                    Teng_fromSI, UHeng_fromSI, Veng_fromSI)
+from engcoolprop.conv_funcs import (ASI_fromEng, CondSI_fromEng, CPSI_fromEng, 
+                                    DSI_fromEng, PSI_fromEng, rhoSI_fromRhoEng, SSI_fromEng, 
+                                    TSI_fromEng, UHSI_fromEng, VSI_fromEng)
+from engcoolprop.conv_funcs import  EchoInput
+from engcoolprop.si_object import SI_obj
 
 # Q values to indicate all liquid or gas
 Q_LIQUID = 0  # all liquid
 Q_GAS = 1     # all gas
-
-def Deng_fromSI( D ): # 1 lbm/ft^3 = 16.01843417 kg/m^3
-    return D  / 16.01843417
-
-def DSI_fromEng( D ):
-    return D * 16.01843417
-
-def Teng_fromSI( T ):
-    return T * 1.8
-
-def TSI_fromEng( T ):
-    return T / 1.8
-
-def Peng_fromSI( P ):
-    return P / 6894.76
-
-def PSI_fromEng( P ):
-    return P * 6894.76
-
-def UHeng_fromSI( UH ): # 1 BTU/lbm = 2326 J/kg
-    return UH / 2326.0
-
-def UHSI_fromEng( UH ):
-    return UH * 2326.0
-    
-def Seng_fromSI( S ):
-    return S * 0.0002388461111111111
-
-def SSI_fromEng( S ):
-    return S / 0.0002388461111111111
-
-def CPeng_fromSI( S ):
-    return S * 0.0002388461111111111
-
-def CPSI_fromEng( S ):
-    return S / 0.0002388461111111111
-
-def Aeng_fromSI( A ):
-    return A * 3.28084
-    
-def ASI_fromEng( A ):
-    return A / 3.28084
-
-def Veng_fromSI( V ):
-    # AS.viscosity() returns Pa*s
-    return V * 0.6719689751 # convert from Pa*s to lbm/ft/sec
-    
-def VSI_fromEng( V ):
-    return V / 0.6719689751
-
-def CondEng_fromSI( Cond ):
-    return Cond * 0.578176
-
-def CondSI_fromEng( Cond ):
-    return Cond / 0.578176
-
-def EchoInput( x ):
-    return x
 
 # ========== build up generic call logic for "setProps" =============
 # (i.e. discover which input pairs are supported in T,P,D,Q,S,H,E)
@@ -421,7 +371,7 @@ class EC_Fluid(object):
         self.sonicV = Aeng_fromSI( AS.speed_sound() )
         
         try:
-            self.Visc = Veng_fromSI( AS.viscosity() ) * 1.0E5
+            self.Visc = Veng_fromSI( AS.viscosity() ) # multiply only for display * 1.0E5
         except:
             self.Visc = 0.0
         try:
@@ -697,8 +647,9 @@ class EC_Fluid(object):
 
     def getStrTransport(self):
         '''create a string from the Transport properties'''
+        Visc = self.Visc * 1.0E5
         return  "%s Cp=%6g Cv=%6g gamma=%.4f Visc=%6g ThCond=%6g" %\
-        (self.symbol,self.Cp, self.Cv, self.gamma(), self.Visc, self.Cond)
+        (self.symbol,self.Cp, self.Cv, self.gamma(), Visc, self.Cond)
 
     def getStrTPD(self):
         '''create a string from the TPDEHS properties'''
@@ -828,6 +779,8 @@ class EC_Fluid(object):
             print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=%8g"%self.Tnbp, "Ttriple=%8g"%self.Ttriple,")", sep=' ')
         else:
             print("T =%8g"%self.T," degR (Tc=%8g"%self.Tc,", Tnbp=N/A", "Ttriple=%8g"%self.Ttriple,")", sep=' ')
+
+        Visc = self.Visc * 1.0E5
             
         print("P =%8g"%self.P," psia (Pc=%8g"%self.Pc,")", sep=' ')
         print("D =%8g"%self.D," lbm/cu ft (Dc=%8g"%self.Dc,")", sep=' ')
@@ -838,11 +791,42 @@ class EC_Fluid(object):
         print("Cp=%8g"%self.Cp," BTU/lbm degR", sep=' ')
         print("g =%8g"%self.gamma()," Cp/Cv (-)", sep=' ')
         print("A =%8g"%self.sonicV," ft/sec", sep=' ')
-        print("V =%8g"%self.Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
+        print("V =%8g"%Visc," viscosity [1.0E5 * lbm/ft-sec]", sep=' ')
         print("C =%8g"%self.Cond," thermal conductivity [BTU/ft-hr-R]", sep=' ')
         print("MW=%8g"%self.WtMol," lbm/lbmmole", sep=' ')
         print("Q =%8g"%self.Q," Vapor Quality (mass fraction gas)", sep=' ')
         print("Z =%8g"%self.Z," (-)", sep=' ')
+
+    def printSIProps(self):
+        '''print a multiline property summary with SI units'''
+
+        ec_fluidL = ['Cond', 'Cp', 'Cv', 'D', 'Dc', 'E', 'gamma', 'good_nbp', 'H', 'name', 
+            'P', 'Pc', 'Q', 'S', 'sonicV', 'symbol', 'T', 'Tc', 'Tnbp', 'Ttriple', 
+            'Visc', 'WtMol', 'Z']
+
+        si_obj = SI_obj( self, ec_fluidL)
+
+
+        print("State Point for fluid",self.name,"("+self.symbol+")")
+        if self.good_nbp:
+            print("T =%s"%si_obj.T," degK (Tc=%s"%si_obj.Tc.strip(),", Tnbp=%s"%si_obj.Tnbp.strip(), "Ttriple=%s"%si_obj.Ttriple.strip(),")")
+        else:
+            print("T =%s"%si_obj.T," degK (Tc=%s"%si_obj.Tc.strip(),", Tnbp=N/A", "Ttriple=%s"%si_obj.Ttriple.strip(),")")
+            
+        print("P =%s"%si_obj.P," Pa (Pc=%s"%si_obj.Pc.strip(),")")
+        print("D =%s"%si_obj.D," kg/m^3 (Dc=%s"%si_obj.Dc.strip(),")")
+        print("E =%s"%si_obj.E," J/kg")
+        print("H =%s"%si_obj.H," J/kg")
+        print("S =%s"%si_obj.S," J/kg/K")
+        print("Cv=%s"%si_obj.Cv," J/kg/K")
+        print("Cp=%s"%si_obj.Cp," J/kg/K")
+        print("g =%s"%si_obj.gamma," Cp/Cv (-)")
+        print("A =%s"%si_obj.sonicV," m/s")
+        print("V =%s"%si_obj.Visc," viscosity Pa-s")
+        print("C =%s"%si_obj.Cond," thermal conductivity W/m/K")
+        print("MW=%s"%si_obj.WtMol," g/mol")
+        print("Q =%s"%si_obj.Q," Vapor Quality (mass fraction gas)")
+        print("Z =%s"%si_obj.Z," (-)")
 
     def compressibility(self):
         '''returns Z'''
@@ -851,7 +835,7 @@ class EC_Fluid(object):
     def dH_FromHZero(self):
         return self.H - self.Href
 
-if __name__ == '__main__':
+def dev_tests():
     
     C = EC_Fluid( symbol='CO2' )
     
@@ -933,4 +917,10 @@ if __name__ == '__main__':
         print('dHvap=%g at P=%g'%(dH,P) )
     
     
-    
+    print('_'*55)
+    C = EC_Fluid( symbol='H2O' )
+    C.setTP( 534.67, 14.6959 )
+    C.printSIProps()
+
+if __name__ == '__main__':
+    dev_tests()
