@@ -3,10 +3,10 @@
 # =========== Use these import statements for conversion functions ============
 
 from engcoolprop.conv_funcs import (Aeng_fromSI, CondEng_fromSI, CPeng_fromSI, 
-                                    Deng_fromSI, Peng_fromSI, Seng_fromSI, 
+                                    Deng_fromSI, Peng_fromSI, rhoEng_fromRhoSI, Seng_fromSI, 
                                     Teng_fromSI, UHeng_fromSI, Veng_fromSI)
 from engcoolprop.conv_funcs import (ASI_fromEng, CondSI_fromEng, CPSI_fromEng, 
-                                    DSI_fromEng, PSI_fromEng, SSI_fromEng, 
+                                    DSI_fromEng, PSI_fromEng, rhoSI_fromRhoEng, SSI_fromEng, 
                                     TSI_fromEng, UHSI_fromEng, VSI_fromEng)
 from engcoolprop.conv_funcs import  EchoInput
 
@@ -55,6 +55,14 @@ def Peng_fromSI( P ):
 def PSI_fromEng( P ):
     """Return Pa from psia"""
     return P * 6894.76
+
+def rhoEng_fromRhoSI( rho ):
+    """Return lbm/cuin from  g/cm^3"""
+    return rho / 27.679905
+
+def rhoSI_fromRhoEng( rho ):
+    """Return g/cm^3 from lbm/cuin"""
+    return rho * 27.679905
     
 def Seng_fromSI( S ):
     """Return BTU/lbm degR from J/kg/K"""

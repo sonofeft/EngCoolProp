@@ -72,10 +72,10 @@ from CoolProp.CoolProp import PropsSI
 from CoolProp import AbstractState
 import CoolProp.CoolProp as CP
 from engcoolprop.conv_funcs import (Aeng_fromSI, CondEng_fromSI, CPeng_fromSI, 
-                                    Deng_fromSI, Peng_fromSI, Seng_fromSI, 
+                                    Deng_fromSI, Peng_fromSI, rhoEng_fromRhoSI, Seng_fromSI, 
                                     Teng_fromSI, UHeng_fromSI, Veng_fromSI)
 from engcoolprop.conv_funcs import (ASI_fromEng, CondSI_fromEng, CPSI_fromEng, 
-                                    DSI_fromEng, PSI_fromEng, SSI_fromEng, 
+                                    DSI_fromEng, PSI_fromEng, rhoSI_fromRhoEng, SSI_fromEng, 
                                     TSI_fromEng, UHSI_fromEng, VSI_fromEng)
 from engcoolprop.conv_funcs import  EchoInput
 from engcoolprop.si_object import SI_obj

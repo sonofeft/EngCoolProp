@@ -1,13 +1,9 @@
 
 from engcoolprop.conv_funcs import (ASI_fromEng, CondSI_fromEng, CPSI_fromEng, 
-                                    DSI_fromEng, PSI_fromEng, SSI_fromEng, 
+                                    DSI_fromEng, PSI_fromEng, rhoSI_fromRhoEng, SSI_fromEng, 
                                     TSI_fromEng, UHSI_fromEng, VSI_fromEng)
 from engcoolprop.conv_funcs import  EchoInput
 from engcoolprop.parameter_units import si_unitsD
-
-def rhoSI_fromRhoEng( rho ):
-    """Return g/cm^3 from lbm/cuin"""
-    return rho * 27.679905
     
 # map SI from Engineering conversion functions for each of the fluid properties
 toSI_callD = {} # index=eng prop name, value=conversion func (e.g. SSI_fromEng)
